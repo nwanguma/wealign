@@ -27,7 +27,7 @@ const Input: React.FC<InputProps> = ({
         onChange={onChange}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(value !== "")}
-        className="block py-4 rounded-2xl pl-4 w-full text-sm text-gray-900 bg-gray-100 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer"
+        className="block py-4 rounded-xl pl-4 w-full text-sm text-gray-900 bg-gray-100 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer"
         placeholder=" "
       />
       <label

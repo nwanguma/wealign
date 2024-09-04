@@ -1,41 +1,44 @@
-// app/page.tsx
-
-import React from "react";
-import Head from "next/head";
-import { Inter } from "next/font/google";
-import { useRouter } from "next/navigation";
-
-const inter = Inter({ subsets: ["latin"] });
-
-const Page: React.FC = () => {
-  const router = useRouter();
-
-  // Handler for a sample button click
-  const handleClick = () => {
-    router.push("/another-page"); // Navigate to another page
-  };
-
+export default function Dashboard() {
   return (
-    <>
-      <Head>
-        <title>Page Title</title>
-        <meta name="description" content="Page description goes here." />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
-      <main className={`min-h-screen p-6 ${inter.className}`}>
-        <h1 className="text-3xl font-bold mb-4">Welcome to the Page</h1>
-        <p className="text-lg mb-6">
-          This is a boilerplate page. Customize this content to fit your needs.
-        </p>
-        <button
-          onClick={handleClick}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Go to Another Page
-        </button>
-      </main>
-    </>
-  );
-};
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar */}
+      <aside className="w-1/4 bg-white p-4 border-r border-gray-200">
+        <div className="space-y-4">
+          <div className="font-bold text-xl">Twitter Clone</div>
+        </div>
+      </aside>
 
-export default Page;
+      {/* Main Feed */}
+      <main className="w-1/2 bg-white p-8">
+        <div className="font-bold text-2xl mb-4">Home</div>
+        <div className="space-y-4">
+          <div className="bg-gray-100 p-4 rounded-lg">
+            <p className="text-gray-700">What's happening?</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <p className="font-bold">User Name</p>
+            <p className="text-gray-600">This is a tweet-like post.</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <p className="font-bold">User Name</p>
+            <p className="text-gray-600">This is another tweet-like post.</p>
+          </div>
+        </div>
+      </main>
+
+      {/* Right Sidebar */}
+      <aside className="w-1/4 bg-white p-4 border-l border-gray-200">
+        <div className="space-y-4">
+          <div className="bg-gray-100 p-4 rounded-lg">
+            <p className="font-bold">Trends for you</p>
+            <ul className="space-y-2">
+              <li className="text-blue-500 hover:underline">#TrendingTopic1</li>
+              <li className="text-blue-500 hover:underline">#TrendingTopic2</li>
+              <li className="text-blue-500 hover:underline">#TrendingTopic3</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+}

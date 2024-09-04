@@ -11,9 +11,7 @@ const LoginPage: React.FC = () => {
   return (
     <div className="w-full">
       <div className="space-y-3 p-4 text-center">
-        <div className="font-sans-heading text-5xl font-bold text-black">
-          Hi there!
-        </div>
+        <div className="text-5xl font-bold text-black">Hi there!</div>
         <p className="text-gray-400">
           Welcome to Talent Hunt. Community Dashboard
         </p>

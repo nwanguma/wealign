@@ -8,8 +8,14 @@ interface SideColumnProps {
 
 const SideColumn: React.FC<SideColumnProps> = ({ imageSrc, altText }) => {
   return (
-    <div className="bg-purple-600">
-      <Image src={imageSrc} alt={altText} width={400} height={400} />
+    <div className="relative w-full h-screen">
+      <Image
+        src={imageSrc}
+        alt={altText}
+        fill={true}
+        quality={100}
+        style={{ objectFit: "cover" }}
+      />
     </div>
   );
 };

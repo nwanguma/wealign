@@ -1,9 +1,6 @@
 import React from "react";
-import { Inter } from "next/font/google"; // placeholder font import
-import Image from "next/image";
-import Link from "next/link";
 
-const inter = Inter({ subsets: ["latin"] });
+import AuthSideColumn from "@/components/ui/AuthSideColumn";
 
 export default function AuthLayout({
   children,
@@ -12,18 +9,17 @@ export default function AuthLayout({
 }) {
   return (
     <div className="w-full h-screen bg-[#f7f7f7]">
-      <header className="py-2 px-6">
-        <Image
-          src="/icons/google.svg"
-          width={40}
-          height={30}
-          alt="Talent hunt logo"
-        />
-      </header>
-      <main>{children}</main>
-      <footer className="py-2 px-6 text text-gray-500 bg-[#f7f7f7]">
-        <Link href="/privacy">Privacy Policy</Link>
-      </footer>
+      <main className="w-full flex">
+        <div className="flex-1 flex justify-center items-center px-14">
+          {children}
+        </div>
+        <div className="w-1/2">
+          <AuthSideColumn
+            imageSrc="/images/auth-illustration.jpg"
+            altText="Illustration"
+          />
+        </div>
+      </main>
     </div>
   );
 }

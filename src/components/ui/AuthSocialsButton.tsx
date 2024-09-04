@@ -11,7 +11,7 @@ const AuthSocialsButton: React.FC<IAuthSocialButtonProps> = ({
   text,
 }) => {
   return (
-    <div className="bg-white rounded-3xl flex justify-center items-center text-black py-4 space-x-2">
+    <div className="bg-white rounded-xl flex justify-center items-center text-black py-3 space-x-2">
       <div>
         <Image src={logoUrl} alt="logo" width={28} height={28} />
       </div>
