@@ -10,7 +10,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["Nunito", "sans-serif"],
-        "sans-heading": ["Rubik", "sans-serif"],
+        "sans-heading": ["Roboto", "sans-serif"],
       },
     },
   },

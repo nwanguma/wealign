@@ -10,8 +10,8 @@ export default function AuthLayout({
   return (
     <div className="w-full h-screen bg-[#f7f7f7]">
       <main className="w-full flex">
-        <div className="flex-1 flex justify-center items-center px-14">
-          {children}
+        <div className="flex-1 flex justify-center items-center">
+          <div className="w-2/3">{children}</div>
         </div>
         <div className="w-1/2">
           <AuthSideColumn

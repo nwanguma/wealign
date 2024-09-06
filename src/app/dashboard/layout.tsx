@@ -10,36 +10,35 @@ export default function AuthLayout({
   return (
     <div className="w-full h-screen bg-[#f7f7f7]">
       <header className="w-full font-light text-gray-600">
-        <nav className="flex justify-between items-center px-6 py-6 bg-white">
+        <nav className="flex justify-between items-center px-6 h-14 bg-white">
           <ul className="flex space-x-4 items-center">
             <li className="hover:scale-110 transform transition duration-300">
               <Link href="/home">
                 <Image
-                  src="/icons/google.svg"
+                  src="/icons/th-logo.svg"
                   alt="home"
-                  width={24}
-                  height={24}
+                  width={100}
+                  height={50}
                   className="hover:opacity-80 transition duration-300"
                 />
               </Link>
             </li>
           </ul>
-
           <ul className="flex text-sm text-gray-700">
-            {["Profiles", "Projects", "Events", "Jobs", "Things"].map(
+            {["Profiles", "Projects", "Events", "FAQ"].map(
               (linkText, index) => (
                 <li key={index} className="relative group">
                   <Link
-                    href={`/${linkText.toLowerCase()}`}
-                    className="px-8 py-2 hover:text-blue-500 hover:font-medium transition duration-300"
+                    href={`/dashboard/${linkText.toLowerCase()}`}
+                    className="px-8 py-2 border border-transparent rounded-lg group-hover:border-blue-700 group-hover:text-blue-700 group-hover:font-normal group-hover:bg-blue-50 transition-all duration-300 ease-in-out delay-150"
                   >
                     {linkText}
                   </Link>
-                  <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                 </li>
               )
             )}
           </ul>
+
           <ul className="flex space-x-6 items-center">
             {[
               { src: "/icons/notifications.svg", alt: "notifications" },
@@ -63,11 +62,11 @@ export default function AuthLayout({
             ))}
           </ul>
         </nav>
-        <div className="px-6 py-4 bg-white border-t border-b border-gray-200">
+        <div className="px-6 h-14 flex items-center bg-white border-t border-b border-gray-200">
           <input
             type="text"
             placeholder="Search..."
-            className="w-full max-w-lg px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full max-w-lg px-4 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </header>

@@ -1,15 +1,7 @@
 export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-1/4 bg-white p-4 border-r border-gray-200">
-        <div className="space-y-4">
-          <div className="font-bold text-xl">Twitter Clone</div>
-        </div>
-      </aside>
-
-      {/* Main Feed */}
-      <main className="w-1/2 bg-white p-8">
+      <div className="w-1/2 bg-white p-8">
         <div className="font-bold text-2xl mb-4">Home</div>
         <div className="space-y-4">
           <div className="bg-gray-100 p-4 rounded-lg">
@@ -24,9 +16,7 @@ export default function Dashboard() {
             <p className="text-gray-600">This is another tweet-like post.</p>
           </div>
         </div>
-      </main>
-
-      {/* Right Sidebar */}
+      </div>
       <aside className="w-1/4 bg-white p-4 border-l border-gray-200">
         <div className="space-y-4">
           <div className="bg-gray-100 p-4 rounded-lg">
