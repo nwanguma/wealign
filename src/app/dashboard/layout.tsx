@@ -1,16 +1,29 @@
-import React from "react";
+"use client";
+
+import { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation"; // Get the current route
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import NotificationIcon from "@/components/ui/NotificationIcon";
+import ProfileIcon from "@/components/ui/ProfileIcon";
+import MessageIcon from "@/components/ui/MessageIcon";
+
+export default function AuthLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname(); // Get the current path
+
+  const links = [
+    { name: "Home", href: "/dashboard" },
+    { name: "Profiles", href: "/dashboard/profiles" },
+    { name: "Projects", href: "/dashboard/projects" },
+    { name: "Events", href: "/dashboard/events" },
+  ];
+
   return (
     <div className="w-full h-screen bg-[#f7f7f7]">
-      <header className="w-full font-light text-gray-600">
+      <header className="w-full font-light text-gray-600 border-b border-gray-200">
         <nav className="flex justify-between items-center px-6 h-14 bg-white">
+          {/* Logo */}
           <ul className="flex space-x-4 items-center">
             <li className="hover:scale-110 transform transition duration-300">
               <Link href="/home">
@@ -24,55 +37,55 @@ export default function AuthLayout({
               </Link>
             </li>
           </ul>
-          <ul className="flex text-sm text-gray-700">
-            {["Profiles", "Projects", "Events", "FAQ"].map(
-              (linkText, index) => (
-                <li key={index} className="relative group">
-                  <Link
-                    href={`/dashboard/${linkText.toLowerCase()}`}
-                    className="px-8 py-2 border border-transparent rounded-lg group-hover:border-blue-700 group-hover:text-blue-700 group-hover:font-normal group-hover:bg-blue-50 transition-all duration-300 ease-in-out delay-150"
-                  >
-                    {linkText}
-                  </Link>
-                </li>
-              )
-            )}
-          </ul>
 
-          <ul className="flex space-x-6 items-center">
-            {[
-              { src: "/icons/notifications.svg", alt: "notifications" },
-              { src: "/icons/messages.svg", alt: "messages" },
-              { src: "/icons/profile.svg", alt: "profile" },
-            ].map((icon, index) => (
-              <li
-                key={index}
-                className="hover:rotate-12 transform transition duration-300"
-              >
-                <Link href={`/${icon.alt}`}>
-                  <Image
-                    src={icon.src}
-                    alt={icon.alt}
-                    width={24}
-                    height={24}
-                    className="hover:opacity-80 transition duration-300 hover:filter hover:brightness-0 hover:sepia hover:saturate-[10000%] hover:hue-rotate-[180deg]"
-                  />
+          {/* Menu Links */}
+          <ul className="flex text-sm text-gray-700">
+            {links.map((link) => (
+              <li key={link.href} className="relative group">
+                <Link
+                  href={link.href}
+                  className={`px-8 py-2 border-b ${
+                    pathname === link.href
+                      ? "border-violet-700 text-violet-700 font-semibold"
+                      : "border-transparent group-hover:border-b-violet-700 group-hover:text-violet-700 group-hover:font-normal"
+                  } transition-all duration-300 ease-in-out delay-150`}
+                >
+                  {link.name}
                 </Link>
               </li>
             ))}
           </ul>
+
+          {/* Icons: Notifications, Messages, Profile */}
+          <ul className="flex space-x-6 items-center">
+            <li>
+              <NotificationIcon />
+            </li>
+            <li>
+              {/* <MessageIcon /> */}
+              <Link href="/dashboard/messages">
+                <Image
+                  src="/icons/messages.svg"
+                  alt="messages"
+                  width={24}
+                  height={24}
+                  className="cursor-pointer"
+                />
+              </Link>
+            </li>
+            <li>
+              <ProfileIcon />
+            </li>
+          </ul>
         </nav>
-        <div className="px-6 h-14 flex items-center bg-white border-t border-b border-gray-200">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full max-w-lg px-4 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
       </header>
-      <main className="">
+
+      {/* Main Content */}
+      <main className="min-h-screen">
         <div>{children}</div>
       </main>
+
+      {/* Footer */}
       <footer className="text-center py-4 bg-gray-100">
         <p className="text-sm text-gray-500">This is the footer</p>
       </footer>
