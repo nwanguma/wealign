@@ -1,0 +1,24 @@
+[
+  {
+    "first_name": "Childish",
+    "last_name": "Gambinos",
+    "avatar": "https://example.com/avatar.jpg",
+    "bio": "Software developer with 5+ years of experience in web development.",
+    "location": "San Francisco, CA",
+    "phone": "+1234567890",
+    "website": "https://childishgambino.com",
+    "linkedin": "https://linkedin.com/in/childish-gambino",
+    "github": "https://github.com/childish-gambino",
+    "resume": "https://example.com/resume.pdf",
+    "visibilityStatus": "public",
+    "languages": ["english", "spanish"],
+    "skills": [
+      {
+        "title": "html"
+      },
+      {
+        "title": "css"
+      }
+    ]
+  }
+]

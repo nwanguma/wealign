@@ -27,7 +27,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/types/app/auth/register/page.tsx",
-    ".next/types/app/auth/login/page.tsx"
+    ".next/types/app/auth/login/page.tsx",
+    "src/app/dashboard/events/[id]"
   ],
   "exclude": ["node_modules"]
 }

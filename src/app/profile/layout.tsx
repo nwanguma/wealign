@@ -36,6 +36,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
               </Link>
             </li>
           </ul>
+
           <ul className="flex text-sm text-gray-700">
             {links.map((link) => (
               <li key={link.href} className="relative group">

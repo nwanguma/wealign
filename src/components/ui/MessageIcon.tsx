@@ -1,4 +1,4 @@
-"use client"; // Mark this as a client component
+"use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -7,7 +7,6 @@ export default function ProfileIcon() {
   const [isMessageOpen, setIsMessageOpen] = useState(false);
   const messageRef = useRef<HTMLDivElement>(null);
 
-  // Close the modal when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (

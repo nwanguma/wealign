@@ -1,0 +1,54 @@
+[
+  {
+    "id": "2a54a2ad-de2e-4a2e-98df-e631a3eeb910",
+    "title": "Tech Conference 2024",
+    "description": "An annual conference showcasing the latest in technology and innovation.",
+    "website": "https://techconference2024.com",
+    "ticket_link": "https://techconference2024.com/tickets",
+    "views": 0,
+    "banner": "https://techconference2024.com/banner.jpg",
+    "event_start_date": "2024-09-15T09:00:00.000Z",
+    "event_end_date": "2024-09-17T18:00:00.000Z",
+    "created_at": "2024-08-25T19:38:31.423Z",
+    "owner": null
+  },
+  {
+    "id": "03df44c6-c3cd-4f07-b033-c5c5a70fe6d8",
+    "title": "Tech Conference 2024",
+    "description": "An annual conference showcasing the latest in technology and innovation.",
+    "website": "https://techconference2024.com",
+    "ticket_link": "https://techconference2024.com/tickets",
+    "views": 0,
+    "banner": "https://techconference2024.com/banner.jpg",
+    "event_start_date": "2024-09-15T09:00:00.000Z",
+    "event_end_date": "2024-09-17T18:00:00.000Z",
+    "created_at": "2024-08-25T19:35:49.965Z",
+    "owner": null
+  },
+  {
+    "id": "b368a6d1-689e-4666-9e74-4f4c880cac5f",
+    "title": "Tech Conference 2024",
+    "description": "An annual conference showcasing the latest in technology and innovation.",
+    "website": "https://techconference2024.com",
+    "ticket_link": "https://techconference2024.com/tickets",
+    "views": 0,
+    "banner": "https://techconference2024.com/banner.jpg",
+    "event_start_date": "2024-09-15T09:00:00.000Z",
+    "event_end_date": "2024-09-17T18:00:00.000Z",
+    "created_at": "2024-08-25T19:12:07.641Z",
+    "owner": null
+  },
+  {
+    "id": "d4320cc2-dbba-4105-8e1b-599c851cbd82",
+    "title": "Tech Conference 2024",
+    "description": "An annual conference showcasing the latest in technology and innovation.",
+    "website": "https://techconference2024.com",
+    "ticket_link": "https://techconference2024.com/tickets",
+    "views": 0,
+    "banner": "https://techconference2024.com/banner.jpg",
+    "event_start_date": "2024-09-15T09:00:00.000Z",
+    "event_end_date": "2024-09-17T18:00:00.000Z",
+    "created_at": "2024-08-25T19:10:32.712Z",
+    "owner": null
+  }
+]
