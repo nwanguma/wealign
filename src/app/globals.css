@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@100;200;300;400;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,14 +9,6 @@
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 }
-
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-} */
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -30,4 +24,87 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Quill Editor Base Styles */
+.custom-quill {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 0.8rem !important;
+}
+
+.custom-quill:hover {
+  border-color: #9ca3af !important;
+}
+
+.custom-quill:active,
+.custom-quill:focus-within {
+  border-color: rgba(0, 38, 255, 0.638) !important;
+  outline: none; /* Remove the default browser outline, if desired */
+}
+
+.custom-quill .ql-container {
+  border: 0px !important;
+  border-bottom-left-radius: 1rem !important;
+  border-bottom-right-radius: 1rem !important;
+}
+
+.custom-quill .ql-editor {
+  min-height: 150px !important;
+  font-family: "Nunito", "sans-serif" !important;
+  font-weight: 100 !important;
+  color: #4b5563 !important;
+  font-size: 15px !important;
+}
+
+.custom-quill .ql-editor.ql-blank::before {
+  color: #9ca3af !important;
+  content: attr(data-placeholder) !important;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 300 !important;
+  position: absolute;
+  font-style: normal;
+}
+
+/* Toolbar Styles */
+.custom-quill .ql-toolbar {
+  border: none !important;
+  border-bottom: 1px solid #e3e9f0 !important;
+  border-radius: 0;
+}
+
+.custom-quill .ql-toolbar button {
+  background-color: #eceff3 !important;
+  font-weight: 100 !important;
+  margin-right: 4px;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: none;
+}
+
+.custom-quill .ql-toolbar button:hover {
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.custom-quill .ql-picker-label {
+  background-color: #eceff3;
+  border-radius: 5px;
+  border-color: transparent !important;
+}
+
+.custom-quill .ql-picker-label:active {
+  border: none !important;
+}
+
+.custom-quill .ql-picker-label::before {
+  color: #4b4463 !important;
+  font-weight: 400 !important;
+  font-family: "Nunito", "sans-serif" !important;
+  font-size: 0.9rem;
+}
+
+/* Custom Styling for Links, Strong Text, and Paragraphs */
+.custom-quill .ql-editor p {
+  margin: 0;
 }

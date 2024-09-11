@@ -224,15 +224,34 @@ export const EventCardMain: React.FC<IEventCardProps> = ({
                 <div className="border border-gray-300 p-1 rounded-full">
                   <Image
                     src="/images/test-avatar-3.jpg"
-                    width={30}
-                    height={30}
+                    width={35}
+                    height={35}
                     alt="avatar"
                     className="rounded-full"
                   />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-gray-500">{comment.author}</p>
-                  <p className="text-gray-700 text-sm">{comment.text}</p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-xs text-gray-500 font-normal">
+                      {comment.author}
+                    </p>
+                    <span
+                      className="inline-block w-0.5 h-0.5 rounded-full bg-gray-900"
+                      style={{ width: "3px", height: "3px" }}
+                    ></span>
+                    <span
+                      className="text-xs text-gray-500"
+                      style={{ fontSize: "11px" }}
+                    >
+                      30th Jul 2024
+                    </span>
+                  </div>
+                  <p
+                    className="text-gray-800 text-xs"
+                    style={{ fontSize: "13px" }}
+                  >
+                    {comment.text}
+                  </p>
                 </div>
               </div>
               <div className="text-xs">

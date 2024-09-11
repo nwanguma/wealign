@@ -282,19 +282,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-      {/* <AppModal
-        title="This is the title"
-        isOpen={true}
-        onClose={() => console.log("closed")}
-      > */}
-      {/* <AddEventForm /> */}
-
-      {/* <CreateProjectForm /> */}
-
-      {/* <UpdateProfileForm /> */}
-      {/* <AccountSettings /> */}
-      {/* </AppModal> */}
-      {/* <CustomForm /> */}
     </div>
   );
 }

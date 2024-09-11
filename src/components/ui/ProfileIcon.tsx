@@ -39,7 +39,6 @@ export default function ProfileIcon() {
           <div className="p-4">
             <div className="pb-2 border-b border-gray-200 flex space-x-1 items-center">
               <p className="text-sm font-bold">Profile</p>
-              <Image src="/icons/person.svg" alt="" width={11} height={11} />
             </div>
             <ul className="mt-2 text-sm text-gray-600 space-y-2">
               <li className="p-2 bg-slate-50 rounded-lg flex items-start space-x-2">

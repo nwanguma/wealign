@@ -9,6 +9,8 @@ import { Event, Project } from "../constants";
 import eventsData from "../constants/events.json";
 import projectsData from "../constants/projects.json";
 
+import UpdateProfileForm from "@/components/forms/UpdateProfileForm";
+
 interface IEventCardProps {
   id: string;
   date: string;
@@ -601,7 +603,7 @@ const MainFeed: React.FC = () => {
             </div>
           </div>
           <div className="p-4 bg-white rounded-lg border border-gray-300">
-            <h3 className="font-semibold mb-3 text-gray-700 text-base">
+            <h3 className="font-semibold mb-3 w-7 text-gray-700 text-base">
               Who to Follow
             </h3>
             <div className="space-y-4">
@@ -614,6 +616,21 @@ const MainFeed: React.FC = () => {
           </div>
         </aside>
       </div>
+      {/* <div className="w-full">
+        <AppModal
+          isOpen={true}
+          width="w-5/12"
+          onClose={() => console.log("closed")}
+        > */}
+      {/* <AddEventForm /> */}
+
+      {/* <CreateProjectForm /> */}
+
+      {/* <UpdateProfileForm /> */}
+      {/* <AccountSettings /> */}
+      {/* <CustomForm /> */}
+      {/* </AppModal>
+      </div> */}
     </div>
   );
 };

@@ -46,7 +46,7 @@ const AddEventForm: React.FC = () => {
     });
 
   return (
-    <form className="space-y-6 p-6 bg-white rounded-lg shadow-md max-w-4xl mx-auto">
+    <form className="space-y-6 p-6 bg-white max-w-4xl mx-auto">
       {/* Event Name */}
       <div>
         <label className="block text-gray-700">Event Name</label>
