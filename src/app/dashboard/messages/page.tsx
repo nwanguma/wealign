@@ -4,9 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import io, { Socket } from "socket.io-client";
 import Image from "next/image";
 
-import { ProfilePreviewCard } from "../page";
-
-import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
+import { ProfilePreviewCard } from "@/components/ui/ProfileCard";
 
 interface Message {
   content: string;
@@ -349,9 +347,9 @@ export default function MessagesPage() {
                         <path
                           d="M22 2L2 8.66667L11.5833 12.4167M22 2L15.3333 22L11.5833 12.4167M22 2L11.5833 12.4167"
                           stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         />
                       </svg>
                     </button>

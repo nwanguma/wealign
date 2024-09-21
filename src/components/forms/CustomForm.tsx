@@ -25,7 +25,6 @@ export default function FintechForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form data submitted:", formData);
   };
 
   return (

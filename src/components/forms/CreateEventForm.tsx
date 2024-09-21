@@ -1,154 +1,303 @@
-import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Select from "react-select";
-import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import dynamic from "next/dynamic";
+import React, { useState } from "react";
+import { useForm, FormProvider, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
-import "tailwindcss/tailwind.css";
+import NativeSelect from "./NativeSelectComponent";
+import ReactSelectComponent from "./ReactSelectComponent";
 
-interface PersonOption {
-  value: string;
-  label: string;
-}
+import Image from "next/image";
 
-const AddEventForm: React.FC = () => {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [description, setDescription] = useState<string>("");
-  const [selectedPeople, setSelectedPeople] = useState<PersonOption[]>([]);
-  const [banner, setBanner] = useState<File | null>(null);
-  const [documents, setDocuments] = useState<File[]>([]);
+import Input from "./Input";
 
-  const peopleOptions: PersonOption[] = [
-    { value: "1", label: "John Doe" },
-    { value: "2", label: "Jane Smith" },
+import "react-quill/dist/quill.snow.css";
+// import "tailwindcss/tailwind.css";
+
+import "../../app/globals.css";
+
+// {
+//   "title": "The new conference in town",
+//   "description": "An annual conference showcasing the latest in technology and innovation.",
+//   "website": "https://techconference2024.com",
+//   "banner": "https://techconference2024.com/banner.jpg",
+//   "ticket_link": "https://techconference2024.com/tickets",
+//   "event_start_date": "2024-09-15T09:00:00Z",
+//   "event_end_date": "2024-09-17T18:00:00Z"
+// }
+
+// Dynamically import ReactQuill to disable SSR
+const ReactQuill = dynamic(() => import("react-quill"), {
+  ssr: false,
+  loading: () => (
+    <div className="quill-skeleton h-48 border border-gray-300 rounded-lg"></div>
+  ),
+});
+const schema = yup.object().shape({
+  first_name: yup
+    .string()
+    .required("First name is required")
+    .min(2, "Must be at least 2 characters"),
+  last_name: yup
+    .string()
+    .required("Last name is required")
+    .min(2, "Must be at least 2 characters"),
+  location: yup.string().required("Location is required"),
+  phone: yup
+    .string()
+    .matches(
+      /^\+\d{1,14}$/,
+      "Phone number must be in international format (+1234567890)"
+    ),
+  website: yup.string().url("Must be a valid URL"),
+  linkedin: yup.string().url("Must be a valid URL"),
+  github: yup.string().url("Must be a valid URL"),
+  resume: yup.string().url("Must be a valid URL"),
+  bio: yup
+    .string()
+    .required("Bio is required")
+    .min(10, "Bio must be at least 10 characters"),
+  avatar: yup.mixed().required("Avatar is required"),
+});
+
+const UpdateProfileForm: React.FC = () => {
+  const methods = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const {
+    control,
+    watch,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = methods;
+
+  const [bio, setBio] = useState<string>("");
+  const [selectedLanguages, setSelectedLanguages] = useState<any[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<any[]>([]);
+  const [visibilityStatus, setVisibilityStatus] = useState<
+    "public" | "private"
+  >("public");
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+
+  const languagesOptions = [
+    { value: "english", label: "English" },
+    { value: "spanish", label: "Spanish" },
+    { value: "french", label: "French" },
   ];
 
-  const handleBannerDrop = (acceptedFiles: File[]) => {
-    setBanner(acceptedFiles[0]);
+  const skillsOptions = [
+    { value: "html", label: "HTML" },
+    { value: "css", label: "CSS" },
+    { value: "javascript", label: "JavaScript" },
+  ];
+
+  const handleAvatarDrop = (acceptedFiles: File[]) => {
+    setAvatar(acceptedFiles[0]);
+    setValue("avatar", acceptedFiles[0]);
   };
 
-  const handleDocumentsDrop = (acceptedFiles: File[]) => {
-    setDocuments(acceptedFiles);
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: handleAvatarDrop,
+    accept: { "image/*": [] },
+    maxFiles: 1,
+  });
+
+  const onSubmit = (data: any) => {
+    const profileData = {
+      ...data,
+      avatar,
+      languages: selectedLanguages.map((l) => l.value),
+      skills: selectedSkills.map((s) => ({ title: s.label })),
+    };
   };
-
-  const { getRootProps: getBannerProps, getInputProps: getBannerInputProps } =
-    useDropzone({
-      onDrop: handleBannerDrop,
-      accept: "image/*" as any,
-    });
-
-  const { getRootProps: getDocsProps, getInputProps: getDocsInputProps } =
-    useDropzone({
-      onDrop: handleDocumentsDrop,
-      accept: ".pdf,.doc,.docx" as any,
-    });
 
   return (
-    <form className="space-y-6 p-6 bg-white max-w-4xl mx-auto">
-      {/* Event Name */}
-      <div>
-        <label className="block text-gray-700">Event Name</label>
-        <input
-          type="text"
-          className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter event name"
-        />
-      </div>
-
-      {/* Date Pickers */}
-      <div className="grid grid-cols-2 gap-6">
-        <div>
-          <label className="block text-gray-700">Start Date</label>
-          <DatePicker
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
-            className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500"
-            placeholderText="Select start date"
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700">End Date</label>
-          <DatePicker
-            selected={endDate}
-            onChange={(date) => setEndDate(date)}
-            className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500"
-            placeholderText="Select end date"
-          />
-        </div>
-      </div>
-
-      {/* Invite People */}
-      <div>
-        <label className="block text-gray-700">Invite People</label>
-        <Select
-          isMulti
-          options={peopleOptions}
-          value={selectedPeople}
-          onChange={(selected) => setSelectedPeople(selected as PersonOption[])}
-          className="mt-1"
-          placeholder="Select people to invite"
-        />
-      </div>
-
-      {/* Description Textbox with Advanced Editing */}
-      <div>
-        <label className="block text-gray-700">Event Description</label>
-        <ReactQuill
-          value={description}
-          onChange={setDescription}
-          className="mt-1"
-          placeholder="Describe the event"
-          theme="snow"
-        />
-      </div>
-
-      {/* Event Banner Upload */}
-      <div>
-        <label className="block text-gray-700">Event Banner</label>
-        <div
-          {...getBannerProps()}
-          className="mt-1 p-6 border-dashed border-2 rounded-md flex justify-center items-center cursor-pointer"
-        >
-          <input {...getBannerInputProps()} />
-          {banner ? (
-            <p>{banner.name}</p>
-          ) : (
-            <p>Drag and drop banner image here, or click to select</p>
-          )}
-        </div>
-      </div>
-
-      {/* Event Documents Upload */}
-      <div>
-        <label className="block text-gray-700">Event Documents</label>
-        <div
-          {...getDocsProps()}
-          className="mt-1 p-6 border-dashed border-2 rounded-md flex justify-center items-center cursor-pointer"
-        >
-          <input {...getDocsInputProps()} />
-          {documents.length > 0 ? (
-            <ul>
-              {documents.map((file) => (
-                <li key={file.name}>{file.name}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>Drag and drop documents here, or click to select</p>
-          )}
-        </div>
-      </div>
-
-      {/* Submit Button */}
-      <button
-        type="submit"
-        className="w-full p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+    <FormProvider {...methods}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6 p-6 max-w-4xl mx-auto"
       >
-        Create Event
-      </button>
-    </form>
+        <div>
+          <Input
+            id="first_name"
+            label="Title"
+            placeholder="Kayode"
+            value={watch("first_name")}
+            onChange={(e) => setValue("first_name", e.target.value)}
+            error={errors.first_name?.message}
+            otherClasses={methods.register("first_name")}
+          />
+        </div>
+        <div className="py-3">
+          <label className="block text-gray-700 text-sm">Banner</label>
+          <div
+            {...getRootProps()}
+            className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
+          >
+            <input {...getInputProps()} />
+            {avatar ? (
+              <p>{avatar.name} kjfg</p>
+            ) : (
+              <p>Drag and drop an image, or click to select an avatar</p>
+            )}
+          </div>
+          {errors.avatar && (
+            <p className="text-red-500">{errors.avatar.message}</p>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-6">
+          <div className="w-full">
+            <label className="text-sm mb-1 text-gray-600 inline-block">
+              Start Date
+            </label>
+            <div className="relative w-full">
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
+                placeholderText="Select start date"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Image
+                  src="/icons/calendar.svg" // Path to your SVG file
+                  alt="Calendar"
+                  width={22}
+                  height={22}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="w-full">
+            <label className="text-sm mb-1 text-gray-600 inline-block">
+              End Date
+            </label>
+            <div className="relative w-full">
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
+                placeholderText="Select start date"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Image
+                  src="/icons/calendar.svg" // Path to your SVG file
+                  alt="Calendar"
+                  width={22}
+                  height={22}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <Input
+            id="first_name"
+            label="Website"
+            type="url"
+            value={watch("first_name")}
+            onChange={(e) => setValue("first_name", e.target.value)}
+            error={errors.first_name?.message}
+            otherClasses={methods.register("first_name")}
+            placeholder="https://"
+          />
+        </div>
+        <div>
+          <Input
+            id="last_name"
+            label="Ticket Link"
+            value={watch("last_name")}
+            onChange={(e) => setValue("last_name", e.target.value)}
+            error={errors.last_name?.message}
+            otherClasses={methods.register("last_name")}
+            placeholder="https://"
+          />
+        </div>
+        <div>
+          <Input
+            id="last_name"
+            label="Event link (for virtual events)"
+            value={watch("last_name")}
+            onChange={(e) => setValue("last_name", e.target.value)}
+            error={errors.last_name?.message}
+            otherClasses={methods.register("last_name")}
+            placeholder="https://"
+          />
+        </div>
+        <div>
+          <Input
+            id="last_name"
+            label="Location"
+            value={watch("last_name")}
+            onChange={(e) => setValue("last_name", e.target.value)}
+            error={errors.last_name?.message}
+            otherClasses={methods.register("last_name")}
+            placeholder="https://"
+            required
+          />
+        </div>
+        <div className="py-3">
+          <label className="block text-gray-700 text-sm">
+            Attachments (.docx, .doc, .pdf)
+          </label>
+          <div
+            {...getRootProps()}
+            className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
+          >
+            <input {...getInputProps()} />
+            {avatar ? (
+              <p>{avatar.name} kjfg</p>
+            ) : (
+              <p>Drag and drop a file, or click to select a document</p>
+            )}
+          </div>
+          {errors.avatar && (
+            <p className="text-red-500">{errors.avatar.message}</p>
+          )}
+        </div>
+        <div>
+          <label className="block text-gray-700 text-sm">Description</label>
+          <Controller
+            name="bio"
+            control={control}
+            render={({ field }) => (
+              <ReactQuill
+                value={field.value || bio}
+                onChange={(content) => {
+                  setBio(content);
+                  field.onChange(content);
+                }}
+                className="custom-quill"
+                placeholder="Write a short bio..."
+                theme="snow"
+              />
+            )}
+          />
+          {errors.bio && <p className="text-red-500">{errors.bio.message}</p>}
+        </div>
+        <div className="flex items-center space-x-2 justify-end">
+          <button
+            type="submit"
+            className="px-6 py-2 text-sm bg-white text-gray-600 border border-gray-300 rounded-md hover:bg-slate-100"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-6 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </FormProvider>
   );
 };
 
-export default AddEventForm;
+export default UpdateProfileForm;

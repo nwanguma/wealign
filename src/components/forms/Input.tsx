@@ -11,6 +11,7 @@ interface InputProps {
   error: string;
   icon?: any;
   placeholder?: string;
+  required?: boolean;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -20,6 +21,7 @@ const Input: React.FC<InputProps> = ({
   value,
   onChange,
   error,
+  required,
   otherClasses,
   placeholder,
   icon,
@@ -38,6 +40,11 @@ const Input: React.FC<InputProps> = ({
         >
           {icon}
           <span>{label}</span>
+          {required && (
+            <span className="text-red-500" aria-hidden="true">
+              *
+            </span>
+          )}
         </label>
         <input
           {...otherClasses}
@@ -50,6 +57,7 @@ const Input: React.FC<InputProps> = ({
           onBlur={() => setIsFocused(value !== "")}
           className="block py-3 rounded-xl pl-4 w-full text-sm text-gray-900 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
           placeholder={placeholder}
+          required
         />
       </div>
       {error && <p className="text-red-500">{error}</p>}

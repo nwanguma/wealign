@@ -26,7 +26,7 @@ body {
   }
 }
 
-/* Quill Editor Base Styles */
+/* Quill Editor Styles */
 .custom-quill {
   border: 1px solid #cbd5e1 !important;
   border-radius: 0.8rem !important;
@@ -66,7 +66,6 @@ body {
   font-style: normal;
 }
 
-/* Toolbar Styles */
 .custom-quill .ql-toolbar {
   border: none !important;
   border-bottom: 1px solid #e3e9f0 !important;
@@ -104,7 +103,12 @@ body {
   font-size: 0.9rem;
 }
 
-/* Custom Styling for Links, Strong Text, and Paragraphs */
 .custom-quill .ql-editor p {
   margin: 0;
+}
+
+/* Datepicker Base Styles */
+/* Fixes a problem with the datepicker where width is fixed */
+.react-datepicker-wrapper {
+  display: block !important;
 }

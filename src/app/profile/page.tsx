@@ -18,9 +18,8 @@ import CreateProjectForm from "@/components/forms/CreateProjectForm";
 import UpdateProfileForm from "@/components/forms/UpdateProfileForm";
 import AccountSettings from "@/components/forms/AccountsSettings";
 
-import { ProfilePreviewCard } from "../dashboard/page";
-
 import events from "../constants/events.json";
+import { ProfilePreviewCard } from "@/components/ui/ProfileCard";
 
 interface IEventCardProps {
   id: string;

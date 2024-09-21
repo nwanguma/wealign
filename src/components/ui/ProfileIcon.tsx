@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function ProfileIcon() {
+export default function ProfileIcon({ avatar }: { avatar?: string | null }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -26,10 +26,10 @@ export default function ProfileIcon() {
     <div className="relative" ref={profileRef}>
       <div className="border border-gray-300 p-1 rounded-full">
         <Image
-          src="/images/test-avatar-3.jpg"
+          src={avatar || "/images/test-avatar-3.jpg"}
           width={30}
           height={30}
-          alt="avatar"
+          alt="user avatar"
           className="cursor-pointer rounded-full"
           onClick={() => setIsProfileOpen(!isProfileOpen)}
         />

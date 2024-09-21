@@ -1,26 +1,14 @@
 "use client";
 
-import AppModal from "@/components/ui/Modal";
-import Image from "next/image";
-
 import { useState } from "react";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
-import CustomForm from "@/components/forms/CustomForm";
-import DashboardPageHeader, {
-  DashboardPageSecondaryHeader,
-} from "@/components/ui/DashboardPageHeader";
-import DashboardProfileCard from "@/components/ui/DashboardProfileCard";
-import DashboardEventCard from "@/components/ui/DashboardEventCard";
-import DashboardProjectCard from "@/components/ui/DashboardProjectCard";
-
-import AddEventForm from "@/components/forms/CreateEventForm";
-import CreateProjectForm from "@/components/forms/CreateProjectForm";
-import UpdateProfileForm from "@/components/forms/UpdateProfileForm";
-import AccountSettings from "@/components/forms/AccountsSettings";
-
-import { ProfilePreviewCard } from "../../page";
-
-import events from "../../../constants/events.json";
+import { ProfilePreviewCard } from "@/components/ui/ProfileCard";
+import { mapLanguageToFlag, Profile } from "@/common/constants";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface IEventCardProps {
   id: string;
@@ -36,33 +24,77 @@ interface IEventCardProps {
   isPreview?: boolean;
 }
 
-export const EventCardMain: React.FC<IEventCardProps> = ({
-  id,
-  date,
-  banner,
+interface IProfileCardMainProps extends Profile {}
+
+function getFilenameAndExtension(url: string): string {
+  const pathname = new URL(url).pathname;
+  const filenameWithExt = pathname.substring(pathname.lastIndexOf("/") + 1);
+  const dotIndex = filenameWithExt.lastIndexOf(".");
+  const filename = filenameWithExt.substring(0, dotIndex);
+  const extension = filenameWithExt.substring(dotIndex + 1);
+
+  return filename + "." + extension;
+}
+
+// {
+//     "status": "success",
+//     "message": "Request successful",
+//     "data": {
+//         "id": "c67432cb-79ff-4a69-b8f1-9de7074138d4",
+//         "first_name": "Childish",
+//         "last_name": "Gambino",
+//         "avatar": "https://example.com/avatar.jpg",
+//         "bio": "Software developer with 5+ years of experience in web development.",
+//         "heading": "Doer of things and solver of hard problems",
+//         "title": "Technical Project Manager",
+//         "location": "San Francisco, CA",
+//         "phone": "+1234567890",
+//         "website": "https://childishgambino.com",
+//         "linkedin": "https://linkedin.com/in/childish-gambino",
+//         "github": "https://github.com/childish-gambino",
+//         "resume": "https://example.com/resume.pdf",
+//         "languages": [
+//             "english",
+//             "spanish"
+//         ],
+//         "skills": [
+//             {
+//                 "title": "html"
+//             },
+//             {
+//                 "title": "css"
+//             }
+//         ],
+//         "user_id": "101e8bd5-336a-4fb1-88cd-d1efd935a4b9"
+//     },
+//     "code": null,
+//     "timestamp": "2024-09-15T10:17:11.408Z"
+// }
+
+export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
+  first_name,
+  last_name,
+  avatar,
+  bio,
+  heading,
   title,
   location,
-  description,
+  phone,
   website,
-  like_count,
-  comment_count,
-  event_start_date,
-  isPreview,
+  linkedin,
+  github,
+  resume,
+  languages,
+  skills,
+  id,
+  comments = [],
+  likes = [],
 }) => {
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState([
-    { id: 1, author: "John Doe", text: "This event looks amazing!" },
-    { id: 2, author: "Jane Smith", text: "Can't wait to attend!" },
-    { id: 3, author: "Emily Rose", text: "What a fantastic initiative!" },
-  ]);
 
   const handleAddComment = () => {
     if (newComment.trim()) {
-      setComments([
-        ...comments,
-        { id: comments.length + 1, author: "You", text: newComment },
-      ]);
       setNewComment("");
     }
   };
@@ -81,11 +113,18 @@ export const EventCardMain: React.FC<IEventCardProps> = ({
             />
           </div>
           <div className="flex flex-col space-y-2">
-            <div className="flex flex-col space-y-1">
-              <span className="font-bold text-2xl text-gray-900">
-                Kayode Otitoju
-              </span>
-              <span className="text-sm text-gray-500">Product Manager</span>
+            <div className="flex flex-col space-y-2">
+              <div className="flex flex-col space-y-1">
+                <span className="font-bold text-2xl text-gray-900">
+                  {first_name} {last_name}
+                </span>
+                <span className="text-sm text-gray-700 font-normal">
+                  {title}
+                </span>
+              </div>
+              <div>
+                <span className="text-sm text-gray-500">{heading}</span>
+              </div>
             </div>
             <div className="space-y-2">
               <span className="text-xs font-medium rounded text-gray-700 bg-green-200 py-1 px-1">
@@ -99,50 +138,61 @@ export const EventCardMain: React.FC<IEventCardProps> = ({
         <h3 className="text-sm font-bold">Details</h3>
         <div className="flex-1 grid grid-cols-3 gap-4">
           <div className="space-y-1">
-            <h3 className="text-sm text-gray-600 font-bold">Starts</h3>
+            <h3 className="text-sm text-gray-600 font-bold">Location</h3>
             <div className="flex space-x-2 items-center">
               {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
-              <span className="text-xs">Thursday, 7th March, 2024 8:00PM</span>
+              <span className="text-xs">{location}</span>
             </div>
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm text-gray-600 font-bold">Ends</h3>
+            <h3 className="text-sm text-gray-600 font-bold">Phone</h3>
             <div className="flex space-x-2 items-center">
               {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
-              <span className="text-xs">Thursday, 7th March, 2024 8:00PM</span>
+              <span className="text-xs text-blue-800">{phone}</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm text-gray-600 font-bold">Linkedin</h3>
+            <div className="flex space-x-2 items-center">
+              {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
+              <span className="text-xs text-blue-800">{linkedin}</span>
             </div>
           </div>
           <div className="space-y-1">
             <h3 className="text-sm text-gray-600 font-bold">Website</h3>
             <div className="flex space-x-2 items-center">
               {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
-              <span className="text-xs text-blue-800">
-                https://event.google.com
-              </span>
+              <span className="text-xs text-blue-800">{website}</span>
             </div>
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm text-gray-600 font-bold">Ticket Link</h3>
+            <h3 className="text-sm text-gray-600 font-bold">Github</h3>
             <div className="flex space-x-2 items-center">
               {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
-              <span className="text-xs text-blue-800">
-                https://event.google.com
-              </span>
+              <span className="text-xs text-blue-800">{github}</span>
             </div>
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm text-gray-600 font-bold">Contact</h3>
-            <div className="flex space-x-2 items-center">
-              {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
-              <span className="text-sm text-gray-400 font-bold">
-                Jidenna Offor
-              </span>
+            <h3 className="text-sm text-gray-600 font-bold">Languages</h3>
+            <div className="flex space-x-3">
+              {languages.map((language) => (
+                <span className="rounded-full inline-block bg-slate-50 p-1 shadow">
+                  <Image
+                    key={language}
+                    src={`/icons/${mapLanguageToFlag[language]}.svg`}
+                    alt=""
+                    width={23}
+                    height={23}
+                    className="rounded-full"
+                  />
+                </span>
+              ))}
             </div>
           </div>
           <div className="space-y-1">
             <h3 className="text-sm text-gray-600 font-bold">Share</h3>
             <div className="flex space-x-3">
-              {["linkedin", "google", "facebook", "twitter"].map((platform) => (
+              {["Linkedin"].map((platform) => (
                 <Image
                   src={`/icons/${platform}-share.svg`}
                   alt=""
@@ -156,91 +206,58 @@ export const EventCardMain: React.FC<IEventCardProps> = ({
       </div>
       <div className="space-y-2 border-b border-b-gray-200 pb-4">
         <h3 className="text-sm font-bold">About</h3>
-        <p className="text-gray-600 text-sm leading-relaxed">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur,
-          ex, dolore nesciunt neque architecto velit minus ipsam quisquam, modi
-          eius vel totam maxime natus eveniet officia. Beatae sed nam vel? Lorem
-          ipsum dolor sit amet consectetur adipisicing elit. Et quod eaque
-          eveniet reiciendis culpa nulla, rerum necessitatibus facere architecto
-          consectetur quo veritatis ipsam qui vel vitae iusto corrupti cum nam.
-          <br></br>
-          <br></br>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur,
-          ex, dolore nesciunt neque architecto velit minus ipsam quisquam, modi
-          eius vel totam maxime natus eveniet officia.
-        </p>
+        <p className="text-gray-600 text-sm leading-relaxed">{bio}</p>
       </div>
-      <div className="space-y-2 border-b border-b-gray-200 pb-4">
-        <h3 className="text-sm font-bold">Skills</h3>
-        <div className="flex gap-2 flex-wrap">
-          {[
-            "Figma",
-            "Blender",
-            "Homebrew",
-            "Yahoo",
-            "Honest",
-            "Independent",
-          ].map((skill, index) => (
-            <div
-              key={skill + index}
-              className="text-xs border border-violet-500 text-violet-500 py-1 px-2 rounded"
-            >
-              {skill}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="w-full border-b border-b-gray-200 pb-4">
-        <div className="space-y-2 w-2/3">
-          <h3 className="text-sm font-bold">Attachments</h3>
-          <div className="space-y-2">
-            <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Image
-                    src="/icons/file.svg"
-                    width={20}
-                    height={20}
-                    alt="file icon"
-                  />
-                  <span>filename.docx</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Image
-                    src="/icons/download.svg"
-                    width={18}
-                    height={18}
-                    alt="file icon"
-                  />
-                  {/* <span>Download</span> */}
-                </div>
+      {skills && (
+        <div className="space-y-2 border-b border-b-gray-200 pb-4">
+          <h3 className="text-sm font-bold">Skills</h3>
+          <div className="flex gap-2 flex-wrap">
+            {skills.map((skill) => (
+              <div
+                key={skill.title}
+                className="capitalize text-xs border border-violet-500 text-violet-500 py-1 px-2 rounded"
+              >
+                {skill.title}
               </div>
-            </div>{" "}
-            <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Image
-                    src="/icons/file.svg"
-                    width={20}
-                    height={20}
-                    alt="file icon"
-                  />
-                  <span>filename.docx</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Image
-                    src="/icons/download.svg"
-                    width={18}
-                    height={18}
-                    alt="file icon"
-                  />
-                  {/* <span>Download</span> */}
-                </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {resume && (
+        <div className="w-full border-b border-b-gray-200 pb-4">
+          <div className="space-y-2 w-2/3">
+            <h3 className="text-sm font-bold">Attachments</h3>
+            <div className="space-y-2">
+              <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50">
+                <Link href={resume as string} download target="_blank">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src="/icons/file.svg"
+                        width={20}
+                        height={20}
+                        alt="file icon"
+                      />
+                      <span className="">
+                        {getFilenameAndExtension(resume)}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src="/icons/download.svg"
+                        width={18}
+                        height={18}
+                        alt="file icon"
+                      />
+                      {/* <span>Download</span> */}
+                    </div>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       {/* Comments Section */}
       <div className="space-y-2 p-3 rounded-lg">
         <h3 className="text-sm font-medium underline">
@@ -294,53 +311,87 @@ export const EventCardMain: React.FC<IEventCardProps> = ({
   );
 };
 
-export default function Dashboard() {
+const fetchProfile = async (id: string): Promise<Profile> => {
+  try {
+    const response = await axiosInstance.get(`/api/profiles/${id}`);
+
+    return response.data.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export default function ProfilePage() {
+  const params = useParams();
+  const id = params?.id;
+
+  const {
+    data: profile,
+    error,
+    isLoading,
+  } = useQuery<Profile, Error>({
+    queryKey: ["profiles", id],
+    queryFn: () => fetchProfile(id as string),
+  });
+
   return (
-    <div className="min-h-screen w-full bg-white">
-      <div className="flex space-x-5 p-6">
-        <div className="flex-1 p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg">
-          <div className="w-full">
-            <EventCardMain
-              id={String(1)}
-              banner={1}
-              date="4, April, 2027"
-              title="A futuristic event"
-              location="London, England"
-              event_start_date="4th July, 2023"
-              description="An annual conference showcasing the latest in technology and innovation. An annual conference showcasing..."
-              like_count="47"
-              comment_count="46"
-            />
-          </div>
-        </div>
-        <aside className="w-1/3 space-y-5">
-          <div className="p-4 bg-white rounded-lg border border-gray-300">
-            <h3 className="font-semibold mb-3 text-gray-700 text-base">
-              Who to Follow
-            </h3>
-            <div className="space-y-4">
-              <ProfilePreviewCard
-                name="Hauwa Halima"
-                title="Project Manager"
-                id="4"
-              />
+    <div>
+      {profile && (
+        <div className="min-h-screen w-full bg-white">
+          <div className="flex space-x-5 p-6">
+            <div className="flex-1 p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg">
+              <div className="w-full">
+                <ProfileCardMain
+                  first_name={profile.first_name}
+                  last_name={profile.last_name}
+                  avatar={profile.avatar}
+                  bio={profile.bio}
+                  heading={profile.heading}
+                  title={profile.title}
+                  location={profile.location}
+                  phone={profile.phone}
+                  website={profile.website}
+                  linkedin={profile.linkedin}
+                  github={profile.github}
+                  resume={profile.resume}
+                  languages={profile.languages}
+                  skills={profile.skills}
+                  id={profile.id}
+                  comments={profile.comments}
+                  likes={profile.likes}
+                />
+              </div>
             </div>
+            <aside className="w-1/3 space-y-5">
+              <div className="p-4 bg-white rounded-lg border border-gray-300">
+                <h3 className="font-semibold mb-3 text-gray-700 text-base">
+                  Who to Follow
+                </h3>
+                <div className="space-y-4">
+                  <ProfilePreviewCard
+                    name="Hauwa Halima"
+                    title="Project Manager"
+                    id="4"
+                  />
+                </div>
+              </div>
+            </aside>
           </div>
-        </aside>
-      </div>
-      {/* <AppModal
+          {/* <AppModal
         title="This is the title"
         isOpen={true}
         onClose={() => console.log("closed")}
       > */}
-      {/* <AddEventForm /> */}
+          {/* <AddEventForm /> */}
 
-      {/* <CreateProjectForm /> */}
+          {/* <CreateProjectForm /> */}
 
-      {/* <UpdateProfileForm /> */}
-      {/* <AccountSettings /> */}
-      {/* </AppModal> */}
-      {/* <CustomForm /> */}
+          {/* <UpdateProfileForm /> */}
+          {/* <AccountSettings /> */}
+          {/* </AppModal> */}
+          {/* <CustomForm /> */}
+        </div>
+      )}
     </div>
   );
 }

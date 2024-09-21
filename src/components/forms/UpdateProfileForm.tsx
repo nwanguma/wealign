@@ -17,7 +17,14 @@ import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
 
 // Dynamically import ReactQuill to disable SSR
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+
+// Dynamically import ReactQuill with a fallback loader
+const ReactQuill = dynamic(() => import("react-quill"), {
+  ssr: false,
+  loading: () => (
+    <div className="quill-skeleton h-48 border border-gray-300 rounded-lg"></div>
+  ),
+});
 
 const schema = yup.object().shape({
   first_name: yup
@@ -97,8 +104,6 @@ const UpdateProfileForm: React.FC = () => {
       languages: selectedLanguages.map((l) => l.value),
       skills: selectedSkills.map((s) => ({ title: s.label })),
     };
-
-    console.log(profileData);
   };
 
   return (

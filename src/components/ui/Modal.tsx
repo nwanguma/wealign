@@ -9,7 +9,7 @@ import { Fragment } from "react";
 
 interface AppModalProps {
   isOpen: boolean;
-  width: string; // This defines the custom width
+  width?: string;
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
@@ -20,10 +20,8 @@ export default function AppModal({
   onClose,
   title,
   children,
-  width, // Include the width prop
+  width = "w-5/12",
 }: AppModalProps) {
-  console.log(width, "width");
-
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -50,13 +48,13 @@ export default function AppModal({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                className={`${width} transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all`}
+                className={`${width} transform overflow-hidden rounded-2xl bg-white p-4 text-left align-middle shadow-xl transition-all`}
               >
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center px-4">
                   {title && (
                     <DialogTitle
                       as="h3"
-                      className="text-lg font-medium leading-6 text-gray-900"
+                      className="text-lg font-bold mt-2 leading-6 text-gray-700 capitalize"
                     >
                       {title}
                     </DialogTitle>
@@ -70,7 +68,7 @@ export default function AppModal({
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
-                      className="w-6 h-6"
+                      className="w-5 h-5"
                     >
                       <path
                         strokeLinecap="round"
