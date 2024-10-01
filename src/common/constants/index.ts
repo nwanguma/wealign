@@ -3,6 +3,7 @@ export interface User {
   email: string;
   created_at: string;
   status: string;
+  last_seen: Date | null;
   profile: Profile;
 }
 
@@ -66,6 +67,7 @@ export interface Skill {
 }
 
 export interface Profile {
+  user_id?: string;
   uuid: string;
   id: string;
   first_name: string;
@@ -116,4 +118,53 @@ export enum ProjectStatus {
   IN_PROGRESS = "in progress",
   PAUSED = "paused",
   NEED_COLLABORATORS = "need collaborators",
+}
+export interface Message {
+  id: string;
+  text: string;
+  sender: User;
+  created_at: string;
+}
+
+export interface Conversation {
+  participants: {
+    user: User;
+    participant: User;
+  };
+  latest_message: Message;
+  messages: Message[];
+  is_group: boolean;
+  id: string;
+}
+
+export interface EventWithPagination {
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+  data: Event[];
+}
+
+export interface JobsWithPagination {
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+  data: Job[];
+}
+
+export interface ProjectsWithPagination {
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+  data: Project[];
+}
+
+export interface ProfilesWithPagination {
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+  data: Profile[];
 }

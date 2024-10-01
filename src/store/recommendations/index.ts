@@ -7,6 +7,7 @@ import recommendProjects from "@/lib/recommendations/projectRecommendations";
 import recommendJobs from "@/lib/recommendations/jobRecommendations";
 import { RootState } from "..";
 import { Profile, Project, Event, Job } from "@/common/constants";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface RecommendationsState {
   profiles: Profile[];
@@ -31,7 +32,7 @@ const initialState: RecommendationsState = {
 export const fetchProfiles = createAsyncThunk(
   "recommendations/fetchProfiles",
   async (_, { getState }) => {
-    const response = await axios.get("/api/profiles", {
+    const response = await axiosInstance.get("/api/proxy/profiles", {
       params: {
         limit: 1000,
         page: 1,
@@ -51,7 +52,7 @@ export const fetchProfiles = createAsyncThunk(
 export const fetchEvents = createAsyncThunk(
   "recommendations/fetchEvents",
   async (_, { getState }) => {
-    const response = await axios.get("/api/events", {
+    const response = await axiosInstance.get("/api/proxy/events", {
       params: {
         limit: 1000,
         page: 1,
@@ -71,7 +72,7 @@ export const fetchEvents = createAsyncThunk(
 export const fetchProjects = createAsyncThunk(
   "recommendations/fetchProjects",
   async (_, { getState }) => {
-    const response = await axios.get("/api/projects", {
+    const response = await axiosInstance.get("/api/proxy/projects", {
       params: {
         limit: 1000,
         page: 1,
@@ -91,7 +92,7 @@ export const fetchProjects = createAsyncThunk(
 export const fetchJobs = createAsyncThunk(
   "recommendations/fetchJobs",
   async (_, { getState }) => {
-    const response = await axios.get("/api/jobs", {
+    const response = await axiosInstance.get("/api/proxy/jobs", {
       params: {
         limit: 1000,
         page: 1,

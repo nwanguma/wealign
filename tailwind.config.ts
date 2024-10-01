@@ -9,8 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Nunito", "sans-serif"],
-        "sans-heading": ["Roboto", "sans-serif"],
+        custom: ["TTCommons", "sans-serif"],
+      },
+      fontWeight: {
+        light: "300",
+        normal: "400",
+        medium: "600",
+        bold: "600",
       },
     },
   },

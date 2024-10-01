@@ -12,17 +12,11 @@ import { EventCardPreview } from "@/components/ui/EventCard";
 import { Event } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
 
-export interface EventWithPagination {
-  page: number;
-  perPage: number;
-  total: number;
-  totalPages: number;
-  data: Event[];
-}
+import { EventWithPagination } from "@/common/constants";
 
 const fetchEvents = async (): Promise<EventWithPagination> => {
   try {
-    const response = await axiosInstance.get("/api/events", {
+    const response = await axiosInstance.get("/api/proxy/events", {
       params: {
         contentType: "all",
       },

@@ -7,27 +7,14 @@ import { useForm, FormProvider, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
-import NativeSelect from "./NativeSelectComponent";
-import ReactSelectComponent from "./ReactSelectComponent";
 
 import Image from "next/image";
 
 import Input from "./Input";
 
 import "react-quill/dist/quill.snow.css";
-// import "tailwindcss/tailwind.css";
 
 import "../../app/globals.css";
-
-// {
-//   "title": "The new conference in town",
-//   "description": "An annual conference showcasing the latest in technology and innovation.",
-//   "website": "https://techconference2024.com",
-//   "banner": "https://techconference2024.com/banner.jpg",
-//   "ticket_link": "https://techconference2024.com/tickets",
-//   "event_start_date": "2024-09-15T09:00:00Z",
-//   "event_end_date": "2024-09-17T18:00:00Z"
-// }
 
 // Dynamically import ReactQuill to disable SSR
 const ReactQuill = dynamic(() => import("react-quill"), {
@@ -131,7 +118,7 @@ const UpdateProfileForm: React.FC = () => {
             placeholder="Kayode"
             value={watch("first_name")}
             onChange={(e) => setValue("first_name", e.target.value)}
-            error={errors.first_name?.message}
+            error={errors.first_name?.message as string}
             otherClasses={methods.register("first_name")}
           />
         </div>
@@ -160,7 +147,7 @@ const UpdateProfileForm: React.FC = () => {
             <div className="relative w-full">
               <DatePicker
                 selected={startDate}
-                onChange={(date) => setStartDate(date)}
+                onChange={(date) => setStartDate(date as Date)}
                 className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
                 placeholderText="Select start date"
               />
@@ -181,7 +168,7 @@ const UpdateProfileForm: React.FC = () => {
             <div className="relative w-full">
               <DatePicker
                 selected={startDate}
-                onChange={(date) => setStartDate(date)}
+                onChange={(date) => setStartDate(date as Date)}
                 className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
                 placeholderText="Select start date"
               />
@@ -203,7 +190,7 @@ const UpdateProfileForm: React.FC = () => {
             type="url"
             value={watch("first_name")}
             onChange={(e) => setValue("first_name", e.target.value)}
-            error={errors.first_name?.message}
+            error={errors.first_name?.message as string}
             otherClasses={methods.register("first_name")}
             placeholder="https://"
           />
@@ -214,7 +201,7 @@ const UpdateProfileForm: React.FC = () => {
             label="Ticket Link"
             value={watch("last_name")}
             onChange={(e) => setValue("last_name", e.target.value)}
-            error={errors.last_name?.message}
+            error={errors.last_name?.message as string}
             otherClasses={methods.register("last_name")}
             placeholder="https://"
           />
@@ -225,7 +212,7 @@ const UpdateProfileForm: React.FC = () => {
             label="Event link (for virtual events)"
             value={watch("last_name")}
             onChange={(e) => setValue("last_name", e.target.value)}
-            error={errors.last_name?.message}
+            error={errors.last_name?.message as string}
             otherClasses={methods.register("last_name")}
             placeholder="https://"
           />
@@ -236,7 +223,7 @@ const UpdateProfileForm: React.FC = () => {
             label="Location"
             value={watch("last_name")}
             onChange={(e) => setValue("last_name", e.target.value)}
-            error={errors.last_name?.message}
+            error={errors.last_name?.message as string}
             otherClasses={methods.register("last_name")}
             placeholder="https://"
             required

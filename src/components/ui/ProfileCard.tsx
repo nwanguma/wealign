@@ -1,23 +1,103 @@
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useMutation } from "@tanstack/react-query";
+
 import { Skill } from "@/common/constants";
+import axiosInstance from "@/lib/axiosInstance";
+import { AppDispatch, RootState } from "@/store";
+import { fetchProfiles } from "@/store/recommendations";
+import { Router } from "next/router";
+import { addToConversations } from "@/store/conversations";
 
 interface IProfilePreviewCardProps {
-  id: string;
+  profile_id: string;
+  user_id?: string;
   name: string;
   title: string;
   isPreview?: boolean;
-  handleFollow?: () => void;
   hasFollowed?: boolean;
 }
 
+const followUser = async (profileId: string) => {
+  const response = await axiosInstance.patch(
+    `/api/proxy/profiles/${profileId}/follow`
+  );
+
+  return response.data.data;
+};
+
+const initiateConversation = async (recipientId: string) => {
+  const response = await axiosInstance.post(
+    `/api/proxy/conversations/${recipientId}`
+  );
+
+  return response.data?.data;
+};
+
+interface JustFollowed {
+  [key: string]: boolean;
+}
+
 export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
-  id,
+  profile_id,
+  user_id,
   name,
   title,
-  handleFollow,
   hasFollowed,
 }) => {
+  const router = useRouter();
+  const { conversations } = useSelector((state: RootState) => ({
+    conversations: state.conversations.data,
+  }));
+  const dispatch = useDispatch<AppDispatch>();
+  const [justFollowed, setJustFollowed] = useState<JustFollowed>({});
+  const followMutation = useMutation({
+    mutationFn: (profileId: string) => followUser(profileId),
+    onSuccess: (data, profileId) => {
+      setJustFollowed((prevState) => ({
+        ...prevState,
+        [profileId]: true,
+      }));
+
+      dispatch(fetchProfiles());
+    },
+    onError: (error: any) => {
+      console.error("Error following the user:", error);
+    },
+  });
+  const initiateConversationsMutation = useMutation({
+    mutationFn: (recipientId: string) => initiateConversation(recipientId),
+    onSuccess: (data) => {
+      const isExistingConversation = conversations.find(
+        (conversation) => conversation.id === data.id
+      );
+
+      if (isExistingConversation) {
+        router.push(`/dashboard/messages/${data.id}`);
+      } else {
+        dispatch(addToConversations(data));
+
+        setTimeout(() => {
+          router.push("/dashboard/messages");
+        }, 2000);
+      }
+    },
+    onError: (error: any) => {
+      // console.error("Error following the user:", error);
+    },
+  });
+
+  const handleFollow = (profileId: string) => {
+    followMutation.mutate(profileId);
+  };
+
+  const handleInitiateConversations = (recipientId: string) => {
+    initiateConversationsMutation.mutate(recipientId);
+  };
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex-1 flex items-center space-x-2">
@@ -36,9 +116,9 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        {!hasFollowed && (
+        {!hasFollowed && !justFollowed[profile_id] && (
           <button
-            onClick={handleFollow}
+            onClick={() => handleFollow(profile_id)}
             className="flex items-center p-3 shadow bg-white border border-gray-300 text-sm rounded-full hover:bg-gray-100 text-blue-700"
           >
             <svg
@@ -72,8 +152,10 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
             </svg>
           </button>
         )}
-
-        <button className="flex items-center p-3 bg-white border  shadow border-gray-300 text-blue-700 text-sm hover:bg-gray-100 rounded-full">
+        <button
+          onClick={() => handleInitiateConversations(user_id as string)}
+          className="flex items-center p-3 bg-white border  shadow border-gray-300 text-blue-700 text-sm hover:bg-gray-100 rounded-full"
+        >
           <svg
             className="w-4 h-4"
             viewBox="0 0 24 24"

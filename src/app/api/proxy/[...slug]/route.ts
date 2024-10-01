@@ -25,10 +25,14 @@ async function parseRequestBody(req: Request) {
 async function handler(req: Request) {
   const start = performance.now();
   const url = new URL(req.url);
-  const slug = url.pathname.split("/api/")[1];
+  const slug = url.pathname.split("/api/proxy/")[1];
   const nonce = crypto.randomBytes(16).toString("base64");
-
   const reqBody = await parseRequestBody(req);
+
+  console.log(
+    req.headers.get("Authorization"),
+    req.headers.get("authorization")
+  );
 
   try {
     const response = await axios({
@@ -44,7 +48,9 @@ async function handler(req: Request) {
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "Content-Security-Policy": `default-src 'self'; script-src 'nonce-${nonce}'`,
         Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZTBiYWEwYS1hYzEyLTQ5MGEtYTUzNC1lNTdjNTYzZjkyNWQiLCJlbWFpbCI6InRob21wc29uZ3JleUB5b3BtYWlsLmNvbSIsImlhdCI6MTcyNjkzOTUyNCwiZXhwIjoxNzI2OTQzMTI0fQ.UitUstRldhc8jIb8Jii6dYHiFgviGlHEHHV0Jy9QA9Q",
+          // req.headers.get("Authorization") ||
+          // req.headers.get("authorization") ||
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWZiYjk4Yi1hMzZlLTQ0YmUtYjM4MC00YmM4NWZkNTJjNmEiLCJlbWFpbCI6ImtheW9kZW90aXRvanVtaUB5b3BtYWlsLmNvbSIsImlhdCI6MTcyNzc5OTg4MiwiZXhwIjoxNzI3ODAzNDgyfQ.EhrkOBgQE5Hm5WySRxk1xpPIL9yNrV8J0jiUr94P_JQ",
       },
       data: reqBody,
       timeout: 5000,

@@ -16,6 +16,7 @@ interface IEventCardPreviewProps {
   comment_count?: number;
   event_start_date: string;
   isPreview?: boolean;
+  description_limit?: number;
 }
 
 export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
@@ -27,6 +28,7 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
   like_count,
   comment_count,
   event_start_date,
+  description_limit = 40,
   isPreview,
 }) => {
   const { dayOfWeek, day, month } = formatDateShort(event_start_date, {
@@ -63,7 +65,7 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
               {/** Truncate string past a certain character limit */}
               {!isPreview && (
                 <span className="text-sm text-gray-600 leading-snug">
-                  {truncateString(description as string, 40)}
+                  {truncateString(description as string, description_limit)}
                 </span>
               )}
             </div>

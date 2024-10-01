@@ -13,17 +13,11 @@ import AddItemButton from "@/components/ui/AddItemButton";
 
 import FilterComponent from "@/components/ui/Filter";
 
-export interface JobsWithPagination {
-  page: number;
-  perPage: number;
-  total: number;
-  totalPages: number;
-  data: Job[];
-}
+import { JobsWithPagination } from "@/common/constants";
 
 const fetchJobs = async (): Promise<JobsWithPagination> => {
   try {
-    const response = await axiosInstance.get("/api/jobs", {
+    const response = await axiosInstance.get("/api/proxy/jobs", {
       params: {
         contentType: "all",
       },

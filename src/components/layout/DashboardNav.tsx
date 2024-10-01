@@ -32,9 +32,9 @@ export default function DashboardNav() {
         <li className="hover:scale-110 transform transition duration-300">
           <Link href="/home">
             <Image
-              src="/icons/th-logo.svg"
+              src="/icons/collabhub-logo.svg"
               alt="home"
-              width={100}
+              width={140}
               height={50}
               className="hover:opacity-80 transition duration-300"
             />

@@ -18,18 +18,21 @@ export const ActivityComponent: React.FC<ActivityProps> = ({
   currentUserProfileId,
 }) => {
   const { type, owner, participant, event, project, profile } = activity;
+
   const activityOwnerName =
     owner.id === currentUserProfileId
       ? "You"
-      : owner.first_name + " " + owner.last_name + type === ActivityTypes.FOLLOW
-      ? ""
-      : "'s";
+      : owner.first_name + " " + owner.last_name;
+  type === ActivityTypes.FOLLOW
+    ? activityOwnerName + ""
+    : activityOwnerName + "'s";
+
   const activityParticipant =
-    participant.id === currentUserProfileId &&
-    participant.id &&
+    participant?.id === currentUserProfileId &&
+    participant?.id &&
     type === ActivityTypes.FOLLOW
       ? "You"
-      : participant.id === currentUserProfileId
+      : participant?.id === currentUserProfileId
       ? "Your"
       : participant.first_name + " " + participant.last_name;
   const resourceTitle = event?.title || project?.title;

@@ -12,18 +12,11 @@ import axiosInstance from "@/lib/axiosInstance";
 import AddItemButton from "@/components/ui/AddItemButton";
 
 import FilterComponent from "@/components/ui/Filter";
-
-export interface ProjectsWithPagination {
-  page: number;
-  perPage: number;
-  total: number;
-  totalPages: number;
-  data: Project[];
-}
+import { ProjectsWithPagination } from "@/common/constants";
 
 const fetchProjects = async (): Promise<ProjectsWithPagination> => {
   try {
-    const response = await axiosInstance.get("/api/projects", {
+    const response = await axiosInstance.get("/api/proxy/projects", {
       params: {
         contentType: "all",
       },
@@ -66,7 +59,7 @@ export default function Projects() {
             title="Discover Projects and Collaborators"
             description="Connect with talented professionals and find exciting projects to work on. Whether you're looking for a team or want to join an existing project, explore opportunities to collaborate and bring your ideas to life."
           />
-          <div className="h-14 py-5 flex flex-col space-y-5 w-full">
+          <div className="py-5 flex flex-col space-y-5 w-full">
             <FilterComponent />
             <div className="w-full grid grid-cols-3 gap-5">
               {projects?.map(

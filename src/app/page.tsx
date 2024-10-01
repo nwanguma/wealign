@@ -1,113 +1,231 @@
+import React, { useState } from "react";
 import Image from "next/image";
+import {
+  useQueries,
+  UseQueryResult,
+  UseQueryOptions,
+  useMutation,
+} from "@tanstack/react-query";
+import axios from "axios";
+import Link from "next/link";
 
-export default function Home() {
+import { ProjectCard } from "@/components/ui/ProjectCard";
+import { fetchCurrentUser } from "@/store/user";
+import { Event } from "@/common/constants";
+import AppModal from "@/components/ui/Modal";
+import { AppDispatch, RootState } from "@/store";
+import CreateProjectForm from "@/components/forms/CreateProjectForm";
+import AddEventForm from "@/components/forms/CreateEventForm";
+import { EventCardPreview } from "@/components/ui/EventCard";
+import { ProfilePreviewCard } from "@/components/ui/ProfileCard";
+import { ActivityComponent } from "@/components/ui/Activity";
+import {
+  fetchProfiles,
+  fetchEvents,
+  fetchProjects,
+  fetchJobs,
+} from "@/store/recommendations";
+import { User } from "@/common/constants";
+import AddItemButton from "@/components/ui/AddItemButton";
+import { Activity } from "@/common/constants";
+import { fetchConversations } from "@/store/conversations";
+
+import { EventWithPagination } from "@/common/constants";
+import { ProjectsWithPagination } from "@/common/constants";
+import { ProfilesWithPagination } from "@/common/constants";
+import { Profile, Project } from "@/common/constants";
+import HomeAuthControls from "@/components/ui/HomeAuthControls";
+
+const fetchActivities = async (): Promise<Activity[]> => {
+  try {
+    const response = await axios.get("/api/proxy/activities");
+
+    return response.data.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+const fetchEventsData = async (
+  pagination: any,
+  contentType: string
+): Promise<EventWithPagination> => {
+  try {
+    const response = await axios.get("/api/proxy/events", {
+      params: {
+        limit: pagination.limit,
+        page: pagination.page,
+        contentType,
+      },
+    });
+
+    return response.data.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+const fetchProjectsData = async (
+  pagination: any,
+  contentType: string
+): Promise<ProjectsWithPagination[]> => {
+  try {
+    const response = await axios.get("/api/proxy/projects", {
+      params: {
+        limit: pagination.limit,
+        page: pagination.page,
+        contentType,
+      },
+    });
+
+    return response.data.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+const riderText = [
+  "Connecting you with the finest talent globally",
+  "Connect with innovators and bring your ideas to life",
+  "Unlock career-defining opportunities with top professionals",
+  "Discover exciting collaborations and make an impact",
+  "Build your dream team and achieve success together",
+  "Explore job openings that match your passion and expertise",
+  "Create, collaborate, and grow in a thriving professional network",
+  "Elevate your career by working with industry-leading talent",
+  "Turn your ideas into reality with the right connections",
+  "Find the perfect team for your next big project",
+];
+
+const Home: React.FC = ({ params }: any) => {
+  const riderTextDisplayIndex = Math.floor(Math.random() * 10);
+
+  const { slug } = params;
+  const events: Event[] = [];
+  const projects: Project[] = [];
+  const profiles: Profile[] = [];
+
+  const links: { href: string; name: string }[] = [];
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="w-full">
+      <header className="w-full min-h-screen pt-6 bg-gradient-to-r from-blue-100 via-purple-100 to-white">
+        <nav className="flex justify-between items-center px-6 h-10">
+          <ul className="flex space-x-4 items-center">
+            <li className="hover:scale-110 transform transition duration-300">
+              <Link href="/home">
+                <Image
+                  src="/icons/collabhub-logo.svg"
+                  alt="home"
+                  width={140}
+                  height={50}
+                  className="hover:opacity-80 transition duration-300"
+                />
+              </Link>
+            </li>
+          </ul>
+          <ul className="flex text-sm text-gray-700">
+            {links.map((link) => (
+              <li key={link.href} className="relative group">
+                <Link
+                  href={link.href}
+                  className={`px-8 py-2 border-b ${
+                    slug === link.href
+                      ? "border-violet-700 text-violet-700 font-semibold"
+                      : "border-transparent group-hover:border-b-violet-700 group-hover:text-violet-700 group-hover:font-normal"
+                  } transition-all duration-300 ease-in-out delay-150`}
+                >
+                  {link.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <ul className="space-x-5">
+            <HomeAuthControls main />
+          </ul>
+        </nav>
+        <div className="w-full min-h-[calc(100vh-10%)] flex">
+          <div className="flex items-center flex-col w-9/12 mx-auto mt-[6%] 2xl:mt-[8%]">
+            <div className="bg-blue-100 text-blue-600 text-sm px-2 rounded flex space-x-1 items-center">
+              <span>{riderText[riderTextDisplayIndex]}</span>
+              <Image
+                src="/icons/work-color.svg"
+                width={15}
+                height={15}
+                alt="work"
+              />
+            </div>
+            <div className="text-6xl font-bold text-center mt-2 mb-16">
+              Discover top <span className="text-blue-700">talent</span>{" "}
+              <br></br> collaborate on{" "}
+              <span className="text-blue-700">projects</span>
+              <br></br> and unlock new{" "}
+              <span className="text-blue-700">job opportunities</span>
+            </div>
+            <div className="mb-5 text-gray-500 w-1/2 text-center">
+              Connect with professionals, explore exciting projects, and find
+              your next career move in one dynamic platform
+              <Image
+                src="/icons/celebration.svg"
+                width={16}
+                height={16}
+                alt="work"
+                className="ml-1 -mt-1 inline"
+              />
+            </div>
+            <div className="w-1/2 text-center space-x-3 space-y-3 pb-3">
+              {[
+                { title: "JavaScript" },
+                { title: "TypeScript" },
+                { title: "Front-end" },
+                { title: "React" },
+                { title: "Node.js" },
+                { title: "Next.js" },
+                { title: "Go" },
+                { title: "Design" },
+                { title: "UI/UX" },
+                { title: "Docker" },
+              ].map((skill) => (
+                <span
+                  key={skill.title}
+                  className="inline-block capitalize text-sm border border-violet-500 text-violet-500 py-2 px-3 rounded"
+                >
+                  {skill.title}
+                </span>
+              ))}
+            </div>
+            <div className="mt-10">
+              <HomeAuthControls />
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      </header>
+      {/* <div className="flex space-x-5">
+        <div className="w-1/4 space-y-5">
+          <div className="p-4 bg-white rounded-lg border border-gray-300">
+            <div className="space-y-4">
+              {projects &&
+                projects.map((project) => {
+                  return <div key={project.id}>This is the project</div>;
+                })}
+            </div>
+            <div className="space-y-4">
+              {events &&
+                events.map((event) => {
+                  return <div key={event.id}>This is the event</div>;
+                })}
+            </div>
+            <div className="space-y-4">
+              {profiles &&
+                profiles.map((profile) => {
+                  return <div key={profile.id}>This is the profile</div>;
+                })}
+            </div>
+          </div>
+        </div>
+      </div> */}
+    </div>
   );
-}
+};
+
+export default Home;

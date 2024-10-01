@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
 
 import "./globals.css";
-
-const nunito = Nunito({ subsets: ["latin-ext"] });
 
 export const metadata: Metadata = {
   title: "Talent Hunt",
@@ -17,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${nunito.className} font-light`}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

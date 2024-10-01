@@ -8,18 +8,11 @@ import { ProfileCard } from "@/components/ui/ProfileCard";
 import FilterComponent from "@/components/ui/Filter";
 import { Skill, Profile } from "@/common/constants";
 import AddItemButton from "@/components/ui/AddItemButton";
-
-export interface ProfilesWithPagination {
-  page: number;
-  perPage: number;
-  total: number;
-  totalPages: number;
-  data: Profile[];
-}
+import { ProfilesWithPagination } from "@/common/constants";
 
 const fetchProfiles = async (): Promise<ProfilesWithPagination> => {
   try {
-    const response = await axiosInstance.get("/api/profiles");
+    const response = await axiosInstance.get("/api/proxy/profiles");
 
     return response.data.data;
   } catch (error: any) {

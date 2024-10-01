@@ -313,7 +313,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
 
 const fetchProfile = async (id: string): Promise<Profile> => {
   try {
-    const response = await axiosInstance.get(`/api/profiles/${id}`);
+    const response = await axiosInstance.get(`/api/proxy/profiles/${id}`);
 
     return response.data.data;
   } catch (error: any) {

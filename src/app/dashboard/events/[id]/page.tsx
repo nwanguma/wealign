@@ -12,7 +12,7 @@ import { RootState } from "@/store";
 
 const fetchEvent = async (id: string): Promise<Event> => {
   try {
-    const response = await axiosInstance.get(`/api/events/${id}`);
+    const response = await axiosInstance.get(`/api/proxy/events/${id}`);
 
     return response.data.data;
   } catch (error: any) {

@@ -50,7 +50,11 @@ export default function AppModal({
               <DialogPanel
                 className={`${width} transform overflow-hidden rounded-2xl bg-white p-4 text-left align-middle shadow-xl transition-all`}
               >
-                <div className="flex justify-between items-center px-4">
+                <div
+                  className={`flex ${
+                    !title ? "justify-end" : "justify-between"
+                  } items-center px-4`}
+                >
                   {title && (
                     <DialogTitle
                       as="h3"
@@ -79,7 +83,6 @@ export default function AppModal({
                     </svg>
                   </button>
                 </div>
-
                 <div className="mt-2">{children}</div>
               </DialogPanel>
             </TransitionChild>

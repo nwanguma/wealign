@@ -1,18 +1,10 @@
-import NextAuth, {
-  NextAuthOptions,
-  TokenSet,
-  Session,
-  User,
-  Account,
-} from "next-auth";
-// import GoogleProvider from "next-auth/providers/google";
-// import LinkedInProvider from "next-auth/providers/linkedin";
+import NextAuth, { NextAuthOptions, User, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 import { JWT } from "next-auth/jwt";
 
 interface Credentials {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -31,18 +23,10 @@ interface UserWithTokens extends User {
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_CLIENT_ID!,
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    // }),
-    // LinkedInProvider({
-    //   clientId: process.env.LINKEDIN_CLIENT_ID!,
-    //   clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-    // }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "text" },
+        email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(
@@ -52,25 +36,25 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const response = await axios.post(
-            "https://localhost:8000/auth/login",
+            `${process.env.BACKEND_URL}/auth/login`,
             {
-              username: credentials.username,
+              email: credentials.email,
               password: credentials.password,
             }
           );
 
-          const result = response.data;
+          const result = response.data?.data;
 
-          if (result && response.status === 200) {
+          if (result && response.status === 201) {
             return {
               ...result.user,
               accessToken: result.access_token,
               refreshToken: result.refresh_token,
-              accessTokenExpires: Date.now() + 7 * 1000,
+              accessTokenExpires: Date.now() + result.expires_in * 1000, // Token expiration in ms
             };
           }
         } catch (error) {
-          console.error("Error in credentials authorization:", error);
+          // console.error("Error in credentials authorization:", error);
           return null;
         }
 
@@ -82,32 +66,58 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
-    async jwt({ token, account, user }: any) {
-      if (account && user) {
-        return {
-          accessToken: user.accessToken,
-          refreshToken: user.refreshToken,
-          accessTokenExpires: Date.now() + user.accessTokenExpires,
-        };
+    async jwt({
+      token,
+      user,
+      account,
+    }: {
+      token: JWT;
+      user?: User;
+      account?: any;
+    }) {
+      if (user) {
+        const isUserWithTokens = (user: User): user is UserWithTokens =>
+          (user as UserWithTokens).accessToken !== undefined;
+
+        if (isUserWithTokens(user)) {
+          return {
+            accessToken: user.accessToken,
+            refreshToken: user.refreshToken,
+            accessTokenExpires: user.accessTokenExpires,
+          };
+        }
       }
 
-      if (Date.now() < token.accessTokenExpires) {
+      // Return previous token if it's still valid
+      if (
+        (token as Token).accessToken &&
+        Date.now() < (token as Token).accessTokenExpires
+      ) {
         return token;
       }
 
-      return refreshAccessToken(token);
+      // Token expired, refresh it
+      return refreshAccessToken(token as Token);
     },
 
-    async session({ session, token }: any) {
-      session.accessToken = token.accessToken;
-      session.error = token.error;
+    async session({
+      session,
+      token,
+    }: {
+      session: Session;
+      token: JWT | Token;
+    }): Promise<Session> {
+      const tokenWithAccess = token as Token;
+      session.accessToken = tokenWithAccess.accessToken;
+      (session as any).error = tokenWithAccess.error;
+
       return session;
     },
   },
 
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 
   pages: {
@@ -131,9 +141,9 @@ async function refreshAccessToken(token: Token): Promise<Token> {
 
     return {
       ...token,
-      accessToken: refreshedTokens.accessToken,
-      accessTokenExpires: Date.now() + refreshedTokens.expiresIn * 1000,
-      refreshToken: refreshedTokens.refreshToken ?? token.refreshToken,
+      accessToken: refreshedTokens.access_token,
+      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000, // Exact time in ms
+      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
     };
   } catch (error) {
     console.error("Error refreshing access token:", error);

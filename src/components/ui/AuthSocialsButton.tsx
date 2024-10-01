@@ -4,14 +4,19 @@ import Image from "next/image";
 interface IAuthSocialButtonProps {
   logoUrl: string;
   text: string;
+  onClick: () => void;
 }
 
 const AuthSocialsButton: React.FC<IAuthSocialButtonProps> = ({
   logoUrl,
   text,
+  onClick,
 }) => {
   return (
-    <div className="bg-white rounded-xl flex justify-center items-center text-black py-3 space-x-2">
+    <div
+      onClick={onClick}
+      className="bg-slate-50 hover:bg-slate-100 border cursor-pointer border-gray-100 rounded-xl flex justify-center items-center text-black py-3 space-x-2"
+    >
       <div>
         <Image src={logoUrl} alt="logo" width={28} height={28} />
       </div>

@@ -29,14 +29,15 @@ import {
   fetchJobs,
 } from "@/store/recommendations";
 import { User } from "@/common/constants";
-import { EventWithPagination } from "./events/page";
-import { ProjectsWithPagination } from "./projects/page";
+import { ProjectsWithPagination } from "@/common/constants";
+import { EventWithPagination } from "@/common/constants";
 import AddItemButton from "@/components/ui/AddItemButton";
 import { Activity } from "@/common/constants";
+import { fetchConversations } from "@/store/conversations";
 
 const fetchActivities = async (): Promise<Activity[]> => {
   try {
-    const response = await axiosInstance.get("/api/activities");
+    const response = await axiosInstance.get("/api/proxy/activities");
 
     return response.data.data;
   } catch (error: any) {
@@ -49,7 +50,7 @@ const fetchEventsData = async (
   contentType: string
 ): Promise<EventWithPagination> => {
   try {
-    const response = await axiosInstance.get("/api/events", {
+    const response = await axiosInstance.get("/api/proxy/events", {
       params: {
         limit: pagination.limit,
         page: pagination.page,
@@ -68,7 +69,7 @@ const fetchProjectsData = async (
   contentType: string
 ): Promise<ProjectsWithPagination[]> => {
   try {
-    const response = await axiosInstance.get("/api/projects", {
+    const response = await axiosInstance.get("/api/proxy/projects", {
       params: {
         limit: pagination.limit,
         page: pagination.page,
@@ -82,27 +83,10 @@ const fetchProjectsData = async (
   }
 };
 
-const followUser = async (profileId: string) => {
-  const response = await axiosInstance.patch(
-    `/api/profiles/${profileId}/follow`
-  );
-
-  return response.data.data;
-};
-
 const MainFeed: React.FC = () => {
   const [followersModalIsOpen, setFollowersModalIsOpen] = useState(false);
   const [followingModalIsOpen, setFollowingModalIsOpen] = useState(false);
 
-  const followMutation = useMutation({
-    mutationFn: (profileId: string) => followUser(profileId),
-    onSuccess: () => {
-      // console.log("User followed successfully");
-    },
-    onError: (error: any) => {
-      // console.error("Error following the user:", error);
-    },
-  });
   const dispatch = useDispatch<AppDispatch>();
   const { mainFeedSettings } = useSelector((state: RootState) => state.ui);
   const currentUser: User = useSelector((state: RootState) => state.user);
@@ -150,10 +134,6 @@ const MainFeed: React.FC = () => {
     UseQueryResult<ProjectsWithPagination, unknown>,
     UseQueryResult<EventWithPagination, unknown>
   ];
-
-  const handleFollow = (profileId: string) => {
-    followMutation.mutate(profileId);
-  };
 
   const [activitiesResult, projectsResult, eventsResult] = results as [
     UseQueryResult<Activity[], unknown>,
@@ -251,6 +231,7 @@ const MainFeed: React.FC = () => {
     if (!jobsRecommendations || !jobsRecommendations?.length)
       dispatch(fetchJobs());
     if (!currentUser.id) dispatch(fetchCurrentUser());
+    dispatch(fetchConversations());
   }, [dispatch]);
 
   return (
@@ -278,6 +259,11 @@ const MainFeed: React.FC = () => {
                   />
                 </div>
               ))}
+              {!eventsRecommendations.length && (
+                <div className="text-gray-500" style={{ fontSize: "13.5px" }}>
+                  There are no upcoming events.
+                </div>
+              )}
             </div>
           </div>
         </aside>
@@ -416,12 +402,13 @@ const MainFeed: React.FC = () => {
                 >
                   <EventCardPreview
                     id={event.id}
-                    banner="https://nwanguma.github.io/Quick-host/images/test-event-3.jpg"
+                    banner={event.banner}
                     title={event.title}
-                    location="London, England"
+                    location={event.location as string}
                     event_start_date={event.event_start_date}
-                    description="An annual conference showcasing the latest in technology and innovation. An annual conference showcasing..."
+                    description={event.description}
                     comment_count={event.comments?.length}
+                    description_limit={50}
                   />
                 </div>
               ))}
@@ -457,8 +444,9 @@ const MainFeed: React.FC = () => {
 
                   if (currentUser)
                     hasFollowed = currentUser.profile.following
-                      .map((following) => following.uuid)
+                      .map((following) => following.id)
                       .includes(profile.id);
+
                   return (
                     <div
                       key={profile.id}
@@ -467,9 +455,9 @@ const MainFeed: React.FC = () => {
                       <ProfilePreviewCard
                         name={profile.first_name + " " + profile.last_name}
                         title={profile.title}
-                        id={profile.id}
+                        profile_id={profile.id}
+                        user_id={profile.user_id}
                         hasFollowed={hasFollowed}
-                        handleFollow={() => handleFollow(profile.id)}
                       />
                     </div>
                   );
@@ -508,6 +496,7 @@ const MainFeed: React.FC = () => {
                   hasFollowed = currentUser.profile.following
                     .map((following) => following.uuid)
                     .includes(profile.id);
+
                 return (
                   <div
                     key={profile.id}
@@ -516,9 +505,9 @@ const MainFeed: React.FC = () => {
                     <ProfilePreviewCard
                       name={profile.first_name + " " + profile.last_name}
                       title={profile.title}
-                      id={profile.id}
+                      profile_id={profile.id}
+                      user_id={profile.user_id}
                       hasFollowed={hasFollowed}
-                      handleFollow={() => handleFollow(profile.id)}
                     />
                   </div>
                 );
@@ -549,9 +538,9 @@ const MainFeed: React.FC = () => {
                     <ProfilePreviewCard
                       name={profile.first_name + " " + profile.last_name}
                       title={profile.title}
-                      id={profile.id}
+                      profile_id={profile.id}
+                      user_id={profile.user_id}
                       hasFollowed={hasFollowed}
-                      handleFollow={() => handleFollow(profile.id)}
                     />
                   </div>
                 );

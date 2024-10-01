@@ -1,3 +1,4 @@
+import axiosInstance from "@/lib/axiosInstance";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -8,6 +9,7 @@ const initialState: User = {
   email: "",
   created_at: "",
   status: "",
+  last_seen: new Date(),
   profile: {
     uuid: "",
     id: "",
@@ -34,7 +36,7 @@ const initialState: User = {
 export const fetchUser = createAsyncThunk(
   "user/fetchUser",
   async (userId: string) => {
-    const response = await axios.get(`/api/users/${userId}`);
+    const response = await axiosInstance.get(`/api/proxy/users/${userId}`);
     return response.data.data;
   }
 );
@@ -42,7 +44,7 @@ export const fetchUser = createAsyncThunk(
 export const fetchCurrentUser = createAsyncThunk(
   "user/fetchCurrentUser",
   async () => {
-    const response = await axios.get(`/api/users/me`);
+    const response = await axiosInstance.get(`/api/proxy/users/me`);
 
     return response.data.data;
   }

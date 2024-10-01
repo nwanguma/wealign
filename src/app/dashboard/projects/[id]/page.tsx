@@ -13,7 +13,7 @@ import { RootState } from "@/store";
 
 const fetchProject = async (id: string): Promise<Project> => {
   try {
-    const response = await axiosInstance.get(`/api/projects/${id}`);
+    const response = await axiosInstance.get(`/api/proxy/projects/${id}`);
 
     return response.data.data;
   } catch (error: any) {
@@ -23,7 +23,7 @@ const fetchProject = async (id: string): Promise<Project> => {
 
 const followUser = async (profileId: string) => {
   const response = await axiosInstance.patch(
-    `/api/profiles/${profileId}/follow`
+    `/api/proxy/profiles/${profileId}/follow`
   );
 
   return response.data.data;
