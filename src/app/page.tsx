@@ -35,6 +35,7 @@ import { ProjectsWithPagination } from "@/common/constants";
 import { ProfilesWithPagination } from "@/common/constants";
 import { Profile, Project } from "@/common/constants";
 import HomeAuthControls from "@/components/ui/HomeAuthControls";
+import { useSearchParams } from "next/navigation";
 
 const fetchActivities = async (): Promise<Activity[]> => {
   try {
@@ -97,8 +98,9 @@ const riderText = [
   "Find the perfect team for your next big project",
 ];
 
-const Home: React.FC = ({ params }: any) => {
+const Home: React.FC = ({ searchParams, params }: any) => {
   const riderTextDisplayIndex = Math.floor(Math.random() * 10);
+  const actionParam = searchParams?.action;
 
   const { slug } = params;
   const events: Event[] = [];
@@ -141,7 +143,7 @@ const Home: React.FC = ({ params }: any) => {
             ))}
           </ul>
           <ul className="space-x-5">
-            <HomeAuthControls main />
+            <HomeAuthControls main action={actionParam} />
           </ul>
         </nav>
         <div className="w-full min-h-[calc(100vh-10%)] flex">
@@ -155,7 +157,7 @@ const Home: React.FC = ({ params }: any) => {
                 alt="work"
               />
             </div>
-            <div className="text-6xl font-bold text-center mt-2 mb-16">
+            <div className="text-6xl font-bold text-center mt-2 mb-16 text-gray-800">
               Discover top <span className="text-blue-700">talent</span>{" "}
               <br></br> collaborate on{" "}
               <span className="text-blue-700">projects</span>

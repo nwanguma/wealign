@@ -29,11 +29,6 @@ async function handler(req: Request) {
   const nonce = crypto.randomBytes(16).toString("base64");
   const reqBody = await parseRequestBody(req);
 
-  console.log(
-    req.headers.get("Authorization"),
-    req.headers.get("authorization")
-  );
-
   try {
     const response = await axios({
       method: req.method,
@@ -48,9 +43,7 @@ async function handler(req: Request) {
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "Content-Security-Policy": `default-src 'self'; script-src 'nonce-${nonce}'`,
         Authorization:
-          // req.headers.get("Authorization") ||
-          // req.headers.get("authorization") ||
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWZiYjk4Yi1hMzZlLTQ0YmUtYjM4MC00YmM4NWZkNTJjNmEiLCJlbWFpbCI6ImtheW9kZW90aXRvanVtaUB5b3BtYWlsLmNvbSIsImlhdCI6MTcyNzc5OTg4MiwiZXhwIjoxNzI3ODAzNDgyfQ.EhrkOBgQE5Hm5WySRxk1xpPIL9yNrV8J0jiUr94P_JQ",
+          req.headers.get("Authorization") || req.headers.get("authorization"),
       },
       data: reqBody,
       timeout: 5000,

@@ -50,11 +50,10 @@ export const authOptions: NextAuthOptions = {
               ...result.user,
               accessToken: result.access_token,
               refreshToken: result.refresh_token,
-              accessTokenExpires: Date.now() + result.expires_in * 1000, // Token expiration in ms
+              accessTokenExpires: Date.now() + result.expires_in * 1000,
             };
           }
         } catch (error) {
-          // console.error("Error in credentials authorization:", error);
           return null;
         }
 
@@ -88,7 +87,6 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
-      // Return previous token if it's still valid
       if (
         (token as Token).accessToken &&
         Date.now() < (token as Token).accessTokenExpires
@@ -96,7 +94,6 @@ export const authOptions: NextAuthOptions = {
         return token;
       }
 
-      // Token expired, refresh it
       return refreshAccessToken(token as Token);
     },
 
@@ -117,7 +114,7 @@ export const authOptions: NextAuthOptions = {
 
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
 
   pages: {
@@ -142,7 +139,7 @@ async function refreshAccessToken(token: Token): Promise<Token> {
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000, // Exact time in ms
+      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
     };
   } catch (error) {

@@ -29,7 +29,6 @@ const LoginPage: React.FC = () => {
   });
 
   const {
-    control,
     watch,
     handleSubmit,
     setValue,
@@ -37,6 +36,7 @@ const LoginPage: React.FC = () => {
   } = methods;
 
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSignIn = async (provider: string) => {
     const res = await signIn(provider, { callbackUrl: "/" });
@@ -46,6 +46,8 @@ const LoginPage: React.FC = () => {
   };
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    setLoading(true);
+
     const res = await signIn("credentials", {
       redirect: true,
       email: data.email,
@@ -56,6 +58,8 @@ const LoginPage: React.FC = () => {
     if (res?.error) {
       setError(res.error);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -116,6 +120,7 @@ const LoginPage: React.FC = () => {
               text="Log In"
               style="bg-blue-600 text-white w-full hover:bg-blue-700"
               type="submit"
+              loading={loading}
             />
           </div>
         </form>

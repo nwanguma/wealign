@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+import { signOut } from "next-auth/react";
+import { handleSignOut } from "@/store";
+
 export default function ProfileIcon({ avatar }: { avatar?: string | null }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -42,17 +45,21 @@ export default function ProfileIcon({ avatar }: { avatar?: string | null }) {
             </div>
             <ul className="mt-2 text-sm text-gray-600 space-y-2">
               <li className="p-2 bg-slate-50 rounded-lg flex items-start space-x-2">
-                <span className="text-gray-800 font-normal">
-                  Update Profile
-                </span>
+                <Link
+                  href="/dashboard/me"
+                  className="text-gray-800 font-normal cursor-pointer"
+                >
+                  View Profile
+                </Link>
               </li>
-              <li className="p-2 bg-slate-50 rounded-lg flex items-start space-x-2">
-                <span className="text-gray-800 font-normal">
-                  Account Settings
-                </span>
-              </li>
-              <li className="p-2 bg-slate-50 rounded-lg flex items-start space-x-2 justify-between">
-                <span className="flex flex-col space-y-1">
+              <li
+                className="p-2 bg-slate-50 rounded-lg flex items-start space-x-2 justify-between"
+                onClick={() => {
+                  signOut();
+                  handleSignOut();
+                }}
+              >
+                <span className="flex flex-col space-y-1 cursor-pointer">
                   <span className="text-red-600">Logout</span>
                 </span>
               </li>

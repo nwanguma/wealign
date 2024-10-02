@@ -12,7 +12,9 @@ const DashboardPageHeader: React.FC<IDashboardPageHeaderProps> = ({
 }) => {
   return (
     <div className="w-full flex flex-col justify-center space-y-5 min-h-28 bg-gradient-to-r from-blue-100 via-purple-100 to-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 font-custom">
+        {title}
+      </h2>
       <p className="text-gray-600 mt-2 text-sm w-2/3">{description}</p>
     </div>
   );

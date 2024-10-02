@@ -7,33 +7,34 @@ import {
   useQueries,
   UseQueryResult,
   UseQueryOptions,
-  useMutation,
 } from "@tanstack/react-query";
 
-import { ProjectCard } from "@/components/ui/ProjectCard";
 import axiosInstance from "@/lib/axiosInstance";
+import { RootState, AppDispatch } from "@/store";
 import { fetchCurrentUser } from "@/store/user";
-import { Event } from "@/common/constants";
+import { fetchConversations } from "@/store/conversations";
+import { setMainFeedSettings } from "@/store/ui";
+import { ProjectCard } from "@/components/ui/ProjectCard";
 import AppModal from "@/components/ui/Modal";
-import { AppDispatch, RootState } from "@/store";
 import CreateProjectForm from "@/components/forms/CreateProjectForm";
 import AddEventForm from "@/components/forms/CreateEventForm";
 import { EventCardPreview } from "@/components/ui/EventCard";
 import { ProfilePreviewCard } from "@/components/ui/ProfileCard";
-import { setMainFeedSettings } from "@/store/ui";
 import { ActivityComponent } from "@/components/ui/Activity";
+import AddItemButton from "@/components/ui/AddItemButton";
 import {
   fetchProfiles,
   fetchEvents,
   fetchProjects,
   fetchJobs,
 } from "@/store/recommendations";
-import { User } from "@/common/constants";
-import { ProjectsWithPagination } from "@/common/constants";
-import { EventWithPagination } from "@/common/constants";
-import AddItemButton from "@/components/ui/AddItemButton";
-import { Activity } from "@/common/constants";
-import { fetchConversations } from "@/store/conversations";
+import {
+  Event,
+  User,
+  Activity,
+  ProjectsWithPagination,
+  EventWithPagination,
+} from "@/common/constants";
 
 const fetchActivities = async (): Promise<Activity[]> => {
   try {
@@ -268,10 +269,14 @@ const MainFeed: React.FC = () => {
           </div>
         </aside>
         <div className="flex-1 space-y-6">
-          <div className="p-4 bg-white rounded-lg border border-gray-300 space-y-3 flex justify-between items-center">
+          <div
+            className={`p-4 rounded-lg border border-gray-300 space-y-3 flex items-center ${
+              currentUser.id ? "justify-between" : "justify-end"
+            }`}
+          >
             {currentUser.id && (
-              <div className="w-1/2 space-y-4">
-                <div className="flex items-center space-x-4">
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center space-x-2">
                   <div className="border border-gray-300 p-1 rounded-full">
                     <Image
                       src="/images/test-avatar.jpg"
@@ -287,7 +292,7 @@ const MainFeed: React.FC = () => {
                       {currentUser.profile.last_name}
                     </span>
                     <span className="text-xs text-gray-500">
-                      Product Manager
+                      {currentUser.profile.title}
                     </span>
                   </div>
                 </div>
@@ -309,7 +314,7 @@ const MainFeed: React.FC = () => {
                 </div>
               </div>
             )}
-            <div className="space-y-6">
+            <div className="space-y-6 w-5/12">
               <div className="">
                 <div className="">
                   <div className="flex space-x-3 justify-end">
@@ -327,8 +332,8 @@ const MainFeed: React.FC = () => {
               </div>
               <div className="space-y-3 text-right">
                 <span className="text-xs font-medium">Customize feed</span>
-                <div className="flex space-x-2 items-center">
-                  <span className="text-xs text-gray-500">Feed Content:</span>
+                <div className="flex space-x-2 items-center justify-end">
+                  <span className="text-xs text-gray-500">Content:</span>
                   {["events", "projects"].map((contentType) => (
                     <div
                       onClick={() => handleMainFeedContentChange(contentType)}
@@ -344,7 +349,7 @@ const MainFeed: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <div className="flex space-x-2 items-center">
+                <div className="flex space-x-2 items-center justify-end">
                   <span className="text-xs text-gray-500">From:</span>
                   {["following", "all"].map((contentTypeFrom) => (
                     <div

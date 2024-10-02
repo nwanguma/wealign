@@ -9,7 +9,7 @@ import queryClient from "../../lib/react-query-client";
 import { PersistGate } from "redux-persist/integration/react";
 import Image from "next/image";
 
-import { store, persistor } from "@/store"; // Import persistor
+import { store, persistor } from "@/store";
 import DashboadHeader from "@/components/layout/DashboardHeader";
 import DashboardFooter from "@/components/layout/DashboardFooter";
 import DashboardNav from "@/components/layout/DashboardNav";
@@ -34,11 +34,11 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <Provider store={store}>
       <PersistGate loading={<Loading />} persistor={persistor}>
-        <div className="w-full h-screen bg-[#f7f7f7]">
+        <div className={`w-full h-screen bg-[#f7f7f7] ${nunito.className}`}>
           <DashboadHeader>
             <DashboardNav />
           </DashboadHeader>
-          <main className={`${nunito.className} min-h-screen`}>
+          <main className="min-h-screen">
             <div>
               <QueryClientProvider client={queryClient}>
                 {children}

@@ -13,6 +13,7 @@ import AppModal from "@/components/ui/Modal";
 import { Conversation, Message, User } from "@/common/constants";
 import { Profile } from "@/common/constants";
 import { timeAgo } from "@/lib/helpers";
+import { getSession } from "next-auth/react";
 
 interface IMessageFilters {
   limit: number;
@@ -157,7 +158,6 @@ export default function MessagesPage() {
                 </div>
 
                 <div className="space-y-1">
-                  {console.log(conversations, "****")}
                   {conversations
                     ?.filter((conversation) => {
                       return (

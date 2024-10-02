@@ -1,11 +1,11 @@
 import React from "react";
-import Image from "next/image";
 
 interface IAuthSocialButtonProps {
   type?: "button" | "submit" | "reset" | undefined;
   text: string;
   style: string;
   onclick?: () => void;
+  loading?: boolean;
 }
 
 const AuthButton: React.FC<IAuthSocialButtonProps> = ({
@@ -13,6 +13,7 @@ const AuthButton: React.FC<IAuthSocialButtonProps> = ({
   text,
   style,
   onclick,
+  loading,
 }) => {
   return (
     <button
@@ -20,7 +21,7 @@ const AuthButton: React.FC<IAuthSocialButtonProps> = ({
       onClick={onclick}
       className={`rounded-xl flex justify-center items-center py-4 ${style}`}
     >
-      {text}
+      {loading ? "Loading..." : text}
     </button>
   );
 };

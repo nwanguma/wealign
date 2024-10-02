@@ -4,15 +4,23 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  const isProtected = !req.nextUrl.pathname.startsWith("/auth");
+  const isProtected = req.nextUrl.pathname.startsWith("/dashboard");
 
   if (isProtected && !token) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+    const url = new URL("/", req.url);
+
+    // url.searchParams.set("action", "login");
+
+    return NextResponse.redirect(url);
+  }
+
+  if (!isProtected && token) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/", "/dashboard", "/dashboard/:path*"],
 };
