@@ -9,6 +9,7 @@ import { signIn } from "next-auth/react";
 import AuthSocialsButton from "@/components/ui/AuthSocialsButton";
 import AuthButton from "@/components/ui/Button";
 import Input from "@/components/forms/Input";
+import { useRouter } from "next/navigation";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -23,7 +24,8 @@ type FormValues = {
   password: string;
 };
 
-const LoginPage: React.FC = () => {
+const LoginForm: React.FC = () => {
+  const router = useRouter();
   const methods = useForm({
     resolver: yupResolver(schema),
   });
@@ -42,6 +44,8 @@ const LoginPage: React.FC = () => {
     const res = await signIn(provider, { callbackUrl: "/" });
     if (res?.error) {
       setError("Failed to sign in with " + provider);
+    } else {
+      router.push("/dashboard");
     }
   };
 
@@ -129,4 +133,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default LoginForm;

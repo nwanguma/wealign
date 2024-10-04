@@ -6,10 +6,12 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { signIn } from "next-auth/react";
+import axios from "axios";
 
 import AuthSocialsButton from "@/components/ui/AuthSocialsButton";
 import AuthButton from "@/components/ui/Button";
 import Input from "@/components/forms/Input";
+import { useRouter } from "next/navigation";
 
 const schema = yup.object().shape({
   first_name: yup.string().required("First name is required"),
@@ -22,11 +24,15 @@ const schema = yup.object().shape({
 });
 
 type FormValues = {
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
 };
 
-const RegisterPage: React.FC = () => {
+const RegisterForm: React.FC = () => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const methods = useForm({
     resolver: yupResolver(schema),
   });
@@ -48,17 +54,29 @@ const RegisterPage: React.FC = () => {
     }
   };
 
+  const handleSignUp = async (data: FormValues) => {
+    return await axios.post("/api/proxy/auth/register", data);
+  };
+
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    setLoading(true);
+
+    await handleSignUp(data);
+
     const res = await signIn("credentials", {
       redirect: false,
       email: data.email,
       password: data.password,
-      callbackUrl: "/",
+      callbackUrl: "/dashboard",
     });
 
     if (res?.error) {
       setError(res.error);
+    } else {
+      router.push("/dashboard");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -142,6 +160,7 @@ const RegisterPage: React.FC = () => {
               text="Log In"
               style="bg-blue-600 text-white w-full hover:bg-blue-700"
               type="submit"
+              loading={loading}
             />
           </div>
         </form>
@@ -150,4 +169,4 @@ const RegisterPage: React.FC = () => {
   );
 };
 
-export default RegisterPage;
+export default RegisterForm;

@@ -69,3 +69,13 @@ export const formatDateLong = (dateString: string): string => {
 
   return `${dayOfWeek}, ${dayWithSuffix} ${month}, ${year} ${time}`;
 };
+
+export const getFilenameAndExtension = (url: string): string => {
+  const pathname = new URL(url).pathname;
+  const filenameWithExt = pathname.substring(pathname.lastIndexOf("/") + 1);
+  const dotIndex = filenameWithExt.lastIndexOf(".");
+  const filename = filenameWithExt.substring(0, dotIndex);
+  const extension = filenameWithExt.substring(dotIndex + 1);
+
+  return filename + "." + extension;
+};

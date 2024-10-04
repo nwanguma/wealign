@@ -9,10 +9,8 @@ import CreateJobForm from "@/components/forms/CreateJobForm";
 import { JobCard } from "@/components/ui/JobCard";
 import { Job } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
-import AddItemButton from "@/components/ui/AddItemButton";
 
 import FilterComponent from "@/components/ui/Filter";
-
 import { JobsWithPagination } from "@/common/constants";
 
 const fetchJobs = async (): Promise<JobsWithPagination> => {

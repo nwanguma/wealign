@@ -67,8 +67,6 @@ export interface Skill {
 }
 
 export interface Profile {
-  user_id?: string;
-  uuid: string;
   id: string;
   first_name: string;
   last_name: string;
@@ -84,9 +82,19 @@ export interface Profile {
   skills?: Skill[] | null;
   title: string;
   heading: string;
-  views: number;
-  followers: Profile[];
-  following: Profile[];
+  views?: number;
+  followers?: Profile[];
+  following?: Profile[];
+  comments?: any[];
+  reactions?: any[];
+  events?: Event[];
+  jobs?: Job[];
+  projects?: Project[];
+  user_id?: string;
+  status?: string;
+  is_mentor?: boolean;
+  mentor_note?: string;
+  requires_update?: boolean;
 }
 
 export enum ActivityTypes {

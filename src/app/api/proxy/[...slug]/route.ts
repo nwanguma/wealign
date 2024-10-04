@@ -1,5 +1,4 @@
-import axios, { AxiosRequestHeaders } from "axios";
-import rateLimit from "express-rate-limit";
+import axios from "axios";
 import { performance } from "perf_hooks";
 import crypto from "crypto";
 import { NextResponse } from "next/server";

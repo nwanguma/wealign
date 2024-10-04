@@ -5,12 +5,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
 
-import { Skill } from "@/common/constants";
+import { mapLanguageToFlag, Skill } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
 import { AppDispatch, RootState } from "@/store";
 import { fetchProfiles } from "@/store/recommendations";
-import { Router } from "next/router";
 import { addToConversations } from "@/store/conversations";
+import { getFilenameAndExtension } from "@/lib/helpers";
+import { Profile, Event, Project, Job } from "@/common/constants";
+
+import { EventCardPreview } from "./EventCard";
+import { ProjectCard } from "./ProjectCard";
+import { JobCard } from "./JobCard";
+import { WithTooltip } from "./WithTooltip";
+import { SkeletonLoader } from "./SkeletonLoader";
 
 interface IProfilePreviewCardProps {
   profile_id: string;
@@ -307,5 +314,430 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
         </div>
       </div>
     </Link>
+  );
+};
+
+interface IProfileCardMainProps extends Profile {}
+
+export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
+  first_name,
+  last_name,
+  avatar,
+  bio,
+  heading,
+  title,
+  location,
+  phone,
+  website,
+  linkedin,
+  github,
+  resume,
+  languages,
+  skills,
+  status,
+  id,
+  comments = [],
+  reactions = [],
+  events,
+  projects,
+  jobs,
+  is_mentor,
+  mentor_note,
+  requires_update,
+}) => {
+  const [showCommentInput, setShowCommentInput] = useState(false);
+  const [newComment, setNewComment] = useState("");
+
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      setNewComment("");
+    }
+  };
+
+  return (
+    <div className="relative space-y-4">
+      <div className="flex flex-col space-y-6 border-b border-b-gray-200 pb-4">
+        <div className="flex items-center space-x-6">
+          <div className="border border-gray-300 p-1 rounded-full">
+            <Image
+              src="/images/test-avatar.jpg"
+              width={150}
+              height={150}
+              alt="avatar"
+              className="rounded-full"
+            />
+          </div>
+          <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-2">
+              <div className="flex flex-col space-y-1">
+                <span className="font-bold text-2xl text-gray-900 flex items-center space-x-2 capitalize">
+                  <span>
+                    {first_name} {last_name}
+                  </span>
+                  {!is_mentor && (
+                    <span className="text-xs font-medium rounded text-gray-700 bg-green-200 py-1 px-1">
+                      mentor
+                    </span>
+                  )}
+                </span>
+                {title && (
+                  <span className="text-sm text-gray-700 font-normal">
+                    {title}
+                  </span>
+                )}
+              </div>
+              {heading && (
+                <div>
+                  <span className="text-sm text-gray-500">{heading}</span>
+                </div>
+              )}
+            </div>
+            {status && (
+              <div className="space-x-2 capitalize">
+                <span className="text-xs font-medium rounded text-gray-700 bg-violet-200 py-1 px-1">
+                  {status}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      {!requires_update && (
+        <div>
+          <div className="space-y-3 border-b border-b-gray-200 pb-4">
+            <h3 className="text-sm font-bold">Details</h3>
+            <div className="flex-1 grid grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Location</h3>
+                <div className="flex space-x-2 items-center">
+                  {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
+                  <span className="text-xs">{location}</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Phone</h3>
+                <div className="flex space-x-2 items-center">
+                  {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
+                  <span className="text-xs text-blue-800">{phone}</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Linkedin</h3>
+                <div className="flex space-x-2 items-center">
+                  {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
+                  <span className="text-xs text-blue-800">{linkedin}</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Website</h3>
+                <div className="flex space-x-2 items-center">
+                  {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
+                  <span className="text-xs text-blue-800">{website}</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Github</h3>
+                <div className="flex space-x-2 items-center">
+                  {/* <Image src="/icons/calendar.svg" alt="" width={20} height={20} /> */}
+                  <span className="text-xs text-blue-800">{github}</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Languages</h3>
+                <div className="flex space-x-3">
+                  {(languages as string[]).map((language: string) => (
+                    <span
+                      className="rounded-full inline-block bg-slate-50 p-1 shadow"
+                      key={language}
+                    >
+                      {WithTooltip(
+                        language,
+                        <Image
+                          src={`/icons/${
+                            (mapLanguageToFlag as any)[language]
+                          }.svg`}
+                          alt=""
+                          width={23}
+                          height={23}
+                          className="rounded-full"
+                        />
+                      )}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Share</h3>
+                <div className="flex space-x-3">
+                  {["Linkedin", "Google", "Twitter", "Facebook"].map(
+                    (platform) => (
+                      <div key={platform}>
+                        {WithTooltip(
+                          platform,
+                          <Image
+                            key={platform}
+                            src={`/icons/${platform}-share.svg`}
+                            alt=""
+                            width={20}
+                            height={20}
+                          />
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2 border-b border-b-gray-200 pb-4">
+            <h3 className="text-sm font-bold">About</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">{bio}</p>
+          </div>
+          {is_mentor && mentor_note && (
+            <div className="space-y-2 border-b border-b-gray-200 pb-4">
+              <h3 className="text-sm font-bold">Mentor Note</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                {mentor_note}
+              </p>
+            </div>
+          )}
+          {skills && (
+            <div className="space-y-2 border-b border-b-gray-200 pb-4">
+              <h3 className="text-sm font-bold">Skills</h3>
+              <div className="flex gap-2 flex-wrap">
+                {skills.map((skill: { title: string }) => (
+                  <div
+                    key={skill.title}
+                    className="capitalize text-xs border border-violet-500 text-violet-500 py-1 px-2 rounded"
+                  >
+                    {skill.title}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {resume && (
+            <div className="w-full border-b border-b-gray-200 pb-4">
+              <div className="space-y-2 w-2/3">
+                <h3 className="text-sm font-bold">Attachments</h3>
+                <div className="space-y-2">
+                  <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50">
+                    <Link href={resume as string} download target="_blank">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Image
+                            src="/icons/file.svg"
+                            width={20}
+                            height={20}
+                            alt="file icon"
+                          />
+                          <span className="">
+                            {getFilenameAndExtension(resume)}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {WithTooltip(
+                            "Download",
+                            <Image
+                              src="/icons/download.svg"
+                              width={18}
+                              height={18}
+                              alt="file icon"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {projects && (
+            <div className="space-y-2 w-full relative border-b border-b-gray-200 pb-4">
+              <div className="flex justify-between">
+                <h3 className="text-sm font-bold">Projects</h3>
+                <Link
+                  href={"/projects"}
+                  className="text-xs text-gray-600 flex items-center space-x-2"
+                >
+                  <span>View your projects</span>
+                  <Image src="/icons/link.svg" width={15} height={15} alt="" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-x-10">
+                {projects
+                  ?.slice(0, 4)
+                  .map(
+                    ({
+                      id,
+                      title,
+                      description,
+                      website,
+                      github_url,
+                      created_at,
+                      skills,
+                      status,
+                    }: Project) => {
+                      return (
+                        <ProjectCard
+                          key={id}
+                          id={id}
+                          title={title}
+                          description={description}
+                          website={website}
+                          github_url={github_url}
+                          created_at={created_at}
+                          skills={skills}
+                          status={status}
+                        />
+                      );
+                    }
+                  )}
+              </div>
+              {!(projects as Project[]).length && (
+                <div className="text-gray-500" style={{ fontSize: "13.5px" }}>
+                  There are no upcoming events.
+                </div>
+              )}
+            </div>
+          )}
+          {events && (
+            <div className="space-y-2 w-full relative border-b border-b-gray-200 pb-4">
+              <div className="flex justify-between">
+                <h3 className="text-sm font-bold">Events</h3>
+                <Link
+                  href={"/events"}
+                  className="text-xs text-gray-600 flex items-center space-x-2"
+                >
+                  <span>View your events</span>
+                  <Image src="/icons/link.svg" width={15} height={15} alt="" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-x-10">
+                {events?.slice(0, 4).map((event: Event) => {
+                  return (
+                    <div className="border border-gray-300 rounded-lg px-3 py-6">
+                      <EventCardPreview
+                        id={event.id}
+                        banner={event.banner}
+                        title={event.title}
+                        location={event.location as string}
+                        event_start_date={event.event_start_date}
+                        description={event.description}
+                        comment_count={event.comments?.length}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              {!events.length && (
+                <div className="text-gray-500" style={{ fontSize: "13.5px" }}>
+                  There are no upcoming events.
+                </div>
+              )}
+            </div>
+          )}
+          {jobs && (
+            <div className="space-y-2 w-full relative border-b border-b-gray-200 pb-4">
+              <div className="flex justify-between">
+                <h3 className="text-sm font-bold">Jobs</h3>
+                <Link
+                  href={"/jobs"}
+                  className="text-xs text-gray-600 flex items-center space-x-2"
+                >
+                  <span>View your jobs</span>
+                  <Image src="/icons/link.svg" width={15} height={15} alt="" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-x-10">
+                {jobs?.map(
+                  ({
+                    id,
+                    title,
+                    description,
+                    website,
+                    application_url,
+                    created_at,
+                    requirements,
+                    status,
+                  }) => (
+                    <JobCard
+                      key={id}
+                      id={id}
+                      title={title}
+                      description={description}
+                      website={website}
+                      application_url={application_url as string}
+                      created_at={created_at}
+                      requirements={requirements}
+                      status={status}
+                    />
+                  )
+                )}
+              </div>
+              {!(jobs as Job[]).length && (
+                <div className="text-gray-500" style={{ fontSize: "13.5px" }}>
+                  There are no upcoming jobs.
+                </div>
+              )}
+            </div>
+          )}
+          {!comments && (
+            <div className="space-y-2 p-3 rounded-lg">
+              <h3 className="text-sm font-medium underline">
+                Comments ({(comments as any[]).length})
+              </h3>
+              <div className="space-y-3 border border-gray-300 rounded-lg p-1">
+                {(comments as any[]).map((comment: any) => (
+                  <div
+                    key={comment.id}
+                    className="px-3 py-2 rounded-lg flex items-center space-x-3 border-b border-gray-100  justify-between"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div className="border border-gray-300 p-1 rounded-full">
+                        <Image
+                          src="/images/test-avatar-3.jpg"
+                          width={30}
+                          height={30}
+                          alt="avatar"
+                          className="rounded-full"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-gray-500">
+                          {comment.author}
+                        </p>
+                        <p className="text-gray-700 text-sm">{comment.text}</p>
+                      </div>
+                    </div>
+                    <div className="text-xs">
+                      {/* <Image src="/icons/bin.svg" width={18} height={18} alt="" /> */}
+                      <span className="text-red-400 underline">Delete</span>
+                    </div>
+                  </div>
+                ))}
+                <div className="flex items-center space-x-3 px-3 pb-2 border-green-500">
+                  <input
+                    type="text"
+                    placeholder="Add a comment..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-gray-500 rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
+                  />
+                  {/* <button
+              onClick={handleAddComment}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+            >
+              Post
+            </button> */}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      {requires_update && <SkeletonLoader />}
+    </div>
   );
 };
