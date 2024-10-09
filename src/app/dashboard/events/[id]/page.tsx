@@ -61,7 +61,7 @@ export default function Dashboard() {
         </div>
         <aside className="w-1/3 space-y-5">
           <div className="p-4 bg-white rounded-lg border border-gray-300">
-            <h3 className="font-semibold mb-3 text-gray-700">
+            <h3 className="font-app-medium mb-3 text-gray-700">
               Upcoming events
             </h3>
             <div className="space-y-4">
@@ -87,9 +87,13 @@ export default function Dashboard() {
                 <div className="flex items-center space-x-5">
                   <div className="max-w-20">
                     <div className="flex flex-col justify-center items-center">
-                      <span className="text-xs text-gray-500">Mon</span>
+                      <span className="text-xs text-custom-gray-paragraph">
+                        Mon
+                      </span>
                       <span className="text-lg font-bold text-gray-900">4</span>
-                      <span className="text-xs text-gray-500">April</span>
+                      <span className="text-xs text-custom-gray-paragraph">
+                        April
+                      </span>
                     </div>
                   </div>
                   <div className="w-1/3 h-20 relative rounded-lg">
@@ -102,7 +106,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex flex-col flex-1">
                     <span className="font-medium">A futuristic tech event</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-custom-gray-paragraph">
                       London, England
                     </span>
                   </div>

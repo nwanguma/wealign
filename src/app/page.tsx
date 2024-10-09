@@ -148,7 +148,7 @@ const Home: React.FC = ({ searchParams, params }: any) => {
         </nav>
         <div className="w-full min-h-[calc(100vh-10%)] flex">
           <div className="flex items-center flex-col w-9/12 mx-auto mt-[6%] 2xl:mt-[8%]">
-            <div className="bg-blue-100 text-blue-600 text-sm px-2 rounded flex space-x-1 items-center">
+            <div className="bg-blue-100 text-blue-600 text-md px-2 rounded flex space-x-1 items-center">
               <span>{riderText[riderTextDisplayIndex]}</span>
               <Image
                 src="/icons/work-color.svg"
@@ -164,7 +164,7 @@ const Home: React.FC = ({ searchParams, params }: any) => {
               <br></br> and unlock new{" "}
               <span className="text-blue-700">job opportunities</span>
             </div>
-            <div className="mb-5 text-gray-500 w-1/2 text-center">
+            <div className="mb-5 text-gray-500 w-1/2 text-center text-lg-xl">
               Connect with professionals, explore exciting projects, and find
               your next career move in one dynamic platform
               <Image

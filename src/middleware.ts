@@ -8,11 +8,6 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const isProtected = req.nextUrl.pathname.startsWith("/dashboard");
 
-  console.log(
-    "**&&'",
-    await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
-  );
-
   if (isProtected && !token) {
     const url = new URL("/", req.url);
 

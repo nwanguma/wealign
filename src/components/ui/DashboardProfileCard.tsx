@@ -40,7 +40,7 @@ const DashboardProfileCard: React.FC<IDashboardProfileCardProps> = ({
         </div>
         <div className="flex flex-col space-y-1">
           <span className="font-medium">{name}</span>
-          <span className="text-sm text-gray-500">{title}</span>
+          <span className="text-sm text-custom-gray-paragraph">{title}</span>
         </div>
       </div>{" "}
       <p className="text-sm leading-snug text-gray-600">{heading}</p>

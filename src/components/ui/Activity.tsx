@@ -48,10 +48,12 @@ export const ActivityComponent: React.FC<ActivityProps> = ({
   return (
     <div>
       <span className="text-xs">
-        <span className="font-medium">{activityOwnerName}</span>{" "}
+        <span className="font-app-medium">{activityOwnerName}</span>{" "}
         <span className="text-gray-600">{activityTypeToMessage[type]}</span>{" "}
         <Link href={`/dashboard/profiles/${participant.id}`}>
-          <span className="font-medium underline">{activityParticipant}</span>
+          <span className="font-app-medium underline">
+            {activityParticipant}
+          </span>
         </Link>{" "}
         {resourceTitle && (
           <Link href={`/dashboard/${resourceType}/${resource.id}`}>

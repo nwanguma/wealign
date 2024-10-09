@@ -276,7 +276,9 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
                     />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs text-gray-500">{comment.author}</p>
+                    <p className="text-xs text-custom-gray-paragraph">
+                      {comment.author}
+                    </p>
                     <p className="text-gray-700 text-sm">{comment.text}</p>
                   </div>
                 </div>
@@ -292,7 +294,7 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
               placeholder="Add a comment..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-gray-500 rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
+              className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-custom-gray-paragraph rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
             />
             <button
               onClick={() => console.log("clicked")}

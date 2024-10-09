@@ -81,7 +81,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       </main>
 
       <footer className="text-center py-4 bg-gray-100">
-        <p className="text-sm text-gray-500">This is the footer</p>
+        <p className="text-sm text-custom-gray-paragraph">This is the footer</p>
       </footer>
     </div>
   );

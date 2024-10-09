@@ -197,14 +197,14 @@ export default function MessagesPage() {
                               conversation.participants?.participant.profile
                                 .last_name}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-custom-gray-paragraph">
                             {conversation?.latest_message?.text}
                           </span>
                         </div>
                       </div>
                     ))}
                   {!conversations?.length && (
-                    <div className="bg-slate-50 mt-5 rounded-lg h-14 p-2 flex flex-col justify-center items-center space-y-3 text-gray-500">
+                    <div className="bg-slate-50 mt-5 rounded-lg h-14 p-2 flex flex-col justify-center items-center space-y-3 text-custom-gray-paragraph">
                       <span className="text-sm font-medium">
                         Hmmm, there is nothing here!
                       </span>
@@ -236,7 +236,7 @@ export default function MessagesPage() {
                             activeConversation.participants?.participant.profile
                               .last_name}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-custom-gray-paragraph">
                           {(activeConversation.participants?.participant
                             ?.last_seen &&
                             timeAgo(
@@ -363,7 +363,7 @@ export default function MessagesPage() {
               )}
               {!activeConversation && (
                 <div className="flex h-1/2 w-full justify-center ">
-                  <div className="w-96 bg-slate-50 mt-10 rounded-xl h-64 px-4 py-8 text-center flex flex-col justify-center items-center space-y-6 text-gray-500">
+                  <div className="w-96 bg-slate-50 mt-10 rounded-xl h-64 px-4 py-8 text-center flex flex-col justify-center items-center space-y-6 text-custom-gray-paragraph">
                     <div>
                       <p className="text-xl font-bold mb-3">Say hi!</p>
                       <p

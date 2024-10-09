@@ -1,0 +1,81 @@
+@font-face {
+    font-family: 'TTCommonsPro-It';
+    src: url('TTCommonsPro-It.woff2') format('woff2'),
+        url('TTCommonsPro-It.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TTCommonsPro-BdIt';
+    src: url('TTCommonsPro-BdIt.woff2') format('woff2'),
+        url('TTCommonsPro-BdIt.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TTCommonsPro-Bd';
+    src: url('TTCommonsPro-Bd.woff2') format('woff2'),
+        url('TTCommonsPro-Bd.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TTCommonsPro-Bd';
+    src: url('TTCommonsPro-Bd.woff2') format('woff2'),
+        url('TTCommonsPro-Bd.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TTCommonsPro-It';
+    src: url('TTCommonsPro-It.woff2') format('woff2'),
+        url('TTCommonsPro-It.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TTCommonsPro-BdIt';
+    src: url('TTCommonsPro-BdIt.woff2') format('woff2'),
+        url('TTCommonsPro-BdIt.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TTCommonsPro-Lt';
+    src: url('TTCommonsPro-Lt.woff2') format('woff2'),
+        url('TTCommonsPro-Lt.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TTCommonsPro-Md';
+    src: url('TTCommonsPro-Md.woff2') format('woff2'),
+        url('TTCommonsPro-Md.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TTCommonsPro-Rg';
+    src: url('TTCommonsPro-Rg.woff2') format('woff2'),
+        url('TTCommonsPro-Rg.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

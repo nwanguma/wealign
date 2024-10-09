@@ -20,7 +20,7 @@ const AuthButton = ({
 }) => {
   return (
     <button
-      style={{ fontSize: "14.8px" }}
+      style={{ fontSize: "16px" }}
       onClick={onClick}
       className={`${className} text-sm px-6 py-3 rounded ${
         variant !== "filled"

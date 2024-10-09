@@ -1,7 +1,6 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-
 import { Profile, User } from "@/common/constants";
 
 const initialState: User = {
@@ -11,7 +10,6 @@ const initialState: User = {
   status: "",
   last_seen: new Date(),
   profile: {
-    uuid: "",
     id: "",
     first_name: "",
     views: 0,
@@ -57,11 +55,20 @@ const userSlice = createSlice({
     setUser: (state, action: PayloadAction<User>) => {
       return action.payload;
     },
-    updateFollowers: (state, action: PayloadAction<Profile>) => {
-      state.profile.followers = [...state.profile.followers, action.payload];
-    },
-    updateFollowing: (state, action: PayloadAction<Profile>) => {
-      state.profile.following = [...state.profile.following, action.payload];
+    // updateFollowers: (state, action: PayloadAction<Profile>) => {
+    //   state.profile.followers = [
+    //     ...state.profile.followers,
+    //     action.payload.followers,
+    //   ];
+    // },
+    // updateFollowing: (state, action: PayloadAction<Profile>) => {
+    //   state.profile.following = [
+    //     ...state.profile.following,
+    //     action.payload.followers,
+    //   ];
+    // },
+    updateProfile: (state, action: PayloadAction<Profile>) => {
+      state.profile = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -80,5 +87,10 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, updateFollowers, updateFollowing } = userSlice.actions;
+export const {
+  setUser,
+  updateProfile,
+  // updateFollowers,
+  // updateFollowing
+} = userSlice.actions;
 export default userSlice.reducer;

@@ -31,16 +31,18 @@ export default function ProfilePage() {
   const [accountsSettingsModalIsOpen, setAccountsSettingsModalIsOpen] =
     useState(false);
   const [updateProfileModalIsOpen, setUpdateProfileModalIsOpen] = useState(
-    user.profile.requires_update
+    !!user.profile?.requires_update
   );
 
   const {
     data: profile,
     error,
     isLoading,
+    refetch,
   } = useQuery<Profile, Error>({
     queryKey: ["profiles", id],
     queryFn: () => fetchProfile(id as string),
+    enabled: !!id,
   });
 
   return (
@@ -73,6 +75,8 @@ export default function ProfilePage() {
                   jobs={profile.jobs}
                   mentor_note={profile.mentor_note}
                   requires_update={profile.requires_update}
+                  is_mentor={profile.is_mentor}
+                  status={profile.status}
                 />
                 <div className="absolute -top-4 right-0">
                   <div className="flex space-x-5">
@@ -116,7 +120,10 @@ export default function ProfilePage() {
               setUpdateProfileModalIsOpen(false);
             }}
           >
-            <UpdateProfileForm />
+            <UpdateProfileForm
+              handleModalClose={() => setUpdateProfileModalIsOpen(false)}
+              triggerRefetch={refetch}
+            />
           </AppModal>
           <AppModal
             title={"Account Settings"}

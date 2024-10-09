@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { mapLanguageToFlag, Skill } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
@@ -18,6 +19,7 @@ import { ProjectCard } from "./ProjectCard";
 import { JobCard } from "./JobCard";
 import { WithTooltip } from "./WithTooltip";
 import { SkeletonLoader } from "./SkeletonLoader";
+import ShareComponent from "./ShareComponent";
 
 interface IProfilePreviewCardProps {
   profile_id: string;
@@ -118,8 +120,8 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
           />
         </div>
         <div className="flex flex-col flex-1">
-          <span className="font-medium text-sm">{name}</span>
-          <span className="text-xs text-gray-500">{title}</span>
+          <span className="font-app-medium text-sm">{name}</span>
+          <span className="text-xs text-custom-gray-paragraph">{title}</span>
         </div>
       </div>
       <div className="flex items-center space-x-2">
@@ -221,15 +223,17 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
               />
             </div>
             <div className="flex-1 space-y-3">
-              <div className="flex flex-col">
+              <div className="flex flex-col space-y-1">
                 <span className="font-medium text-sm">{name}</span>
                 <span className="text-xs text-gray-700 font-normal">
                   {title}
                 </span>
-                <span className="text-xs text-gray-500">{heading}</span>
+                <span className="text-xs text-custom-gray-paragraph">
+                  {heading}
+                </span>
               </div>
               <div className="w-3/4 leading-4 text-gray-700">
-                <span className="text-sm leading-tight text-gray-500">
+                <span className="text-sm leading-tight text-custom-gray-paragraph font-light">
                   {bio}{" "}
                 </span>
               </div>
@@ -263,7 +267,7 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
         </div>
         <div className="absolute top-0 right-0">
           <div className="flex items-center space-x-2">
-            <button className="flex items-center p-3 shadow bg-white border border-gray-300 text-sm rounded-full hover:bg-gray-100 text-gray-500">
+            <button className="flex items-center p-3 shadow bg-white border border-gray-300 text-sm rounded-full hover:bg-gray-100 text-custom-gray-paragraph">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="currentColor"
@@ -294,7 +298,7 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
                 </g>
               </svg>
             </button>
-            <button className="flex items-center p-3 bg-white border  shadow border-gray-300 text-gray-500 text-sm hover:bg-gray-100 rounded-full">
+            <button className="flex items-center p-3 bg-white border  shadow border-gray-300 text-custom-gray-paragraph text-sm hover:bg-gray-100 rounded-full">
               <svg
                 className="w-4 h-4"
                 viewBox="0 0 24 24"
@@ -345,8 +349,18 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
   mentor_note,
   requires_update,
 }) => {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [newComment, setNewComment] = useState("");
+
+  const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL}${pathname}${
+    searchParams
+      ? `${searchParams.toString() ? "?" : ""}${searchParams.toString()}`
+      : ""
+  }`;
+
+  console.log(fullUrl);
 
   const handleAddComment = () => {
     if (newComment.trim()) {
@@ -356,11 +370,11 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
 
   return (
     <div className="relative space-y-4">
-      <div className="flex flex-col space-y-6 border-b border-b-gray-200 pb-4">
+      <div className="flex flex-col space-y-6 border-b border-b-gray-200 py-4">
         <div className="flex items-center space-x-6">
           <div className="border border-gray-300 p-1 rounded-full">
             <Image
-              src="/images/test-avatar.jpg"
+              src={avatar || "/images/test-avatar.jpg"}
               width={150}
               height={150}
               alt="avatar"
@@ -370,12 +384,12 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
           <div className="flex flex-col space-y-2">
             <div className="flex flex-col space-y-2">
               <div className="flex flex-col space-y-1">
-                <span className="font-bold text-2xl text-gray-900 flex items-center space-x-2 capitalize">
+                <span className="text-2xl text-gray-900 flex items-center space-x-2 capitalize font-app-medium">
                   <span>
                     {first_name} {last_name}
                   </span>
-                  {!is_mentor && (
-                    <span className="text-xs font-medium rounded text-gray-700 bg-green-200 py-1 px-1">
+                  {is_mentor && (
+                    <span className="text-xs font-app-normal rounded text-gray-700 bg-green-200 py-1 px-1">
                       mentor
                     </span>
                   )}
@@ -388,7 +402,9 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
               </div>
               {heading && (
                 <div>
-                  <span className="text-sm text-gray-500">{heading}</span>
+                  <span className="text-sm text-custom-gray-paragraph">
+                    {heading}
+                  </span>
                 </div>
               )}
             </div>
@@ -404,9 +420,9 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
       </div>
       {!requires_update && (
         <div>
-          <div className="space-y-3 border-b border-b-gray-200 pb-4">
+          <div className="space-y-3 border-b border-b-gray-200 py-4">
             <h3 className="text-sm font-bold">Details</h3>
-            <div className="flex-1 grid grid-cols-3 gap-4">
+            <div className="flex-1 grid grid-cols-3 gap-5">
               <div className="space-y-1">
                 <h3 className="text-sm text-gray-600 font-bold">Location</h3>
                 <div className="flex space-x-2 items-center">
@@ -466,35 +482,18 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                   ))}
                 </div>
               </div>
-              <div className="space-y-1">
-                <h3 className="text-sm text-gray-600 font-bold">Share</h3>
-                <div className="flex space-x-3">
-                  {["Linkedin", "Google", "Twitter", "Facebook"].map(
-                    (platform) => (
-                      <div key={platform}>
-                        {WithTooltip(
-                          platform,
-                          <Image
-                            key={platform}
-                            src={`/icons/${platform}-share.svg`}
-                            alt=""
-                            width={20}
-                            height={20}
-                          />
-                        )}
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
+              <ShareComponent
+                url={fullUrl}
+                text="Collaborate with this professional on collabhub"
+              />
             </div>
           </div>
-          <div className="space-y-2 border-b border-b-gray-200 pb-4">
+          <div className="space-y-2 border-b border-b-gray-200 py-4">
             <h3 className="text-sm font-bold">About</h3>
             <p className="text-gray-600 text-sm leading-relaxed">{bio}</p>
           </div>
           {is_mentor && mentor_note && (
-            <div className="space-y-2 border-b border-b-gray-200 pb-4">
+            <div className="space-y-2 border-b border-b-gray-200 py-4">
               <h3 className="text-sm font-bold">Mentor Note</h3>
               <p className="text-gray-600 text-sm leading-relaxed">
                 {mentor_note}
@@ -502,7 +501,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
             </div>
           )}
           {skills && (
-            <div className="space-y-2 border-b border-b-gray-200 pb-4">
+            <div className="space-y-2 border-b border-b-gray-200 py-4">
               <h3 className="text-sm font-bold">Skills</h3>
               <div className="flex gap-2 flex-wrap">
                 {skills.map((skill: { title: string }) => (
@@ -517,9 +516,9 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
             </div>
           )}
           {resume && (
-            <div className="w-full border-b border-b-gray-200 pb-4">
+            <div className="w-full border-b border-b-gray-200 py-4">
               <div className="space-y-2 w-2/3">
-                <h3 className="text-sm font-bold">Attachments</h3>
+                <h3 className="text-sm font-bold">Resume</h3>
                 <div className="space-y-2">
                   <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50">
                     <Link href={resume as string} download target="_blank">
@@ -554,7 +553,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
             </div>
           )}
           {projects && (
-            <div className="space-y-2 w-full relative border-b border-b-gray-200 pb-4">
+            <div className="space-y-2 w-full relative border-b border-b-gray-200 py-4">
               <div className="flex justify-between">
                 <h3 className="text-sm font-bold">Projects</h3>
                 <Link
@@ -596,14 +595,17 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                   )}
               </div>
               {!(projects as Project[]).length && (
-                <div className="text-gray-500" style={{ fontSize: "13.5px" }}>
-                  There are no upcoming events.
+                <div
+                  className="text-custom-gray-paragraph"
+                  style={{ fontSize: "13.5px" }}
+                >
+                  Your projects will be displayed here.
                 </div>
               )}
             </div>
           )}
           {events && (
-            <div className="space-y-2 w-full relative border-b border-b-gray-200 pb-4">
+            <div className="space-y-2 w-full relative border-b border-b-gray-200 py-4">
               <div className="flex justify-between">
                 <h3 className="text-sm font-bold">Events</h3>
                 <Link
@@ -632,14 +634,17 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                 })}
               </div>
               {!events.length && (
-                <div className="text-gray-500" style={{ fontSize: "13.5px" }}>
-                  There are no upcoming events.
+                <div
+                  className="text-custom-gray-paragraph"
+                  style={{ fontSize: "13.5px" }}
+                >
+                  Youre events will be displayed here.
                 </div>
               )}
             </div>
           )}
           {jobs && (
-            <div className="space-y-2 w-full relative border-b border-b-gray-200 pb-4">
+            <div className="space-y-2 w-full relative border-b border-b-gray-200 py-4">
               <div className="flex justify-between">
                 <h3 className="text-sm font-bold">Jobs</h3>
                 <Link
@@ -677,8 +682,11 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                 )}
               </div>
               {!(jobs as Job[]).length && (
-                <div className="text-gray-500" style={{ fontSize: "13.5px" }}>
-                  There are no upcoming jobs.
+                <div
+                  className="text-custom-gray-paragraph"
+                  style={{ fontSize: "13.5px" }}
+                >
+                  Your jobs will be listed here.
                 </div>
               )}
             </div>
@@ -705,7 +713,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                         />
                       </div>
                       <div className="space-y-1">
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-custom-gray-paragraph">
                           {comment.author}
                         </p>
                         <p className="text-gray-700 text-sm">{comment.text}</p>
@@ -723,7 +731,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                     placeholder="Add a comment..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-gray-500 rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
+                    className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-custom-gray-paragraph rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
                   />
                   {/* <button
               onClick={handleAddComment}

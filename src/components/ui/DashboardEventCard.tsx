@@ -55,7 +55,7 @@ const DashboardEventCard: React.FC<IDashboardEventCardProps> = ({
             width={15}
             height={15}
           />
-          <span className="text-gray-500">{location}</span>
+          <span className="text-custom-gray-paragraph">{location}</span>
         </div>
         <div className="flex space-x-1 text-sm leading-snug text-gray-700">
           <Image
@@ -64,7 +64,7 @@ const DashboardEventCard: React.FC<IDashboardEventCardProps> = ({
             width={15}
             height={15}
           />
-          <span className="text-gray-500">{website}</span>
+          <span className="text-custom-gray-paragraph">{website}</span>
         </div>
         <div className="flex space-x-1 text-sm leading-snug text-gray-700">
           <Image
@@ -73,7 +73,7 @@ const DashboardEventCard: React.FC<IDashboardEventCardProps> = ({
             width={15}
             height={15}
           />
-          <span className="text-gray-500">{ticketLink}</span>
+          <span className="text-custom-gray-paragraph">{ticketLink}</span>
         </div>
       </div>
       <div className="flex justify-between items-center">

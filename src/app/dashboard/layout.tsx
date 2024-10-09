@@ -1,7 +1,5 @@
 "use client";
 
-import { Nunito } from "next/font/google";
-
 import { ReactNode } from "react";
 import { Provider, useSelector } from "react-redux";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -13,8 +11,6 @@ import { store, persistor, RootState } from "@/store";
 import DashboadHeader from "@/components/layout/DashboardHeader";
 import DashboardFooter from "@/components/layout/DashboardFooter";
 import DashboardNav from "@/components/layout/DashboardNav";
-
-const nunito = Nunito({ subsets: ["latin-ext"] });
 
 const Loading = () => {
   return (
@@ -34,7 +30,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <Provider store={store}>
       <PersistGate loading={<Loading />} persistor={persistor}>
-        <div className={`w-full h-screen bg-[#f7f7f7] ${nunito.className}`}>
+        <div
+          className={`w-full h-screen bg-[#f7f7f7] text-custom-gray font-app-normal`}
+        >
           <DashboadHeader>
             <DashboardNav />
           </DashboadHeader>

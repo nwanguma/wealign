@@ -47,7 +47,9 @@ export default function NotificationIcon() {
                   <span className="text-gray-800 font-normal">
                     This is a new message
                   </span>
-                  <span className="text-gray-500 text-xs">Fri 3:12 PM</span>
+                  <span className="text-custom-gray-paragraph text-xs">
+                    Fri 3:12 PM
+                  </span>
                 </span>
                 <span className="w-1.5 h-1.5 inline-block bg-blue-700 rounded-full mt-1"></span>
               </li>

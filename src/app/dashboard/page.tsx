@@ -240,9 +240,7 @@ const MainFeed: React.FC = () => {
       <div className="flex space-x-5">
         <aside className="w-96 space-y-5">
           <div className="p-4 bg-white rounded-lg border border-gray-300">
-            <h3 className="font-semibold mb-3 text-gray-700">
-              Upcoming events
-            </h3>
+            <h3 className="font-app-medium mb-3">Upcoming events</h3>
             <div className="space-y-4">
               {eventsRecommendations?.slice(0, 4).map((event: Event) => (
                 <div
@@ -261,7 +259,10 @@ const MainFeed: React.FC = () => {
                 </div>
               ))}
               {!eventsRecommendations.length && (
-                <div className="text-gray-500" style={{ fontSize: "13.5px" }}>
+                <div
+                  className="text-custom-gray-paragraph"
+                  style={{ fontSize: "13.5px" }}
+                >
                   There are no upcoming events.
                 </div>
               )}
@@ -279,7 +280,7 @@ const MainFeed: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <div className="border border-gray-300 p-1 rounded-full">
                     <Image
-                      src="/images/test-avatar.jpg"
+                      src={currentUser.profile.avatar || ""}
                       width={80}
                       height={80}
                       alt="avatar"
@@ -287,11 +288,11 @@ const MainFeed: React.FC = () => {
                     />
                   </div>
                   <div className="flex flex-col space-y-1">
-                    <span className="font-semibold text-sm text-gray-900">
+                    <span className="font-medium text-base text-custom-gray-heading font-custom font-app-medium">
                       {currentUser.profile.first_name}{" "}
                       {currentUser.profile.last_name}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-custom-gray-small-text">
                       {currentUser.profile.title}
                     </span>
                   </div>
@@ -301,14 +302,14 @@ const MainFeed: React.FC = () => {
                     className="underline cursor-pointer"
                     onClick={handleToggleFollowersModal}
                   >
-                    <span>{currentUser.profile.followers.length}</span>{" "}
+                    <span>{currentUser.profile.followers?.length}</span>{" "}
                     <span>Followers</span>
                   </span>
                   <span
                     className="underline cursor-pointer"
                     onClick={handleToggleFollowingModal}
                   >
-                    <span>{currentUser.profile.following.length}</span>{" "}
+                    <span>{currentUser.profile.following?.length}</span>{" "}
                     <span className="underline">Following</span>
                   </span>
                 </div>
@@ -325,7 +326,7 @@ const MainFeed: React.FC = () => {
                     <AddItemButton
                       title="Project"
                       handleOnClick={handleToggleAddProjectModal}
-                      fill="bg-slate-100 text-gray-500 hover:bg-slate-200"
+                      fill="bg-slate-100 text-custom-gray-paragraph hover:bg-slate-200"
                     />
                   </div>
                 </div>
@@ -333,7 +334,9 @@ const MainFeed: React.FC = () => {
               <div className="space-y-3 text-right">
                 <span className="text-xs font-medium">Customize feed</span>
                 <div className="flex space-x-2 items-center justify-end">
-                  <span className="text-xs text-gray-500">Content:</span>
+                  <span className="text-xs text-custom-gray-paragraph">
+                    Content:
+                  </span>
                   {["events", "projects"].map((contentType) => (
                     <div
                       onClick={() => handleMainFeedContentChange(contentType)}
@@ -350,7 +353,9 @@ const MainFeed: React.FC = () => {
                   ))}
                 </div>
                 <div className="flex space-x-2 items-center justify-end">
-                  <span className="text-xs text-gray-500">From:</span>
+                  <span className="text-xs text-custom-gray-paragraph">
+                    From:
+                  </span>
                   {["following", "all"].map((contentTypeFrom) => (
                     <div
                       onClick={() =>
@@ -423,7 +428,7 @@ const MainFeed: React.FC = () => {
         <aside className="w-1/4 space-y-5">
           {activities && !!activities.length && (
             <div className="p-4 bg-white rounded-lg border border-gray-300">
-              <h3 className="font-semibold mb-3 text-gray-700 text-base">
+              <h3 className="font-app-medium mb-3 text-gray-700 text-base">
                 Timeline Activities
               </h3>
               <div className="space-y-2">
@@ -439,7 +444,7 @@ const MainFeed: React.FC = () => {
             </div>
           )}
           <div className="p-4 bg-white rounded-lg border border-gray-300">
-            <h3 className="font-semibold mb-6  text-gray-700 text-base">
+            <h3 className="font-app-medium mb-6  text-gray-700 text-base">
               Connect with professionals
             </h3>
             <div className="space-y-4">
@@ -448,7 +453,7 @@ const MainFeed: React.FC = () => {
                   let hasFollowed = false;
 
                   if (currentUser)
-                    hasFollowed = currentUser.profile.following
+                    hasFollowed = (currentUser.profile.following || [])
                       .map((following) => following.id)
                       .includes(profile.id);
 
@@ -498,8 +503,8 @@ const MainFeed: React.FC = () => {
                 let hasFollowed = false;
 
                 if (currentUser)
-                  hasFollowed = currentUser.profile.following
-                    .map((following) => following.uuid)
+                  hasFollowed = (currentUser.profile?.following || [])
+                    .map((following) => following.id)
                     .includes(profile.id);
 
                 return (
@@ -532,8 +537,8 @@ const MainFeed: React.FC = () => {
                 let hasFollowed = false;
 
                 if (currentUser)
-                  hasFollowed = currentUser.profile.following
-                    .map((following) => following.uuid)
+                  hasFollowed = (currentUser.profile?.following || [])
+                    .map((following) => following.id)
                     .includes(profile.id);
                 return (
                   <div

@@ -1,41 +1,66 @@
-import dynamic from "next/dynamic";
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useForm, FormProvider, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
-import NativeSelect from "./NativeSelectComponent";
+import { RootState } from "@/store";
 import ReactSelectComponent from "./ReactSelectComponent";
-
-import Image from "next/image";
-
 import Input from "./Input";
-
+import { useMutation } from "@tanstack/react-query";
 import "react-quill/dist/quill.snow.css";
-// import "tailwindcss/tailwind.css";
-
 import "../../app/globals.css";
+import { useDispatch, useSelector } from "react-redux";
+// import { WithTooltip } from "../ui/WithTooltip";
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axiosInstance";
+import { Profile, Skill } from "@/common/constants";
+import { AppDispatch } from "@/store";
 
-// Dynamically import ReactQuill to disable SSR
+import { updateProfile } from "@/store/user";
+import TextArea from "./TextArea";
+import { useRouter } from "next/navigation";
+import { WithTooltip } from "../ui/WithTooltip";
+import Link from "next/link";
+import { getFilenameAndExtension } from "@/lib/helpers";
+import NativeSelect from "./NativeSelectComponent";
 
-// Dynamically import ReactQuill with a fallback loader
-const ReactQuill = dynamic(() => import("react-quill"), {
-  ssr: false,
-  loading: () => (
-    <div className="quill-skeleton h-48 border border-gray-300 rounded-lg"></div>
-  ),
-});
+export enum ProfileStatus {
+  HIRING = "hiring",
+  JOB_HUNTING = "looking for work",
+}
+
+const stripHtml = (html: string) => {
+  const tempElement = document.createElement("div");
+  tempElement.innerHTML = html;
+  return tempElement.textContent || tempElement.innerText || "";
+};
 
 const schema = yup.object().shape({
-  first_name: yup
+  avatar: yup.mixed().required("Avatar is required"),
+  // first_name: yup
+  //   .string()
+  //   .required("First name is required")
+  //   .min(2, "Must be at least 2 characters"),
+  // last_name: yup
+  //   .string()
+  //   .required("Last name is required")
+  //   .min(2, "Must be at least 2 characters"),
+  title: yup
     .string()
-    .required("First name is required")
-    .min(2, "Must be at least 2 characters"),
-  last_name: yup
+    .required("Title is required")
+    .min(10, "Title must be at least 10 characters"),
+  heading: yup
     .string()
-    .required("Last name is required")
-    .min(2, "Must be at least 2 characters"),
+    .required("Heading is required")
+    .min(10, "Heading must be at least 10 characters"),
+  bio: yup
+    .string()
+    .required("Bio is required")
+    .min(10, "Bio must be at least 10 characters"),
   location: yup.string().required("Location is required"),
+  status: yup.string(),
   phone: yup
     .string()
     .matches(
@@ -45,18 +70,77 @@ const schema = yup.object().shape({
   website: yup.string().url("Must be a valid URL"),
   linkedin: yup.string().url("Must be a valid URL"),
   github: yup.string().url("Must be a valid URL"),
-  resume: yup.string().url("Must be a valid URL"),
-  bio: yup
-    .string()
-    .required("Bio is required")
-    .min(10, "Bio must be at least 10 characters"),
-  avatar: yup.mixed().required("Avatar is required"),
+  // resume: yup.string().url("Must be a valid URL"),
+  resume: yup.mixed().required("Resume is required"),
+  languages: yup.array(),
+  // .of(yup.string().required("Language is required"))
+  // .min(1, "At least one language is required")
+  // .required("Languages are required"),
+
+  skills: yup.array(),
+  // .of(yup.string().required("Skill is required"))
+  // .min(1, "At least one skill is required")
+  // .required("Skills are required"),
+  is_mentor: yup.boolean(),
+  mentor_note: yup.string().min(10, "Note must be at least 10 characters"),
 });
 
-const UpdateProfileForm: React.FC = () => {
+const fetchSkills = async (): Promise<Skill[]> => {
+  const result = await axiosInstance.get("/api/proxy/skills");
+
+  return result.data?.data;
+};
+
+const handleUpdateProfile = async (
+  profileId: string,
+  data: Partial<Profile>
+) => {
+  const response = await axiosInstance.put(
+    `/api/proxy/profiles/${profileId}`,
+    data
+  );
+
+  return response.data.data;
+};
+
+interface IUpdateProfileForm {
+  handleModalClose: () => void;
+  triggerRefetch: () => void;
+}
+
+const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
+  handleModalClose,
+  triggerRefetch,
+}) => {
+  const user = useSelector((state: RootState) => state.user);
+  const [loading, setLoading] = useState(false);
+  const defaultValues = {
+    avatar: user?.profile?.avatar || "",
+    title: user?.profile?.title || "",
+    heading: user?.profile?.heading || "",
+    bio: user?.profile?.bio || "",
+    location: user?.profile?.location || "",
+    phone: user?.profile?.phone || "",
+    website: user?.profile?.website || "",
+    linkedin: user?.profile?.linkedin || "",
+    github: user?.profile?.github || "",
+    resume: user?.profile?.resume || "",
+    languages: user?.profile?.languages?.map((lang) => lang) || [],
+    skills: user?.profile?.skills?.map((skill) => skill.title as string) || [],
+    is_mentor: user?.profile.is_mentor || false,
+    mentor_note: user?.profile.mentor_note || "",
+    status: user?.profile.status || "",
+  };
+  const router = useRouter();
   const methods = useForm({
     resolver: yupResolver(schema),
+    defaultValues,
   });
+  const { data: skills } = useQuery({
+    queryKey: ["skills"],
+    queryFn: () => fetchSkills(),
+  });
+  const dispatch = useDispatch<AppDispatch>();
 
   const {
     control,
@@ -67,12 +151,41 @@ const UpdateProfileForm: React.FC = () => {
   } = methods;
 
   const [bio, setBio] = useState<string>("");
-  const [selectedLanguages, setSelectedLanguages] = useState<any[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<any[]>([]);
-  const [visibilityStatus, setVisibilityStatus] = useState<
-    "public" | "private"
-  >("public");
+  const [selectedLanguages, setSelectedLanguages] = useState<any[]>(
+    user?.profile?.languages?.map((lang) => ({ value: lang, label: lang })) ||
+      []
+  );
+  const [deletedResume, setDeletedResume] = useState(false);
+  const [deletedAvatar, setDeletedAvatar] = useState(false);
+  const [selectedSkills, setSelectedSkills] = useState<any[]>(
+    user?.profile?.skills?.map((skill) => ({
+      value: skill.title,
+      label: skill.title,
+    })) || []
+  );
+  const [visibilityStatus, setVisibilityStatus] = useState<string>(
+    (user?.profile?.visibility_status as string) || "public"
+  );
   const [avatar, setAvatar] = useState<File | null>(null);
+  const [resume, setResume] = useState<File | null>(null);
+
+  const updateProfileMutation = useMutation({
+    mutationFn: ({
+      profileId,
+      data,
+    }: {
+      profileId: string;
+      data: Partial<Profile>;
+    }) => handleUpdateProfile(profileId, data),
+    onSuccess: (data: Profile) => {
+      dispatch(updateProfile(data));
+      triggerRefetch();
+      handleModalClose();
+    },
+    onError: (error: any) => {
+      // console.error("Error following the user:", error);
+    },
+  });
 
   const languagesOptions = [
     { value: "english", label: "English" },
@@ -80,30 +193,104 @@ const UpdateProfileForm: React.FC = () => {
     { value: "french", label: "French" },
   ];
 
-  const skillsOptions = [
-    { value: "html", label: "HTML" },
-    { value: "css", label: "CSS" },
-    { value: "javascript", label: "JavaScript" },
+  const profileStatusOptions = [
+    { value: "hiring", label: "Hiring" },
+    {
+      value: "looking for work",
+      label: "Looking for work",
+    },
   ];
+
+  const skillsOptions = (skills || [])?.map((skill) => {
+    return { value: skill.title, label: skill.title };
+  });
 
   const handleAvatarDrop = (acceptedFiles: File[]) => {
     setAvatar(acceptedFiles[0]);
-    setValue("avatar", acceptedFiles[0]);
+
+    (async function () {
+      const formData = new FormData();
+      formData.append("file", acceptedFiles[0]);
+
+      const result = await axiosInstance.post(
+        "/api/proxy/files/upload/avatars",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setValue("avatar", result?.data?.data?.url);
+    })();
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const handleResumeDrop = (acceptedFiles: File[]) => {
+    setResume(acceptedFiles[0]);
+
+    (async function () {
+      const formData = new FormData();
+      formData.append("file", acceptedFiles[0]);
+
+      const result = await axiosInstance.post(
+        "/api/proxy/files/upload/attachments",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setValue("resume", result?.data?.data?.url);
+    })();
+  };
+
+  const {
+    getRootProps: getAvatarRootProps,
+    getInputProps: getAvatarInputProps,
+  } = useDropzone({
     onDrop: handleAvatarDrop,
     accept: { "image/*": [] },
     maxFiles: 1,
   });
 
+  const {
+    getRootProps: getResumeRootProps,
+    getInputProps: getResumeInputProps,
+  } = useDropzone({
+    onDrop: handleResumeDrop,
+    accept: {
+      "application/pdf": [],
+      "application/msword": [],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [],
+    },
+    maxFiles: 1,
+  });
+
   const onSubmit = (data: any) => {
+    setLoading(true);
+
     const profileData = {
       ...data,
-      avatar,
+      bio: stripHtml(data.bio),
       languages: selectedLanguages.map((l) => l.value),
       skills: selectedSkills.map((s) => ({ title: s.label })),
+      visibility_status: visibilityStatus,
     };
+
+    (async function () {
+      try {
+        await updateProfileMutation.mutate({
+          profileId: user?.profile.id,
+          data: profileData,
+        });
+      } finally {
+        setLoading(false);
+      }
+    })();
   };
 
   return (
@@ -118,152 +305,65 @@ const UpdateProfileForm: React.FC = () => {
               <div className="relative">
                 <div className="border border-gray-300 p-1 rounded-full">
                   <Image
-                    src="/images/test-avatar-3.jpg"
+                    src={
+                      !deletedAvatar && user?.profile?.avatar
+                        ? user?.profile?.avatar
+                        : "/images/test-avatar-3.jpg"
+                    }
                     width={80}
                     height={80}
                     alt="avatar"
                     className="rounded-full"
                   />
                 </div>
-                <div className="absolute bottom-2 -right-2">
-                  <Image src="/icons/edit.svg" alt="" width={13} height={13} />
+                <div className="absolute bottom-0 -right-1">
+                  {WithTooltip(
+                    "Remove",
+                    <span
+                      onClick={() => {
+                        setValue("avatar", "");
+                        setDeletedAvatar(true);
+                      }}
+                    >
+                      <Image
+                        src="/icons/bin.svg"
+                        width={15}
+                        height={15}
+                        alt="file icon"
+                      />
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-xl text-gray-900">
-                  Kayode Otitoju
+                  {user.profile?.first_name + " " + user.profile?.last_name}
                 </span>
-                <span className="text-sm text-gray-500">Product Manager</span>
+                <span className="text-sm text-custom-gray-paragraph">
+                  {user.profile?.title}
+                </span>
               </div>
             </div>
           </div>
           <div className="py-3">
-            <label className="block text-gray-700 text-sm">Avatar</label>
+            <label className="block text-gray-700 text-sm">
+              Avatar (.png, .jpg, .jpeg)
+            </label>
             <div
-              {...getRootProps()}
+              {...getAvatarRootProps()}
               className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
             >
-              <input {...getInputProps()} />
+              <input {...getAvatarInputProps()} />
               {avatar ? (
-                <p>{avatar.name} kjfg</p>
+                <p>{avatar.name}</p>
               ) : (
                 <p>Drag and drop an image, or click to select an avatar</p>
               )}
             </div>
             {errors.avatar && (
-              <p className="text-red-500">{errors.avatar.message}</p>
+              <p className="text-red-500">{errors.avatar?.message}</p>
             )}
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-6">
-          <Input
-            id="first_name"
-            label="First Name"
-            placeholder="Kayode"
-            value={watch("first_name")}
-            onChange={(e) => setValue("first_name", e.target.value)}
-            error={errors.first_name?.message}
-            otherClasses={methods.register("first_name")}
-          />
-          <Input
-            id="last_name"
-            label="Last Name"
-            value={watch("last_name")}
-            onChange={(e) => setValue("last_name", e.target.value)}
-            error={errors.last_name?.message}
-            otherClasses={methods.register("last_name")}
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700 text-sm">Bio</label>
-          <Controller
-            name="bio"
-            control={control}
-            render={({ field }) => (
-              <ReactQuill
-                value={field.value || bio}
-                onChange={(content) => {
-                  setBio(content);
-                  field.onChange(content);
-                }}
-                className="custom-quill"
-                placeholder="Write a short bio..."
-                theme="snow"
-              />
-            )}
-          />
-          {errors.bio && <p className="text-red-500">{errors.bio.message}</p>}
-        </div>
-
-        <Input
-          id="location"
-          label="Location"
-          value={watch("location")}
-          onChange={(e) => setValue("location", e.target.value)}
-          error={errors.location?.message}
-          otherClasses={methods.register("location")}
-        />
-
-        <div className="grid grid-cols-2 gap-6">
-          <Input
-            id="phone"
-            label="Phone"
-            type="text"
-            value={watch("phone")}
-            onChange={(e) => setValue("phone", e.target.value)}
-            error={errors.phone?.message}
-            otherClasses={methods.register("phone")}
-          />
-          <Input
-            id="website"
-            label="Website"
-            type="url"
-            value={watch("website")}
-            onChange={(e) => setValue("website", e.target.value)}
-            error={errors.website?.message}
-            otherClasses={methods.register("website")}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-6">
-          <Input
-            id="linkedin"
-            label="LinkedIn"
-            type="url"
-            value={watch("linkedin")}
-            onChange={(e) => setValue("linkedin", e.target.value)}
-            error={errors.linkedin?.message}
-            otherClasses={methods.register("linkedin")}
-          />
-          <Input
-            id="github"
-            label="GitHub"
-            type="url"
-            value={watch("github")}
-            onChange={(e) => setValue("github", e.target.value)}
-            error={errors.github?.message}
-            otherClasses={methods.register("github")}
-          />
-        </div>
-        <div className="py-3">
-          <label className="block text-gray-700 text-sm">
-            Resume (.docx, .doc, .pdf)
-          </label>
-          <div
-            {...getRootProps()}
-            className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
-          >
-            <input {...getInputProps()} />
-            {avatar ? (
-              <p>{avatar.name} kjfg</p>
-            ) : (
-              <p>Drag and drop a file, or click to select a document</p>
-            )}
-          </div>
-          {errors.avatar && (
-            <p className="text-red-500">{errors.avatar.message}</p>
-          )}
         </div>
         <div className="space-y-2">
           <label className="block text-sm text-gray-600">
@@ -292,17 +392,118 @@ const UpdateProfileForm: React.FC = () => {
             </label>
           </div>
         </div>
+        {/* <Input
+          id="avatar"
+          label="Avatar"
+          placeholder="https://example.jpg"
+          value={watch("avatar") as string}
+          onChange={(e) => setValue("avatar", e.target.value)}
+          error={errors.avatar?.message as string as string}
+          otherClasses={methods.register("avatar")}
+        /> */}
+        {/* <div className="grid grid-cols-2 gap-6">
+          <Input
+            id="first_name"
+            label="First Name"
+            value={watch("first_name")}
+            onChange={(e) => setValue("first_name", e.target.value)}
+            error={errors.first_name?.message as string as string}
+            otherClasses={methods.register("first_name")}
+          />
+          <Input
+            id="last_name"
+            label="Last Name"
+            value={watch("last_name")}
+            onChange={(e) => setValue("last_name", e.target.value)}
+            error={errors.last_name?.message as string as string}
+            otherClasses={methods.register("last_name")}
+          />
+        </div> */}
+        <Input
+          id="title"
+          label="Title"
+          value={watch("title")}
+          onChange={(e) => setValue("title", e.target.value)}
+          error={errors.title?.message as string}
+          otherClasses={methods.register("title")}
+        />
+        <Input
+          id="heading"
+          label="Heading"
+          value={watch("heading")}
+          onChange={(e) => setValue("heading", e.target.value)}
+          error={errors.heading?.message as string}
+          otherClasses={methods.register("heading")}
+        />
+        <TextArea
+          id="bio"
+          label="Bio"
+          value={watch("bio")}
+          onChange={(e) => setValue("bio", e.target.value)}
+          error={errors.bio?.message as string}
+          otherClasses={methods.register("bio")}
+        />
+        <Input
+          id="location"
+          label="Location"
+          value={watch("location")}
+          onChange={(e) => setValue("location", e.target.value)}
+          error={errors.location?.message as string}
+          otherClasses={methods.register("location")}
+        />
+        <div className="grid grid-cols-2 gap-6">
+          <Input
+            id="phone"
+            label="Phone"
+            type="text"
+            value={watch("phone") as string}
+            onChange={(e) => setValue("phone", e.target.value)}
+            error={errors.phone?.message as string}
+            otherClasses={methods.register("phone")}
+          />
+          <Input
+            id="website"
+            label="Website"
+            type="url"
+            value={watch("website") as string}
+            onChange={(e) => setValue("website", e.target.value)}
+            error={errors.website?.message as string}
+            otherClasses={methods.register("website")}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <Input
+            id="linkedin"
+            label="LinkedIn"
+            type="url"
+            value={watch("linkedin") as string}
+            onChange={(e) => setValue("linkedin", e.target.value)}
+            error={errors.linkedin?.message as string}
+            otherClasses={methods.register("linkedin")}
+          />
+          <Input
+            id="github"
+            label="GitHub"
+            type="url"
+            value={watch("github") as string}
+            onChange={(e) => setValue("github", e.target.value)}
+            error={errors.github?.message as string}
+            otherClasses={methods.register("github")}
+          />
+        </div>
         <div>
           <Controller
             name="languages"
             control={control}
             render={({ field }) => (
               <ReactSelectComponent
-                name="languages"
                 label="Languages"
                 options={languagesOptions}
-                isMulti={true}
-                error={errors.languages?.message}
+                placeholder="Select languages"
+                error={errors.languages?.message as string}
+                setSelectedOption={setSelectedLanguages}
+                selectedOption={selectedLanguages}
               />
             )}
           />
@@ -313,15 +514,132 @@ const UpdateProfileForm: React.FC = () => {
             control={control}
             render={({ field }) => (
               <ReactSelectComponent
-                name="skills"
                 label="Skills"
                 options={skillsOptions}
-                isMulti={true}
-                error={errors.skills?.message}
+                placeholder="Select skills"
+                error={errors.skills?.message as string}
+                setSelectedOption={setSelectedSkills}
+                selectedOption={selectedSkills}
               />
             )}
           />
         </div>
+        <NativeSelect
+          id="status"
+          label="What are you up to?"
+          placeholder="Select Status"
+          value={watch("status") as string}
+          onChange={(e) => setValue("status", e.target.value)}
+          error={errors?.status?.message}
+          options={profileStatusOptions}
+          otherClasses={methods.register("status")}
+        />
+        <div className="py-3">
+          <label className="block text-gray-700 text-sm">
+            Resume (.docx, .doc, .pdf)
+          </label>
+          <div
+            {...getResumeRootProps()}
+            className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
+          >
+            <input {...getResumeInputProps()} />
+            {resume ? (
+              <p>{resume.name}</p>
+            ) : (
+              <p>Drag and drop a file, or click to select a document</p>
+            )}
+          </div>
+          {errors.resume && (
+            <p className="text-red-500">{errors.resume.message}</p>
+          )}
+          {!deletedResume && user?.profile.resume && (
+            <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50 mt-2 flex items-center space-x-2">
+              <Link
+                href={user.profile?.resume as string}
+                download
+                target="_blank"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Image
+                      src="/icons/file.svg"
+                      width={20}
+                      height={20}
+                      alt="file icon"
+                    />
+                    <span className="">
+                      {getFilenameAndExtension(user?.profile.resume)}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {WithTooltip(
+                      "Download",
+                      <Image
+                        src="/icons/download.svg"
+                        width={20}
+                        height={20}
+                        alt="file icon"
+                      />
+                    )}
+                  </div>
+                </div>
+              </Link>
+              {WithTooltip(
+                "Remove",
+                <span
+                  onClick={() => {
+                    setValue("resume", "");
+                    setDeletedResume(true);
+                  }}
+                >
+                  <Image
+                    src="/icons/bin.svg"
+                    width={20}
+                    height={20}
+                    alt="file icon"
+                  />
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="space-y-2">
+          <label className="block text-sm text-gray-600">
+            Would you like to be a mentor?
+          </label>
+          <div className="flex items-center space-x-4 mt-1 text-sm">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="yes"
+                checked={watch("is_mentor") === true}
+                onChange={() => setValue("is_mentor", true)}
+                className="form-radio"
+              />
+              <span className="ml-2">Yes</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="no"
+                checked={watch("is_mentor") === false}
+                onChange={() => setValue("is_mentor", false)}
+                className="form-radio"
+              />
+              <span className="ml-2">No</span>
+            </label>
+          </div>
+        </div>
+        {watch("is_mentor") && (
+          <TextArea
+            id="mentor_note"
+            label="Leave a short note for potential mentees"
+            value={watch("mentor_note") as string}
+            onChange={(e) => setValue("mentor_note", e.target.value)}
+            error={errors.mentor_note?.message as string}
+            otherClasses={methods.register("mentor_note")}
+          />
+        )}
         <div className="flex items-center space-x-2 justify-end">
           <button
             type="submit"
@@ -333,7 +651,7 @@ const UpdateProfileForm: React.FC = () => {
             type="submit"
             className="px-6 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Save Changes
+            {loading ? "Loading..." : "Save Changes"}
           </button>
         </div>
       </form>

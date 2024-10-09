@@ -130,7 +130,12 @@ async function refreshAccessToken(token: Token): Promise<Token> {
     const response = await axios.post(
       `${process.env.BACKEND_URL}/auth/refresh`,
       {
-        refreshToken: token.refreshToken,
+        refresh_token: token.refreshToken,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token?.accessToken}`,
+        },
       }
     );
 

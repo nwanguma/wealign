@@ -19,6 +19,9 @@ import "react-quill/dist/quill.snow.css";
 
 import "../../app/globals.css";
 
+import { Skill } from "@/common/constants";
+import AddItemInput from "./AddItemInput";
+
 // {
 //     "title": "New Project Title",
 //     "description": "This is a description of the project.",
@@ -46,15 +49,16 @@ const ReactQuill = dynamic(() => import("react-quill"), {
 });
 
 const schema = yup.object().shape({
-  first_name: yup
+  title: yup
     .string()
-    .required("First name is required")
+    .required("Title is required")
     .min(2, "Must be at least 2 characters"),
-  last_name: yup
+  description: yup
     .string()
-    .required("Last name is required")
+    .required("Description is required")
     .min(2, "Must be at least 2 characters"),
   location: yup.string().required("Location is required"),
+  status: yup.string().required("Location is required"),
   phone: yup
     .string()
     .matches(
@@ -62,14 +66,8 @@ const schema = yup.object().shape({
       "Phone number must be in international format (+1234567890)"
     ),
   website: yup.string().url("Must be a valid URL"),
-  linkedin: yup.string().url("Must be a valid URL"),
-  github: yup.string().url("Must be a valid URL"),
-  resume: yup.string().url("Must be a valid URL"),
-  bio: yup
-    .string()
-    .required("Bio is required")
-    .min(10, "Bio must be at least 10 characters"),
-  avatar: yup.mixed().required("Avatar is required"),
+  github_url: yup.string().url("Must be a valid URL"),
+  skills: yup.array(),
 });
 
 const UpdateProfileForm: React.FC = () => {
@@ -91,15 +89,9 @@ const UpdateProfileForm: React.FC = () => {
   const [visibilityStatus, setVisibilityStatus] = useState<
     "public" | "private"
   >("public");
-  const [avatar, setAvatar] = useState<File | null>(null);
+  const [attachement, setAttachment] = useState<File | null>(null);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-
-  const languagesOptions = [
-    { value: "english", label: "English" },
-    { value: "spanish", label: "Spanish" },
-    { value: "french", label: "French" },
-  ];
 
   const skillsOptions = [
     { value: "html", label: "HTML" },
@@ -107,24 +99,20 @@ const UpdateProfileForm: React.FC = () => {
     { value: "javascript", label: "JavaScript" },
   ];
 
-  const handleAvatarDrop = (acceptedFiles: File[]) => {
-    setAvatar(acceptedFiles[0]);
-    setValue("avatar", acceptedFiles[0]);
-  };
+  // const handleAttachmentDrop = (acceptedFiles: File[]) => {
+  //   setAttachment(acceptedFiles[0]);
+  //   setValue("attachement", acceptedFiles[0]);
+  // };
 
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop: handleAvatarDrop,
-    accept: { "image/*": [] },
-    maxFiles: 1,
-  });
+  // const { getRootProps, getInputProps } = useDropzone({
+  //   onDrop: handleAttachmentDrop,
+  //   accept: { "image/*": [] },
+  //   maxFiles: 1,
+  // });
 
   const onSubmit = (data: any) => {
-    const profileData = {
-      ...data,
-      avatar,
-      languages: selectedLanguages.map((l) => l.value),
-      skills: selectedSkills.map((s) => ({ title: s.label })),
-    };
+    console.log(data);
+    console.log(selectedSkills.map((s) => ({ title: s.label })));
   };
 
   return (
@@ -135,54 +123,85 @@ const UpdateProfileForm: React.FC = () => {
       >
         <div>
           <Input
-            id="first_name"
+            id="title"
             label="Title"
-            placeholder="Kayode"
-            value={watch("first_name")}
-            onChange={(e) => setValue("first_name", e.target.value)}
-            error={errors.first_name?.message}
-            otherClasses={methods.register("first_name")}
+            value={watch("title")}
+            onChange={(e) => setValue("title", e.target.value)}
+            error={errors.title?.message}
+            otherClasses={methods.register("title")}
           />
         </div>
         <div>
           <Input
-            id="first_name"
+            id="website"
             label="Website"
             type="url"
-            value={watch("first_name")}
-            onChange={(e) => setValue("first_name", e.target.value)}
-            error={errors.first_name?.message}
-            otherClasses={methods.register("first_name")}
+            value={watch("website") as string}
+            onChange={(e) => setValue("website", e.target.value)}
+            error={errors.website?.message}
+            otherClasses={methods.register("website")}
             placeholder="https://"
           />
         </div>
         <div>
           <Input
-            id="last_name"
+            id="github_url"
             label="Repository URL"
-            value={watch("last_name")}
-            onChange={(e) => setValue("last_name", e.target.value)}
-            error={errors.last_name?.message}
-            otherClasses={methods.register("last_name")}
+            value={watch("github_url") as string}
+            onChange={(e) => setValue("github_url", e.target.value)}
+            error={errors.github_url?.message}
+            otherClasses={methods.register("github_url")}
             placeholder="https://github.com/user/your-project-url"
           />
         </div>
+        <div className="w-full">
+          <label className="text-sm mb-1 text-gray-600 inline-block">
+            Start Date
+          </label>
+          <div className="relative w-full">
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date as Date)}
+              className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
+              placeholderText="Select start date"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Image
+                src="/icons/calendar.svg"
+                alt="Calendar"
+                width={22}
+                height={22}
+              />
+            </div>
+          </div>
+        </div>
+        <NativeSelect
+          id="status"
+          label="Status"
+          placeholder="Select Status"
+          value={watch("status") as string}
+          error={errors?.status?.message}
+          options={[{ value: "collaborators", label: "Need collaborators" }]}
+          otherClasses={methods.register("status")}
+        />
         <div>
           <Controller
             name="skills"
             control={control}
             render={({ field }) => (
               <ReactSelectComponent
-                name="skills"
                 label="Skills"
                 options={skillsOptions}
-                isMulti={true}
-                error={errors.skills?.message}
+                placeholder="Select skills"
+                error={errors.skills?.message as string}
+                setSelectedOption={setSelectedSkills}
+                selectedOption={selectedSkills}
               />
             )}
           />
         </div>
-        <div className="py-3">
+        <AddItemInput label="Collaborators" />
+        {/* <div className="py-3">
           <label className="block text-gray-700 text-sm">
             Attachments (.docx, .doc, .pdf)
           </label>
@@ -200,8 +219,8 @@ const UpdateProfileForm: React.FC = () => {
           {errors.avatar && (
             <p className="text-red-500">{errors.avatar.message}</p>
           )}
-        </div>
-        <div>
+        </div> */}
+        {/* <div>
           <label className="block text-gray-700 text-sm">Description</label>
           <Controller
             name="bio"
@@ -220,7 +239,7 @@ const UpdateProfileForm: React.FC = () => {
             )}
           />
           {errors.bio && <p className="text-red-500">{errors.bio.message}</p>}
-        </div>
+        </div> */}
         <div className="flex items-center space-x-2 justify-end">
           <button
             type="submit"

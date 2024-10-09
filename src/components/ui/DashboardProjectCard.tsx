@@ -35,7 +35,7 @@ const DashboardProjectCard: React.FC<IDashboardProjectCardProps> = ({
         </div>
         <div className="flex flex-col space-y-1">
           <span className="font-medium">{title}</span>
-          <span className="text-sm text-gray-500">{author}</span>
+          <span className="text-sm text-custom-gray-paragraph">{author}</span>
         </div>
       </div>{" "}
       <p className="text-sm leading-snug text-gray-700">{description}</p>

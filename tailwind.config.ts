@@ -8,14 +8,22 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        custom: ["TTCommons", "sans-serif"],
+      fontSize: {
+        md: "15px",
+        "lg-xl": "17px",
       },
-      fontWeight: {
-        light: "300",
-        normal: "400",
-        medium: "600",
-        bold: "600",
+      fontFamily: {
+        landing: ["TTCommons_Custom", "sans-serif"],
+        "app-normal": ["CH_Custom_W_Bk", "sans-serif"],
+        "app-semibold": ["CH_Custom_W_XBd", "sans-serif"],
+        "app-bold": ["CH_Custom_W_Blk", "sans-serif"],
+        "app-light": ["CH_Custom_W_Lt", "sans-serif"],
+        "app-medium": ["CH_Custom_W_Md", "sans-serif"],
+      },
+      colors: {
+        "custom-gray-heading": "#222222",
+        "custom-gray-paragraph": "#6A6A6A",
+        "custom-gray-small-text": "#6B7280",
       },
     },
   },

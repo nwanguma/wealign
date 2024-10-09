@@ -43,9 +43,15 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
         <div className="h-full flex items-center space-x-5">
           <div className="max-w-20">
             <div className="flex flex-col justify-center items-center">
-              <span className="text-xs text-gray-500">{dayOfWeek}</span>
-              <span className="text-lg font-bold text-gray-900">{day}</span>
-              <span className="text-xs text-gray-500">{month}</span>
+              <span className="text-xs text-custom-gray-paragraph">
+                {dayOfWeek}
+              </span>
+              <span className="text-lg font-bold text-custom-gray-heading">
+                {day}
+              </span>
+              <span className="text-xs text-custom-gray-paragraph">
+                {month}
+              </span>
             </div>
           </div>
           <div className="w-1/3 h-full min-h-20 relative rounded-lg">
@@ -59,12 +65,14 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
           <div className="flex flex-col flex-1 space-y-4">
             <div className="flex flex-col space-y-2 py-2">
               <div className="flex flex-col">
-                <span className="font-medium">{title}</span>
-                <span className="text-xs text-gray-500">{location}</span>
+                <span className="font-app-medium">{title}</span>
+                <span className="text-xs text-custom-gray-paragraph">
+                  {location}
+                </span>
               </div>
               {/** Truncate string past a certain character limit */}
               {!isPreview && (
-                <span className="text-sm text-gray-600 leading-snug">
+                <span className="text-sm text-custom-gray-paragraph font-light leading-snug">
                   {truncateString(description as string, description_limit)}
                 </span>
               )}
@@ -292,7 +300,7 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
-                    <p className="text-xs text-gray-500 font-normal">
+                    <p className="text-xs text-custom-gray-paragraph font-normal">
                       {comment.author}
                     </p>
                     <span
@@ -300,7 +308,7 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
                       style={{ width: "3px", height: "3px" }}
                     ></span>
                     <span
-                      className="text-xs text-gray-500"
+                      className="text-xs text-custom-gray-paragraph"
                       style={{ fontSize: "11px" }}
                     >
                       30th Jul 2024
@@ -326,7 +334,7 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
               placeholder="Add a comment..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-gray-500 rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
+              className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-custom-gray-paragraph rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
             />
             {/* <button
               onClick={handleAddComment}

@@ -1,108 +1,95 @@
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
-import dynamic from "next/dynamic";
 import React, { useState } from "react";
-import { useForm, FormProvider, Controller } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
+import { Event } from "@/common/constants";
 
 import Image from "next/image";
-
 import Input from "./Input";
 
 import "react-quill/dist/quill.snow.css";
-
 import "../../app/globals.css";
 
-// Dynamically import ReactQuill to disable SSR
-const ReactQuill = dynamic(() => import("react-quill"), {
-  ssr: false,
-  loading: () => (
-    <div className="quill-skeleton h-48 border border-gray-300 rounded-lg"></div>
-  ),
-});
+import TextArea from "./TextArea";
+import axiosInstance from "@/lib/axiosInstance";
+import { useMutation } from "@tanstack/react-query";
+
 const schema = yup.object().shape({
-  first_name: yup
+  title: yup
     .string()
-    .required("First name is required")
-    .min(2, "Must be at least 2 characters"),
-  last_name: yup
-    .string()
-    .required("Last name is required")
-    .min(2, "Must be at least 2 characters"),
-  location: yup.string().required("Location is required"),
-  phone: yup
-    .string()
-    .matches(
-      /^\+\d{1,14}$/,
-      "Phone number must be in international format (+1234567890)"
-    ),
+    .required("Title is required")
+    .min(3, "Must be at least 2 characters"),
+  banner: yup.mixed(),
+  // event_start_date: yup
+  //   .string()
+  //   .required("Start date is required")
+  //   .min(2, "Must be at least 2 characters"),
+  // event_end_date: yup
+  //   .string()
+  //   .required("End date is required")
+  //   .min(2, "Must be at least 2 characters"),
   website: yup.string().url("Must be a valid URL"),
-  linkedin: yup.string().url("Must be a valid URL"),
-  github: yup.string().url("Must be a valid URL"),
-  resume: yup.string().url("Must be a valid URL"),
-  bio: yup
+  ticket_link: yup.string().url("Must be a valid URL"),
+  link: yup.string().url("Must be a valid URL"),
+  location: yup.string().required("Location is required"),
+  description: yup
     .string()
-    .required("Bio is required")
-    .min(10, "Bio must be at least 10 characters"),
-  avatar: yup.mixed().required("Avatar is required"),
+    .required("Description is required")
+    .min(10, "Description must be at least 10 characters"),
 });
 
-const UpdateProfileForm: React.FC = () => {
+const createEvent = async (data: Partial<Event>) => {
+  const result = await axiosInstance.post("/api/proxy/events", data);
+
+  return result?.data?.data;
+};
+
+const CreateEventForm: React.FC = () => {
   const methods = useForm({
     resolver: yupResolver(schema),
   });
 
   const {
-    control,
+    // control,
     watch,
     handleSubmit,
     setValue,
     formState: { errors },
   } = methods;
 
-  const [bio, setBio] = useState<string>("");
-  const [selectedLanguages, setSelectedLanguages] = useState<any[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<any[]>([]);
-  const [visibilityStatus, setVisibilityStatus] = useState<
-    "public" | "private"
-  >("public");
-  const [avatar, setAvatar] = useState<File | null>(null);
+  const createEventMutation = useMutation({
+    mutationFn: (data: Partial<Event>) => createEvent(data),
+    onSuccess: (data: Event) => {},
+    onError: (error: any) => {},
+  });
+
+  const [banner, setBanner] = useState<File | null>(null);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
-  const languagesOptions = [
-    { value: "english", label: "English" },
-    { value: "spanish", label: "Spanish" },
-    { value: "french", label: "French" },
-  ];
+  // const handleBannerDrop = (acceptedFiles: File[]) => {
+  //   setAvatar(acceptedFiles[0]);
+  //   setValue("avatar", acceptedFiles[0]);
+  // };
 
-  const skillsOptions = [
-    { value: "html", label: "HTML" },
-    { value: "css", label: "CSS" },
-    { value: "javascript", label: "JavaScript" },
-  ];
-
-  const handleAvatarDrop = (acceptedFiles: File[]) => {
-    setAvatar(acceptedFiles[0]);
-    setValue("avatar", acceptedFiles[0]);
-  };
-
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop: handleAvatarDrop,
-    accept: { "image/*": [] },
-    maxFiles: 1,
-  });
+  // const { getRootProps, getInputProps } = useDropzone({
+  //   onDrop: handleBannerDrop,
+  //   accept: { "image/*": [] },
+  //   maxFiles: 1,
+  // });
 
   const onSubmit = (data: any) => {
-    const profileData = {
-      ...data,
-      avatar,
-      languages: selectedLanguages.map((l) => l.value),
-      skills: selectedSkills.map((s) => ({ title: s.label })),
-    };
+    (async function () {
+      await createEventMutation.mutate({
+        ...data,
+        event_start_date: startDate,
+        event_end_date: endDate,
+      });
+    })();
   };
 
   return (
@@ -113,16 +100,24 @@ const UpdateProfileForm: React.FC = () => {
       >
         <div>
           <Input
-            id="first_name"
+            id="title"
             label="Title"
-            placeholder="Kayode"
-            value={watch("first_name")}
-            onChange={(e) => setValue("first_name", e.target.value)}
-            error={errors.first_name?.message as string}
-            otherClasses={methods.register("first_name")}
+            value={watch("title")}
+            onChange={(e) => setValue("title", e.target.value)}
+            error={errors.title?.message as string}
+            otherClasses={methods.register("title")}
           />
         </div>
-        <div className="py-3">
+        <Input
+          id="banner"
+          label="Banner"
+          placeholder="https://example.jpg"
+          value={watch("banner") as string}
+          onChange={(e) => setValue("banner", e.target.value)}
+          error={errors.banner?.message as string as string}
+          otherClasses={methods.register("banner")}
+        />
+        {/* <div className="py-3">
           <label className="block text-gray-700 text-sm">Banner</label>
           <div
             {...getRootProps()}
@@ -138,7 +133,7 @@ const UpdateProfileForm: React.FC = () => {
           {errors.avatar && (
             <p className="text-red-500">{errors.avatar.message}</p>
           )}
-        </div>
+        </div> */}
         <div className="grid grid-cols-2 gap-6">
           <div className="w-full">
             <label className="text-sm mb-1 text-gray-600 inline-block">
@@ -153,7 +148,7 @@ const UpdateProfileForm: React.FC = () => {
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Image
-                  src="/icons/calendar.svg" // Path to your SVG file
+                  src="/icons/calendar.svg"
                   alt="Calendar"
                   width={22}
                   height={22}
@@ -167,8 +162,8 @@ const UpdateProfileForm: React.FC = () => {
             </label>
             <div className="relative w-full">
               <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date as Date)}
+                selected={endDate}
+                onChange={(date) => setEndDate(date as Date)}
                 className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
                 placeholderText="Select start date"
               />
@@ -185,51 +180,58 @@ const UpdateProfileForm: React.FC = () => {
         </div>
         <div>
           <Input
-            id="first_name"
+            id="website"
             label="Website"
             type="url"
-            value={watch("first_name")}
-            onChange={(e) => setValue("first_name", e.target.value)}
-            error={errors.first_name?.message as string}
-            otherClasses={methods.register("first_name")}
+            value={watch("website") as string}
+            onChange={(e) => setValue("website", e.target.value)}
+            error={errors.website?.message as string}
+            otherClasses={methods.register("website")}
             placeholder="https://"
           />
         </div>
         <div>
           <Input
-            id="last_name"
+            id="ticket_link"
             label="Ticket Link"
-            value={watch("last_name")}
-            onChange={(e) => setValue("last_name", e.target.value)}
-            error={errors.last_name?.message as string}
-            otherClasses={methods.register("last_name")}
+            value={watch("ticket_link") as string}
+            onChange={(e) => setValue("ticket_link", e.target.value)}
+            error={errors.ticket_link?.message as string}
+            otherClasses={methods.register("ticket_link")}
             placeholder="https://"
           />
         </div>
         <div>
           <Input
-            id="last_name"
+            id="link"
             label="Event link (for virtual events)"
-            value={watch("last_name")}
-            onChange={(e) => setValue("last_name", e.target.value)}
-            error={errors.last_name?.message as string}
-            otherClasses={methods.register("last_name")}
+            value={watch("link") as string}
+            onChange={(e) => setValue("link", e.target.value)}
+            error={errors.link?.message as string}
+            otherClasses={methods.register("link")}
             placeholder="https://"
           />
         </div>
         <div>
           <Input
-            id="last_name"
+            id="location"
             label="Location"
-            value={watch("last_name")}
-            onChange={(e) => setValue("last_name", e.target.value)}
-            error={errors.last_name?.message as string}
-            otherClasses={methods.register("last_name")}
-            placeholder="https://"
+            value={watch("location")}
+            onChange={(e) => setValue("location", e.target.value)}
+            error={errors.location?.message as string}
+            otherClasses={methods.register("location")}
             required
           />
         </div>
-        <div className="py-3">
+        <TextArea
+          id="description"
+          label="Description"
+          value={watch("description")}
+          onChange={(e) => setValue("description", e.target.value)}
+          error={errors.description?.message as string}
+          otherClasses={methods.register("description")}
+        />
+        {/* <div className="py-3">
           <label className="block text-gray-700 text-sm">
             Attachments (.docx, .doc, .pdf)
           </label>
@@ -244,30 +246,10 @@ const UpdateProfileForm: React.FC = () => {
               <p>Drag and drop a file, or click to select a document</p>
             )}
           </div>
-          {errors.avatar && (
-            <p className="text-red-500">{errors.avatar.message}</p>
+          {errors.attachment && (
+            <p className="text-red-500">{errors.attachment.message}</p>
           )}
-        </div>
-        <div>
-          <label className="block text-gray-700 text-sm">Description</label>
-          <Controller
-            name="bio"
-            control={control}
-            render={({ field }) => (
-              <ReactQuill
-                value={field.value || bio}
-                onChange={(content) => {
-                  setBio(content);
-                  field.onChange(content);
-                }}
-                className="custom-quill"
-                placeholder="Write a short bio..."
-                theme="snow"
-              />
-            )}
-          />
-          {errors.bio && <p className="text-red-500">{errors.bio.message}</p>}
-        </div>
+        </div> */}
         <div className="flex items-center space-x-2 justify-end">
           <button
             type="submit"
@@ -287,4 +269,4 @@ const UpdateProfileForm: React.FC = () => {
   );
 };
 
-export default UpdateProfileForm;
+export default CreateEventForm;

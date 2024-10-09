@@ -42,7 +42,7 @@ export const ProjectCard: React.FC<IProjectCardProps> = ({
           </div>
           <div className="flex flex-col space-y-2">
             <div>
-              <span className="font-medium">{title}</span>
+              <span className="font-app-medium">{title}</span>
               {status && (
                 <div className="space-y-2">
                   <span className="capitalize text-xs font-medium rounded text-gray-700 bg-green-200 py-1 px-1">
@@ -280,7 +280,9 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
                     />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs text-gray-500">{comment.author}</p>
+                    <p className="text-xs text-custom-gray-paragraph">
+                      {comment.author}
+                    </p>
                     <p className="text-gray-700 text-sm">{comment.text}</p>
                   </div>
                 </div>
@@ -296,7 +298,7 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
               placeholder="Add a comment..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-gray-500 rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
+              className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-custom-gray-paragraph rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
             />
             <button
               onClick={() => console.log("clicked")}

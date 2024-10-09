@@ -95,6 +95,7 @@ export interface Profile {
   is_mentor?: boolean;
   mentor_note?: string;
   requires_update?: boolean;
+  visibility_status?: string;
 }
 
 export enum ActivityTypes {

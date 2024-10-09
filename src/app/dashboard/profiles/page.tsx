@@ -54,7 +54,7 @@ export default function Profiles() {
                   : profiles.length === 2
                   ? "!grid-cols-2"
                   : ""
-              } grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-5`}
+              } grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-5`}
             >
               {(profiles as Profile[])?.map(
                 ({

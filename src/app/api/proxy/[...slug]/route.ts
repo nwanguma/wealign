@@ -16,6 +16,8 @@ async function parseRequestBody(req: Request) {
       body[key] = value;
     });
     return body;
+  } else if (contentType.includes("multipart/form-data")) {
+    return await req.formData();
   }
 
   return null;
@@ -29,6 +31,13 @@ async function handler(req: Request) {
   const reqBody = await parseRequestBody(req);
 
   try {
+    const formData = reqBody instanceof FormData ? reqBody : null;
+    const data = formData ? formData : reqBody;
+
+    const isMultipart = req.headers
+      .get("content-type")
+      ?.includes("multipart/form-data");
+
     const response = await axios({
       method: req.method,
       url: `${process.env.BACKEND_URL}/${slug}${url.search ? url.search : ""}`,
@@ -43,8 +52,9 @@ async function handler(req: Request) {
         "Content-Security-Policy": `default-src 'self'; script-src 'nonce-${nonce}'`,
         Authorization:
           req.headers.get("Authorization") || req.headers.get("authorization"),
+        ...(isMultipart && { "Content-Type": req.headers.get("content-type") }),
       },
-      data: reqBody,
+      data,
       timeout: 5000,
     });
 

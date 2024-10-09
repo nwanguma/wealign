@@ -34,7 +34,7 @@ const Input: React.FC<InputProps> = ({
       <div className="relative z-0 w-full group">
         <label
           htmlFor={id}
-          // className={`absolute flex  items-center space-x-2 text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-8 ${
+          // className={`absolute flex  items-center space-x-2 text-sm text-custom-gray-paragraph duration-300 transform -translate-y-6 scale-75 top-3 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-8 ${
           //   isFocused || value !== "" ? "scale-75 -translate-y-6" : ""
           // }`}
           className="text-sm mb-1 text-gray-600 inline-block"
