@@ -321,34 +321,39 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
   );
 };
 
-interface IProfileCardMainProps extends Profile {}
+interface IProfileCardMainProps {
+  profile: Profile;
+}
 
 export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
-  first_name,
-  last_name,
-  avatar,
-  bio,
-  heading,
-  title,
-  location,
-  phone,
-  website,
-  linkedin,
-  github,
-  resume,
-  languages,
-  skills,
-  status,
-  id,
-  comments = [],
-  reactions = [],
-  events,
-  projects,
-  jobs,
-  is_mentor,
-  mentor_note,
-  requires_update,
+  profile,
 }) => {
+  const {
+    first_name,
+    last_name,
+    avatar,
+    bio,
+    heading,
+    title,
+    location,
+    phone,
+    website,
+    linkedin,
+    github,
+    resume,
+    languages,
+    skills,
+    status,
+    id,
+    comments = [],
+    reactions = [],
+    events,
+    projects,
+    jobs,
+    is_mentor,
+    mentor_note,
+    requires_update,
+  } = profile;
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [showCommentInput, setShowCommentInput] = useState(false);

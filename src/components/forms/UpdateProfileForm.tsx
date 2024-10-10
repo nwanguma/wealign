@@ -25,6 +25,7 @@ import { WithTooltip } from "../ui/WithTooltip";
 import Link from "next/link";
 import { getFilenameAndExtension } from "@/lib/helpers";
 import NativeSelect from "./NativeSelectComponent";
+import { useSkills } from "@/app/hooks/useSkills";
 
 export enum ProfileStatus {
   HIRING = "hiring",
@@ -85,12 +86,6 @@ const schema = yup.object().shape({
   mentor_note: yup.string().min(10, "Note must be at least 10 characters"),
 });
 
-const fetchSkills = async (): Promise<Skill[]> => {
-  const result = await axiosInstance.get("/api/proxy/skills");
-
-  return result.data?.data;
-};
-
 const handleUpdateProfile = async (
   profileId: string,
   data: Partial<Profile>
@@ -136,10 +131,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
     resolver: yupResolver(schema),
     defaultValues,
   });
-  const { data: skills } = useQuery({
-    queryKey: ["skills"],
-    queryFn: () => fetchSkills(),
-  });
+  const { data: skills, isLoading, error } = useSkills();
   const dispatch = useDispatch<AppDispatch>();
 
   const {

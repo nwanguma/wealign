@@ -58,7 +58,7 @@ export default function AppModal({
                   {title && (
                     <DialogTitle
                       as="h3"
-                      className="text-lg font-bold mt-2 leading-6 text-gray-700 capitalize"
+                      className="text-base font-app-medium mt-2 leading-6 text-gray-700 capitalize"
                     >
                       {title}
                     </DialogTitle>

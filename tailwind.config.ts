@@ -9,6 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontSize: {
+        "xs-sm": "13px",
         md: "15px",
         "lg-xl": "17px",
       },

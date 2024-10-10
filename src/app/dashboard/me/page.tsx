@@ -52,32 +52,7 @@ export default function ProfilePage() {
           <div className="flex space-x-5 p-6">
             <div className="flex-1 p-4 flex flex-col space-y-5 w-full rounded-lg">
               <div className="w-full relative">
-                <ProfileCardMain
-                  first_name={profile.first_name}
-                  last_name={profile.last_name}
-                  avatar={profile.avatar}
-                  bio={profile.bio}
-                  heading={profile.heading}
-                  title={profile.title}
-                  location={profile.location}
-                  phone={profile.phone}
-                  website={profile.website}
-                  linkedin={profile.linkedin}
-                  github={profile.github}
-                  resume={profile.resume}
-                  languages={profile.languages}
-                  skills={profile.skills}
-                  id={profile.id}
-                  comments={profile.comments}
-                  reactions={profile.reactions}
-                  events={profile.events}
-                  projects={profile.projects}
-                  jobs={profile.jobs}
-                  mentor_note={profile.mentor_note}
-                  requires_update={profile.requires_update}
-                  is_mentor={profile.is_mentor}
-                  status={profile.status}
-                />
+                <ProfileCardMain profile={profile} />
                 <div className="absolute -top-4 right-0">
                   <div className="flex space-x-5">
                     <div
