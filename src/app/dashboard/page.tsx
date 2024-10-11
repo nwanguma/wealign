@@ -27,6 +27,7 @@ import {
   fetchEvents,
   fetchProjects,
   fetchJobs,
+  fetchArticles,
 } from "@/store/recommendations";
 import {
   Event,
@@ -34,7 +35,11 @@ import {
   Activity,
   ProjectsWithPagination,
   EventWithPagination,
+  ArticlesWithPagination,
 } from "@/common/constants";
+import { WithTooltip } from "@/components/ui/WithTooltip";
+import CreateArticleForm from "@/components/forms/CreateArticleForm";
+import { ArticleCardPreview } from "@/components/ui/ArticleCard";
 
 const fetchActivities = async (): Promise<Activity[]> => {
   try {
@@ -84,6 +89,25 @@ const fetchProjectsData = async (
   }
 };
 
+const fetchArticlesData = async (
+  pagination: any,
+  contentType: string
+): Promise<ArticlesWithPagination[]> => {
+  try {
+    const response = await axiosInstance.get("/api/proxy/articles", {
+      params: {
+        limit: pagination.limit,
+        page: pagination.page,
+        contentType,
+      },
+    });
+
+    return response.data.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 const MainFeed: React.FC = () => {
   const [followersModalIsOpen, setFollowersModalIsOpen] = useState(false);
   const [followingModalIsOpen, setFollowingModalIsOpen] = useState(false);
@@ -92,11 +116,17 @@ const MainFeed: React.FC = () => {
   const { mainFeedSettings } = useSelector((state: RootState) => state.ui);
   const currentUser: User = useSelector((state: RootState) => state.user);
 
+  console.log(mainFeedSettings);
+
   const [eventsPagination, setEventsPagination] = useState({
     page: 1,
     limit: 10,
   });
   const [projectsPagination, setProjectsPagination] = useState({
+    page: 1,
+    limit: 10,
+  });
+  const [articlesPagination, setArticlesPagination] = useState({
     page: 1,
     limit: 10,
   });
@@ -129,18 +159,34 @@ const MainFeed: React.FC = () => {
         queryFn: () =>
           fetchEventsData(eventsPagination, mainFeedSettings.contentTypeFrom),
       },
+      {
+        queryKey: [
+          "articles",
+          articlesPagination.page,
+          articlesPagination.limit,
+          mainFeedSettings.contentTypeFrom,
+        ],
+        queryFn: () =>
+          fetchArticlesData(
+            articlesPagination,
+            mainFeedSettings.contentTypeFrom
+          ),
+      },
     ] as UseQueryOptions<unknown, unknown, unknown>[],
   }) as [
     UseQueryResult<Activity[], unknown>,
     UseQueryResult<ProjectsWithPagination, unknown>,
-    UseQueryResult<EventWithPagination, unknown>
+    UseQueryResult<EventWithPagination, unknown>,
+    UseQueryResult<ArticlesWithPagination, unknown>
   ];
 
-  const [activitiesResult, projectsResult, eventsResult] = results as [
-    UseQueryResult<Activity[], unknown>,
-    UseQueryResult<ProjectsWithPagination>,
-    UseQueryResult<EventWithPagination>
-  ];
+  const [activitiesResult, projectsResult, eventsResult, articlesResult] =
+    results as [
+      UseQueryResult<Activity[], unknown>,
+      UseQueryResult<ProjectsWithPagination>,
+      UseQueryResult<EventWithPagination>,
+      UseQueryResult<ArticlesWithPagination>
+    ];
 
   let events;
   let eventsTotal: number = 0;
@@ -163,12 +209,21 @@ const MainFeed: React.FC = () => {
     activities = activitiesResult.data;
   }
 
+  let articles;
+  let articlesTotal: number = 0;
+
+  if (articlesResult.data) {
+    articles = articlesResult.data.data;
+    articlesTotal = articlesResult.data.total;
+  }
+
   const user = useSelector((state: RootState) => state.user);
   const {
     profiles: profilesRecommendations,
     events: eventsRecommendations,
     jobs: jobsRecommendations,
     projects: projectsRecommendations,
+    articles: articlesRecommendations,
     isLoading,
     error,
   } = useSelector((state: RootState) => state.recommendations);
@@ -181,9 +236,15 @@ const MainFeed: React.FC = () => {
 
   const [addProjectModalIsOpen, setAddProjectModalIsOpen] =
     useState<boolean>(false);
+  const [addArticleModalIsOpen, setAddArticleModalIsOpen] =
+    useState<boolean>(false);
 
   const handleToggleAddProjectModal = () => {
     setAddProjectModalIsOpen(!addProjectModalIsOpen);
+  };
+
+  const handleToggleAddArticleModal = () => {
+    setAddArticleModalIsOpen(!addArticleModalIsOpen);
   };
 
   const handleMainFeedContentChange = (type: string) => {
@@ -222,6 +283,11 @@ const MainFeed: React.FC = () => {
       setProjectsPagination({ limit: limit, page: newPage || 1 });
   };
 
+  const handleArticlesPageChange = (newPage: number, limit: number) => {
+    if (limit < articlesTotal)
+      setArticlesPagination({ limit: limit, page: newPage || 1 });
+  };
+
   useEffect(() => {
     if (!profilesRecommendations || !profilesRecommendations?.length)
       dispatch(fetchProfiles());
@@ -231,6 +297,8 @@ const MainFeed: React.FC = () => {
       dispatch(fetchEvents());
     if (!jobsRecommendations || !jobsRecommendations?.length)
       dispatch(fetchJobs());
+    if (!articlesRecommendations || !articlesRecommendations?.length)
+      dispatch(fetchArticles());
     if (!currentUser.id) dispatch(fetchCurrentUser());
     dispatch(fetchConversations());
   }, [dispatch]);
@@ -320,11 +388,89 @@ const MainFeed: React.FC = () => {
                 <div className="">
                   <div className="flex space-x-3 justify-end">
                     <AddItemButton
-                      title="Event"
-                      handleOnClick={handleToggleAddEventModal}
+                      icon={
+                        <div>
+                          {WithTooltip(
+                            "New Project",
+                            <svg
+                              className="w-6 h-6"
+                              viewBox="0 0 512 512"
+                              version="1.1"
+                              xmlns="http://www.w3.org/2000/svg"
+                              xmlnsXlink="http://www.w3.org/1999/xlink"
+                            >
+                              <title>work-case-filled</title>
+                              <g
+                                id="Page-1"
+                                stroke="none"
+                                strokeWidth="1"
+                                fill="none"
+                                fillRule="evenodd"
+                              >
+                                <g
+                                  id="work-case"
+                                  fill="#1D4ED8"
+                                  transform="translate(42.666667, 64.000000)"
+                                >
+                                  <path
+                                    d="M1.20792265e-13,197.76 C54.5835501,218.995667 112.186031,231.452204 170.666667,234.666667 L170.666667,277.333333 L256,277.333333 L256,234.666667 C314.339546,231.013 371.833936,218.86731 426.666667,198.613333 L426.666667,362.666667 L1.20792265e-13,362.666667 L1.20792265e-13,197.76 Z M277.333333,-1.42108547e-14 L298.666667,21.3333333 L298.666667,64 L426.666667,64 L426.666667,175.146667 C361.254942,199.569074 292.110481,212.488551 222.293333,213.333333 L222.293333,213.333333 L206.933333,213.333333 C136.179047,212.568604 66.119345,199.278929 7.10542736e-15,174.08 L7.10542736e-15,174.08 L7.10542736e-15,64 L128,64 L128,21.3333333 L149.333333,-1.42108547e-14 L277.333333,-1.42108547e-14 Z M256,42.6666667 L170.666667,42.6666667 L170.666667,64 L256,64 L256,42.6666667 Z"
+                                    id="Combined-Shape-Copy"
+                                  ></path>
+                                </g>
+                              </g>
+                            </svg>
+                          )}
+                        </div>
+                      }
+                      handleOnClick={handleToggleAddProjectModal}
+                      fill="bg-slate-100 text-custom-gray-paragraph hover:bg-slate-200"
                     />
                     <AddItemButton
-                      title="Project"
+                      icon={
+                        <div>
+                          {WithTooltip(
+                            "New Article",
+                            <svg
+                              className="w-6 h-6"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                            >
+                              <path
+                                stroke="#1D4ED8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M15 8h2m-2 4h2m0 4H7m0-8v4h4V8H7zM5 20h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                      }
+                      handleOnClick={handleToggleAddArticleModal}
+                      fill="bg-slate-100 text-custom-gray-paragraph hover:bg-slate-200"
+                    />
+                    <AddItemButton
+                      icon={
+                        <div>
+                          {WithTooltip(
+                            "New Event",
+                            <svg
+                              className="w-6 h-6"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M7 2a1 1 0 0 0-1 1v1.001c-.961.014-1.34.129-1.721.333a2.272 2.272 0 0 0-.945.945C3.116 5.686 3 6.09 3 7.205v10.59c0 1.114.116 1.519.334 1.926.218.407.538.727.945.945.407.218.811.334 1.926.334h11.59c1.114 0 1.519-.116 1.926-.334.407-.218.727-.538.945-.945.218-.407.334-.811.334-1.926V7.205c0-1.115-.116-1.519-.334-1.926a2.272 2.272 0 0 0-.945-.945C19.34 4.13 18.961 4.015 18 4V3a1 1 0 1 0-2 0v1H8V3a1 1 0 0 0-1-1zM5 9v8.795c0 .427.019.694.049.849.012.06.017.074.049.134a.275.275 0 0 0 .124.125c.06.031.073.036.134.048.155.03.422.049.849.049h11.59c.427 0 .694-.019.849-.049a.353.353 0 0 0 .134-.049.275.275 0 0 0 .125-.124.353.353 0 0 0 .048-.134c.03-.155.049-.422.049-.849L19.004 9H5zm8.75 4a.75.75 0 0 0-.75.75v2.5c0 .414.336.75.75.75h2.5a.75.75 0 0 0 .75-.75v-2.5a.75.75 0 0 0-.75-.75h-2.5z"
+                                fill="#1D4ED8"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                      }
                       handleOnClick={handleToggleAddProjectModal}
                       fill="bg-slate-100 text-custom-gray-paragraph hover:bg-slate-200"
                     />
@@ -337,7 +483,7 @@ const MainFeed: React.FC = () => {
                   <span className="text-xs text-custom-gray-paragraph">
                     Content:
                   </span>
-                  {["events", "projects"].map((contentType) => (
+                  {["events", "projects", "articles"].map((contentType) => (
                     <div
                       onClick={() => handleMainFeedContentChange(contentType)}
                       key={contentType}
@@ -422,6 +568,23 @@ const MainFeed: React.FC = () => {
                   />
                 </div>
               ))}
+            {mainFeedSettings.contentType === "articles" &&
+              articles &&
+              articles?.map((article) => (
+                <div
+                  key={article.id}
+                  className="w-full border border-gray-300 rounded-lg p-4 h-48"
+                >
+                  <ArticleCardPreview
+                    id={article.id}
+                    body={article.body}
+                    banner={article.banner}
+                    title={article.title}
+                    createdAt={article.created_at}
+                    owner={article.owner}
+                  />
+                </div>
+              ))}
             {/* <ProjectCard /> */}
           </div>
         </div>
@@ -490,6 +653,13 @@ const MainFeed: React.FC = () => {
         onClose={() => handleToggleAddProjectModal()}
       >
         <CreateProjectForm />
+      </AppModal>
+      <AppModal
+        title="Create Article"
+        isOpen={addArticleModalIsOpen}
+        onClose={() => handleToggleAddArticleModal()}
+      >
+        <CreateArticleForm />
       </AppModal>
       <AppModal
         title="Following"

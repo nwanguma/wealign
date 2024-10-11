@@ -25,6 +25,17 @@ export interface Event {
   reactions: [];
 }
 
+export interface Article {
+  id: string;
+  title: string;
+  body: string;
+  banner: string;
+  created_at: string;
+  owner: Profile;
+  comments: [];
+  reactions: [];
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -152,6 +163,14 @@ export interface EventWithPagination {
   total: number;
   totalPages: number;
   data: Event[];
+}
+
+export interface ArticlesWithPagination {
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+  data: Article[];
 }
 
 export interface JobsWithPagination {

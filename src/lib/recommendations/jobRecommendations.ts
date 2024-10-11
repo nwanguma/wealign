@@ -20,7 +20,7 @@ const recommendJobs = ({
       score += Math.max(0, 10 - daysUntilJobDeadline);
 
       const skillMatches = job.description
-        .split(" ")
+        ?.split(" ")
         .filter((word) =>
           userProfile.skills.map((skill: Skill) => skill.title).includes(word)
         ).length;

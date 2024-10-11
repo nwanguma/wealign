@@ -9,7 +9,7 @@ import conversationsReducer from "./conversations";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "recommendations", "conversations"],
+  whitelist: ["user", "recommendations", "conversations", "ui"],
 };
 
 const rootReducer = combineReducers({

@@ -6,7 +6,7 @@ import recommendEvents from "@/lib/recommendations/eventRecommendations";
 import recommendProjects from "@/lib/recommendations/projectRecommendations";
 import recommendJobs from "@/lib/recommendations/jobRecommendations";
 import { RootState } from "..";
-import { Profile, Project, Event, Job } from "@/common/constants";
+import { Profile, Project, Event, Job, Article } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
 
 interface RecommendationsState {
@@ -14,6 +14,7 @@ interface RecommendationsState {
   events: Event[];
   projects: Project[];
   jobs: Job[];
+  articles: Article[];
   upcomingEvents: Event[];
   isLoading: boolean;
   error: string | null;
@@ -24,6 +25,7 @@ const initialState: RecommendationsState = {
   events: [],
   projects: [],
   jobs: [],
+  articles: [],
   upcomingEvents: [],
   isLoading: false,
   error: null,
@@ -109,6 +111,26 @@ export const fetchJobs = createAsyncThunk(
   }
 );
 
+export const fetchArticles = createAsyncThunk(
+  "recommendations/fetchArticles",
+  async (_, { getState }) => {
+    const response = await axiosInstance.get("/api/proxy/articles", {
+      params: {
+        limit: 1000,
+        page: 1,
+        contentType: "all",
+      },
+    });
+
+    const state = getState() as RootState;
+
+    return {
+      currentUser: state.user,
+      jobs: response.data?.data?.data as Article[],
+    };
+  }
+);
+
 const recommendationsSlice = createSlice({
   name: "recommendations",
   initialState,
@@ -166,7 +188,20 @@ const recommendationsSlice = createSlice({
     });
     builder.addCase(fetchJobs.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = action.error.message || "Failed to fetch projects";
+      state.error = action.error.message || "Failed to fetch jobs";
+    });
+
+    // Articles
+    builder.addCase(fetchArticles.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(fetchArticles.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.jobs = recommendJobs(action.payload as any);
+    });
+    builder.addCase(fetchArticles.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || "Failed to fetch articles";
     });
   },
 });
