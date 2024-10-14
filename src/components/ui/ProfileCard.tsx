@@ -224,7 +224,7 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
             </div>
             <div className="flex-1 space-y-3">
               <div className="flex flex-col space-y-1">
-                <span className="font-medium text-sm">{name}</span>
+                <span className="font-app-medium text-sm">{name}</span>
                 <span className="text-xs text-gray-700 font-normal">
                   {title}
                 </span>
@@ -364,8 +364,6 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
       ? `${searchParams.toString() ? "?" : ""}${searchParams.toString()}`
       : ""
   }`;
-
-  console.log(fullUrl);
 
   const handleAddComment = () => {
     if (newComment.trim()) {

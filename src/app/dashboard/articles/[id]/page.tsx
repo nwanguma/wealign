@@ -40,8 +40,6 @@ export default function Dashboard() {
     queryFn: () => fetchArticle(id as string),
   });
 
-  console.log(article);
-
   return (
     <div className="min-h-screen w-full bg-white">
       <div className="flex space-x-5 p-6">

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import AppModal from "@/components/ui/Modal";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import FilterComponent from "@/components/ui/Filter";
 import AddItemButton from "@/components/ui/AddItemButton";
@@ -11,14 +11,23 @@ import AddArticleForm from "@/components/forms/CreateArticleForm";
 import { ArticleCardPreview } from "@/components/ui/ArticleCard";
 import { Article } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
-
+import ContentWrapper from "@/components/ui/ContentWrapper";
 import { ArticlesWithPagination } from "@/common/constants";
 
-const fetchArticles = async (): Promise<ArticlesWithPagination> => {
+import { IPagination } from "../events/page";
+import { IFilters } from "../events/page";
+import PaginationComponent from "@/components/ui/PaginationComponent";
+
+const fetchArticles = async (
+  pagination: IPagination,
+  filters: IFilters
+): Promise<ArticlesWithPagination> => {
   try {
     const response = await axiosInstance.get("/api/proxy/articles", {
       params: {
         contentType: "all",
+        ...pagination,
+        ...filters,
       },
     });
 
@@ -29,20 +38,32 @@ const fetchArticles = async (): Promise<ArticlesWithPagination> => {
 };
 
 export default function Articles() {
+  const [pagination, setPagination] = useState({ page: 1, limit: 5 });
+  const [filters, setFilters] = useState({
+    keyword: "",
+    createdAt: "",
+    order: "DESC",
+    sortBy: "",
+  });
+
   const {
     data: articlesData,
     error,
     isLoading,
+    refetch,
   } = useQuery<ArticlesWithPagination, Error>({
-    queryKey: ["articles"],
-    queryFn: fetchArticles,
+    queryKey: ["articles", pagination],
+    queryFn: () => fetchArticles(pagination, filters),
+    placeholderData: keepPreviousData,
   });
 
   let articles;
+  let total = 0;
 
   if (articlesData) {
-    const { page, perPage, total, totalPages, data } = articlesData;
+    const { page, perPage, total: pageTotal, totalPages, data } = articlesData;
     articles = articlesData.data;
+    total = pageTotal;
   }
 
   const [addArticleModalIsOpen, setAddArticleModalIsOpen] =
@@ -62,8 +83,21 @@ export default function Articles() {
           />
 
           <div className="py-5 flex flex-col space-y-5 w-full">
-            <FilterComponent />
-            <div className="w-full grid grid-cols-2 gap-5">
+            <FilterComponent
+              filters={filters}
+              setFilters={setFilters}
+              triggerRefetch={refetch}
+              options={{
+                sortByOptions: [
+                  {
+                    value: "created_at",
+                    label: "Date Created",
+                  },
+                  { value: "views", label: "Views" },
+                ],
+              }}
+            />{" "}
+            <ContentWrapper data={articles as Article[]}>
               {articlesData &&
                 articles?.map((article: Article) => (
                   <div
@@ -74,14 +108,23 @@ export default function Articles() {
                       id={article.id}
                       banner={article.banner}
                       title={article.title}
-                      created_at={article.created_at}
+                      createdAt={article.created_at}
+                      owner={article.owner}
                       body={article.body}
                       comment_count={article.comments?.length}
                       like_count={article.reactions?.length}
                     />
                   </div>
                 ))}
-            </div>
+            </ContentWrapper>
+            {articlesData && articles && (
+              <PaginationComponent
+                data={articles}
+                total={total}
+                setPagination={setPagination}
+                limit={pagination.limit}
+              />
+            )}
           </div>
         </div>
       </div>

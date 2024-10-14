@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { timeAgo } from "@/lib/helpers";
 import { Skill, Profile } from "@/common/constants";
-import { formatDateLong } from "@/lib/helpers";
+import { formatDateLong, truncateString } from "@/lib/helpers";
 
 interface IJobCardProps {
   id: string;
@@ -13,7 +13,7 @@ interface IJobCardProps {
   website?: string;
   application_url?: string | null;
   created_at: string;
-  requirements?: Skill[];
+  skills?: Skill[];
   comment_count?: number;
   like_count?: number;
   status?: string;
@@ -28,7 +28,7 @@ export const JobCard: React.FC<IJobCardProps> = ({
   like_count,
   application_url,
   created_at,
-  requirements,
+  skills,
   status,
 }) => {
   return (
@@ -40,7 +40,9 @@ export const JobCard: React.FC<IJobCardProps> = ({
           </div>
           <div className="flex flex-col space-y-2">
             <div>
-              <span className="font-medium">{title}</span>
+              <span className="font-app-medium">
+                {truncateString(title, 25)}
+              </span>
               {status && (
                 <div className="space-y-2">
                   <span className="capitalize text-xs font-medium rounded text-gray-700 bg-green-200 py-1 px-1">
@@ -78,10 +80,12 @@ export const JobCard: React.FC<IJobCardProps> = ({
             </div>
           </div>
         </div>{" "}
-        <p className="text-sm leading-snug text-gray-700">{description}</p>
+        <p className="text-sm leading-snug text-gray-700">
+          {truncateString(description, 140)}
+        </p>
         <div className="flex gap-2 flex-wrap">
-          {requirements &&
-            requirements.map((skill, index) => (
+          {skills &&
+            skills.map((skill, index) => (
               <div
                 key={skill.title}
                 className="capitalize text-xs border border-violet-500 text-violet-500 py-1 px-2 rounded"
@@ -119,7 +123,7 @@ interface IJobCardMainProps {
   comments: any[] | undefined;
   like_count?: number | undefined;
   comment_count?: number | undefined;
-  requirements?: Skill[];
+  skills?: Skill[];
   created_at: string;
   owner: Profile | undefined;
   application_url?: string | null;
@@ -137,7 +141,7 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
   comment_count,
   like_count,
   application_url,
-  requirements,
+  skills,
   created_at,
   deadline,
   status,
@@ -235,11 +239,11 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
         <h3 className="text-sm font-bold">Description</h3>
         <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
       </div>
-      {requirements && !!requirements.length && (
+      {skills && !!skills.length && (
         <div className="space-y-2 border-b border-b-gray-200 pb-4">
           <h3 className="text-sm font-bold">Skills</h3>
           <div className="flex gap-2 flex-wrap">
-            {requirements.map((skill, index) => (
+            {skills.map((skill, index) => (
               <div
                 key={skill.title}
                 className="capitalize text-xs border border-violet-500 text-violet-500 py-1 px-2 rounded"

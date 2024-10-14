@@ -61,19 +61,9 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-
   secret: process.env.NEXTAUTH_SECRET,
-
   callbacks: {
-    async jwt({
-      token,
-      user,
-      account,
-    }: {
-      token: JWT;
-      user?: User;
-      account?: any;
-    }) {
+    async jwt({ token, user }: { token: JWT; user?: User; account?: any }) {
       if (user) {
         const isUserWithTokens = (user: User): user is UserWithTokens =>
           (user as UserWithTokens).accessToken !== undefined;

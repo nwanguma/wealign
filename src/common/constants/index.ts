@@ -62,7 +62,7 @@ export interface Job {
   website: string;
   application_url: string | null;
   created_at: string;
-  requirements?: Skill[];
+  skills?: Skill[];
   likes?: any[];
   comments?: any[];
   owner: Profile;

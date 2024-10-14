@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import AppModal from "@/components/ui/Modal";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
+import ContentWrapper from "@/components/ui/ContentWrapper";
 import FilterComponent from "@/components/ui/Filter";
 import AddItemButton from "@/components/ui/AddItemButton";
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
@@ -11,14 +12,40 @@ import AddEventForm from "@/components/forms/CreateEventForm";
 import { EventCardPreview } from "@/components/ui/EventCard";
 import { Event } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
-
 import { EventWithPagination } from "@/common/constants";
+import PaginationComponent from "@/components/ui/PaginationComponent";
 
-const fetchEvents = async (): Promise<EventWithPagination> => {
+export interface IPagination {
+  page: number;
+  limit: number;
+}
+
+export interface IFilters {
+  skills?: string[] | string;
+  status?: string;
+  keyword?: string;
+  is_mentor?: undefined | boolean;
+  order?: string;
+  sortBy?: string;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  type?: string;
+  createdAt?: string | Date;
+}
+
+const fetchEvents = async (
+  pagination: IPagination,
+  filters: IFilters
+): Promise<EventWithPagination> => {
   try {
+    const { type, ...rest } = filters;
+
     const response = await axiosInstance.get("/api/proxy/events", {
       params: {
         contentType: "all",
+        ...pagination,
+        ...rest,
+        eventType: type,
       },
     });
 
@@ -29,20 +56,34 @@ const fetchEvents = async (): Promise<EventWithPagination> => {
 };
 
 export default function Events() {
+  const [pagination, setPagination] = useState({ page: 1, limit: 5 });
+  const [filters, setFilters] = useState({
+    keyword: "",
+    type: "",
+    startDate: "",
+    endDate: "",
+    order: "DESC",
+    sortBy: "",
+  });
+
   const {
     data: eventsData,
     error,
     isLoading,
+    refetch,
   } = useQuery<EventWithPagination, Error>({
-    queryKey: ["events"],
-    queryFn: fetchEvents,
+    queryKey: ["events", pagination],
+    queryFn: () => fetchEvents(pagination, filters as IFilters),
+    placeholderData: keepPreviousData,
   });
 
   let events;
+  let total = 0;
 
   if (eventsData) {
-    const { page, perPage, total, totalPages, data } = eventsData;
+    const { page, perPage, total: pageTotal, totalPages, data } = eventsData;
     events = eventsData.data;
+    total = pageTotal;
   }
 
   const [addEventModalIsOpen, setAddEventModalIsOpen] =
@@ -62,8 +103,32 @@ export default function Events() {
           />
 
           <div className="py-5 flex flex-col space-y-5 w-full">
-            <FilterComponent />
-            <div className="w-full grid grid-cols-2 gap-5">
+            <FilterComponent
+              filters={filters}
+              setFilters={setFilters}
+              triggerRefetch={refetch}
+              options={{
+                typeOptions: [
+                  { value: "onsite", label: "Onsite" },
+                  {
+                    value: "hybrid",
+                    label: "Hybrid",
+                  },
+                  {
+                    value: "virtual",
+                    label: "Virtual",
+                  },
+                ],
+                sortByOptions: [
+                  {
+                    value: "start_date",
+                    label: "Start Date",
+                  },
+                  { value: "views", label: "Views" },
+                ],
+              }}
+            />
+            <ContentWrapper data={events as Event[]}>
               {eventsData &&
                 events?.map((event: Event) => (
                   <div
@@ -81,7 +146,15 @@ export default function Events() {
                     />
                   </div>
                 ))}
-            </div>
+            </ContentWrapper>
+            {eventsData && events && (
+              <PaginationComponent
+                data={events}
+                total={total}
+                setPagination={setPagination}
+                limit={pagination.limit}
+              />
+            )}
           </div>
         </div>
       </div>

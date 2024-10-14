@@ -3,7 +3,7 @@ import Image from "next/image";
 
 interface InputProps {
   id: string;
-  label: string;
+  label?: string;
   type?: string;
   value: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -31,21 +31,23 @@ const Input: React.FC<InputProps> = ({
   return (
     <div>
       <div className="relative z-0 w-full group">
-        <label
-          htmlFor={id}
-          // className={`absolute flex  items-center space-x-2 text-sm text-custom-gray-paragraph duration-300 transform -translate-y-6 scale-75 top-3 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-8 ${
-          //   isFocused || value !== "" ? "scale-75 -translate-y-6" : ""
-          // }`}
-          className="text-sm mb-1 text-gray-600 inline-block"
-        >
-          {icon}
-          <span>{label}</span>
-          {required && (
-            <span className="text-red-500" aria-hidden="true">
-              *
-            </span>
-          )}
-        </label>
+        {label && (
+          <label
+            htmlFor={id}
+            // className={`absolute flex  items-center space-x-2 text-sm text-custom-gray-paragraph duration-300 transform -translate-y-6 scale-75 top-3 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-8 ${
+            //   isFocused || value !== "" ? "scale-75 -translate-y-6" : ""
+            // }`}
+            className="text-sm mb-1 text-gray-600 inline-block"
+          >
+            {icon}
+            <span>{label}</span>
+            {required && (
+              <span className="text-red-500" aria-hidden="true">
+                *
+              </span>
+            )}
+          </label>
+        )}
         <input
           {...otherClasses}
           type={type}
@@ -60,7 +62,7 @@ const Input: React.FC<InputProps> = ({
           required
         />
       </div>
-      {error && <p className="text-red-500">{error}</p>}
+      {error && <p className="text-xs-sm text-red-500">{error}</p>}
     </div>
   );
 };

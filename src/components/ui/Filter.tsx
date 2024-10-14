@@ -3,33 +3,41 @@ import DatePicker from "react-datepicker";
 import Image from "next/image";
 import "react-datepicker/dist/react-datepicker.css";
 
+import NativeSelect from "../forms/NativeSelectComponent";
+import { IFilters } from "@/app/dashboard/events/page";
+import Input from "../forms/Input";
+import { WithTooltip } from "./WithTooltip";
+
 interface SortByProps {
-  onSortChange: (sortBy: string) => void;
+  options: Option[];
+  filters: IFilters;
+  triggerRefetch: () => void;
+  setFilters: (filters: IFilters) => void;
 }
 
-const SortBy: React.FC<SortByProps> = ({ onSortChange }) => {
-  const [sortBy, setSortBy] = useState<string>("");
-
-  const sortOptions = [
-    { value: "", label: "Sort By" },
-    { value: "date_created", label: "Start Date" },
-    { value: "number_of_views", label: "Views" },
-  ];
-
+const SortBy: React.FC<SortByProps> = ({
+  filters,
+  options,
+  triggerRefetch,
+  setFilters,
+}) => {
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = e.target.value;
-    setSortBy(selectedValue);
-    onSortChange(selectedValue);
+    setFilters({ ...filters, sortBy: e.target.value });
+
+    setTimeout(() => {
+      triggerRefetch();
+    }, 0);
   };
 
   return (
     <div className="relative">
       <select
-        value={sortBy}
+        value={filters?.sortBy}
         onChange={handleSortChange}
         className="block w-32 text-gray-700 pl-3 pr-10 py-2 text-base appearance-none border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
       >
-        {sortOptions.map((option) => (
+        <option value="">Sort By</option>
+        {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
@@ -55,56 +63,6 @@ const SortBy: React.FC<SortByProps> = ({ onSortChange }) => {
   );
 };
 
-interface SelectInputProps {
-  id: string;
-  label: string;
-  options: { value: string; label: string }[];
-  value: string;
-  onChange: (value: string) => void;
-}
-
-const SelectInput: React.FC<SelectInputProps> = ({
-  id,
-  label,
-  options,
-  value,
-  onChange,
-}) => {
-  return (
-    <div className="w-36">
-      <div className="relative">
-        <select
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="block w-36 pl-3 pr-10 py-2 text-base text-gray-700 appearance-none border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-        >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <svg
-            className="w-5 h-5 text-gray-400"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.23 7.21a.75.75 0 011.06.02L10 11.584l3.71-4.354a.75.75 0 111.14.976l-4.25 5a.75.75 0 01-1.14 0l-4.25-5a.75.75 0 01.02-1.06z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 interface DatePickerInputProps {
   selectedDate: Date | null;
   onChange: (date: Date | null) => void;
@@ -122,7 +80,7 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
         selected={selectedDate}
         onChange={onChange}
         placeholderText={placeholder}
-        className="block w-32 pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        className="block w-36 pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
       />
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <Image
@@ -136,77 +94,148 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
   );
 };
 
-const DashboardSearchInput: React.FC = () => {
-  return (
-    <div className="relative">
-      <input
-        type="text"
-        placeholder="Search profile, skill, title..."
-        className="w-64 pl-2 py-1.5 pr-12 border border-gray-300 placeholder:text-sm text-gray-600 rounded-md focus:border-blue-500 focus:outline-none focus:ring-0 focus:ring-blue-500"
-      />
-    </div>
-  );
-};
+interface Option {
+  value: string;
+  label: string;
+}
 
-const FilterComponent: React.FC = () => {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [category, setCategory] = useState<string>("");
+interface IFilterComponentProps {
+  filters: IFilters;
+  setFilters: any;
+  options?: { [key: string]: Option[] };
+  triggerRefetch?: any;
+}
 
-  const categoryOptions = [
-    { value: "", label: "All Categories" },
-    { value: "technology", label: "Technology" },
-    { value: "marketing", label: "Marketing" },
-    { value: "design", label: "Design" },
-  ];
+const FilterComponent: React.FC<IFilterComponentProps> = ({
+  filters,
+  setFilters,
+  options,
+  triggerRefetch,
+}) => {
+  const filterFields = Object.keys(filters);
+  const handleFiltersChange = (e: any) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value });
+  };
+
+  const handleRefetchWithFilters = () => {
+    triggerRefetch();
+  };
 
   return (
     <div className="flex justify-between items-center">
       <div className="flex flex-row flex-wrap md:items-center md:gap-2">
-        <DashboardSearchInput />
-        <SelectInput
-          id="category"
-          label="Category"
-          options={categoryOptions}
-          value={category}
-          onChange={setCategory}
-        />
-        <SelectInput
-          id="category"
-          label="Category"
-          options={categoryOptions}
-          value={category}
-          onChange={setCategory}
-        />
-        <div className="flex space-x-2 items-center">
-          <DatePickerInput
-            selectedDate={startDate}
-            onChange={setStartDate}
-            placeholder="Start Date"
+        {filterFields.includes("keyword") && (
+          <div className="w-72">
+            <Input
+              id="keyword"
+              type="string"
+              placeholder="Keyword..."
+              value={filters.keyword as string}
+              onChange={(e: any) => handleFiltersChange(e)}
+            />
+          </div>
+        )}
+        {filterFields.includes("skills") && options?.statusOptions && (
+          <NativeSelect
+            id="skills"
+            placeholder="Filter by Skill"
+            value={filters.skills as string}
+            onChange={(e) => handleFiltersChange(e)}
+            options={options?.skillsOptions as Option[]}
           />
+        )}
+        {filterFields.includes("status") && options?.statusOptions && (
+          <NativeSelect
+            id="status"
+            placeholder="Select Status"
+            value={filters.status as string}
+            onChange={(e) => handleFiltersChange(e)}
+            options={options?.statusOptions as Option[]}
+          />
+        )}
+        {filterFields.includes("type") && options?.typeOptions && (
+          <NativeSelect
+            id="type"
+            placeholder="Select Type"
+            value={filters.type as string}
+            onChange={(e) => handleFiltersChange(e)}
+            options={options.typeOptions as Option[]}
+          />
+        )}
+        {filterFields.includes("createdAt") && (
           <DatePickerInput
-            selectedDate={endDate}
-            onChange={setEndDate}
-            placeholder="End Date"
+            selectedDate={filters.createdAt as any}
+            onChange={(e: any) => {
+              handleFiltersChange({
+                target: {
+                  name: "createdAt",
+                  value: e,
+                },
+              });
+            }}
+            placeholder="Date Posted"
+          />
+        )}
+        <div className="flex space-x-2 items-center">
+          {filterFields.includes("startDate") && (
+            <DatePickerInput
+              selectedDate={filters.startDate as any}
+              onChange={(e: any) => {
+                handleFiltersChange({
+                  target: {
+                    name: "startDate",
+                    value: e,
+                  },
+                });
+              }}
+              placeholder="Start Date"
+            />
+          )}
+          {filterFields.includes("endDate") && (
+            <DatePickerInput
+              selectedDate={filters.endDate as any}
+              onChange={(e: any) => {
+                handleFiltersChange({
+                  target: {
+                    name: "endDate",
+                    value: e,
+                  },
+                });
+              }}
+              placeholder="End Date"
+            />
+          )}
+        </div>
+        {WithTooltip(
+          "Filter",
+          <button
+            onClick={handleRefetchWithFilters}
+            className="px-3 py-3 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-300 flex items-center"
+          >
+            <svg
+              fill="#ffffff"
+              className="w-4 h-4"
+              viewBox="0 0 1920 1920"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="m0 .011 741.97 984.808v673.566l502.665 251.332V984.82l675.332-896.544-88.154-66.308-697.508 925.891v783.345L852.301 1590.2V947.858L221.322 110.341h1262.289V.011z"
+                fillRule="evenodd"
+              />
+            </svg>
+          </button>
+        )}
+      </div>
+      {options?.sortByOptions && (
+        <div>
+          <SortBy
+            triggerRefetch={triggerRefetch}
+            filters={filters}
+            options={options?.sortByOptions!}
+            setFilters={setFilters}
           />
         </div>
-        <button className="px-3 py-3 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-300 flex items-center">
-          <svg
-            fill="#ffffff"
-            className="w-4 h-4"
-            viewBox="0 0 1920 1920"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="m0 .011 741.97 984.808v673.566l502.665 251.332V984.82l675.332-896.544-88.154-66.308-697.508 925.891v783.345L852.301 1590.2V947.858L221.322 110.341h1262.289V.011z"
-              fill-rule="evenodd"
-            />
-          </svg>
-        </button>
-      </div>
-      <div>
-        <SortBy onSortChange={() => undefined} />
-      </div>
+      )}
     </div>
   );
 };

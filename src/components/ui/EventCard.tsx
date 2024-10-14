@@ -28,7 +28,7 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
   like_count,
   comment_count,
   event_start_date,
-  description_limit = 40,
+  description_limit = 140,
   isPreview,
 }) => {
   const { dayOfWeek, day, month } = formatDateShort(event_start_date, {
@@ -46,7 +46,7 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
               <span className="text-xs text-custom-gray-paragraph">
                 {dayOfWeek}
               </span>
-              <span className="text-lg font-bold text-custom-gray-heading">
+              <span className="text-lg font-app-medium text-custom-gray-heading">
                 {day}
               </span>
               <span className="text-xs text-custom-gray-paragraph">
@@ -65,7 +65,9 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
           <div className="flex flex-col flex-1 space-y-4">
             <div className="flex flex-col space-y-2 py-2">
               <div className="flex flex-col">
-                <span className="font-app-medium">{title}</span>
+                <span className="font-app-medium">
+                  {truncateString(title, 25)}
+                </span>
                 <span className="text-xs text-custom-gray-paragraph">
                   {location}
                 </span>

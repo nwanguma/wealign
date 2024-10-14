@@ -32,12 +32,6 @@ export enum ProfileStatus {
   JOB_HUNTING = "looking for work",
 }
 
-const stripHtml = (html: string) => {
-  const tempElement = document.createElement("div");
-  tempElement.innerHTML = html;
-  return tempElement.textContent || tempElement.innerText || "";
-};
-
 const schema = yup.object().shape({
   avatar: yup.mixed().required("Avatar is required"),
   // first_name: yup
@@ -205,7 +199,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
       formData.append("file", acceptedFiles[0]);
 
       const result = await axiosInstance.post(
-        "/api/proxy/files/upload/avatars",
+        "/api/proxy/files/upload/images",
         formData,
         {
           headers: {
@@ -226,7 +220,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
       formData.append("file", acceptedFiles[0]);
 
       const result = await axiosInstance.post(
-        "/api/proxy/files/upload/attachments",
+        "/api/proxy/files/upload/documents",
         formData,
         {
           headers: {
@@ -267,7 +261,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
 
     const profileData = {
       ...data,
-      bio: stripHtml(data.bio),
+      bio: data.bio,
       languages: selectedLanguages.map((l) => l.value),
       skills: selectedSkills.map((s) => ({ title: s.label })),
       visibility_status: visibilityStatus,
@@ -545,53 +539,55 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
             <p className="text-red-500">{errors.resume.message}</p>
           )}
           {!deletedResume && user?.profile.resume && (
-            <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50 mt-2 flex items-center space-x-2">
-              <Link
-                href={user.profile?.resume as string}
-                download
-                target="_blank"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
+            <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50 mt-2 flex items-center justify-between space-x-2">
+              <div className="flex items-center space-x-2">
+                <Image
+                  src="/icons/file.svg"
+                  width={20}
+                  height={20}
+                  alt="file icon"
+                />
+                <span className="">
+                  {getFilenameAndExtension(user?.profile.resume)}
+                </span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Link
+                  href={user.profile?.resume as string}
+                  download
+                  target="_blank"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {WithTooltip(
+                        "Download",
+                        <Image
+                          src="/icons/download.svg"
+                          width={20}
+                          height={20}
+                          alt="file icon"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </Link>
+                {WithTooltip(
+                  "Remove",
+                  <span
+                    onClick={() => {
+                      setValue("resume", "");
+                      setDeletedResume(true);
+                    }}
+                  >
                     <Image
-                      src="/icons/file.svg"
+                      src="/icons/bin.svg"
                       width={20}
                       height={20}
                       alt="file icon"
                     />
-                    <span className="">
-                      {getFilenameAndExtension(user?.profile.resume)}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {WithTooltip(
-                      "Download",
-                      <Image
-                        src="/icons/download.svg"
-                        width={20}
-                        height={20}
-                        alt="file icon"
-                      />
-                    )}
-                  </div>
-                </div>
-              </Link>
-              {WithTooltip(
-                "Remove",
-                <span
-                  onClick={() => {
-                    setValue("resume", "");
-                    setDeletedResume(true);
-                  }}
-                >
-                  <Image
-                    src="/icons/bin.svg"
-                    width={20}
-                    height={20}
-                    alt="file icon"
-                  />
-                </span>
-              )}
+                  </span>
+                )}
+              </div>
             </div>
           )}
         </div>

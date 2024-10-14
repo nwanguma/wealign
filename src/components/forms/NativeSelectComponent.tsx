@@ -28,14 +28,19 @@ const NativeSelect: React.FC<NativeSelectProps> = ({
   return (
     <div className="relative">
       <div className="relative z-0 w-full group">
-        <label htmlFor={id} className="text-sm mb-1 text-gray-600 inline-block">
-          {label}
-          {required && (
-            <span className="text-red-500" aria-hidden="true">
-              *
-            </span>
-          )}
-        </label>
+        {label && (
+          <label
+            htmlFor={id}
+            className="text-sm mb-1 text-gray-600 inline-block"
+          >
+            {label}
+            {required && (
+              <span className="text-red-500" aria-hidden="true">
+                *
+              </span>
+            )}
+          </label>
+        )}
         <div className="relative">
           <select
             {...(otherClasses || {})}
@@ -45,7 +50,7 @@ const NativeSelect: React.FC<NativeSelectProps> = ({
             onChange={onChange}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(value !== "")}
-            className="block py-3 rounded-xl pl-4 pr-10 w-full text-sm text-gray-900 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
+            className="block py-3 rounded-xl pl-4 pr-10 w-full text-sm text-gray-900 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400 capitalize"
             placeholder={placeholder}
             required={required}
           >

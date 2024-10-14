@@ -9,9 +9,6 @@ import CreateProjectForm from "@/components/forms/CreateProjectForm";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { Project } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
-import AddItemButton from "@/components/ui/AddItemButton";
-
-import FilterComponent from "@/components/ui/Filter";
 import { ProjectsWithPagination } from "@/common/constants";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -63,7 +60,6 @@ export default function Projects() {
             description="Connect with talented professionals and find exciting projects to work on. Whether you're looking for a team or want to join an existing project, explore opportunities to collaborate and bring your ideas to life."
           />
           <div className="py-5 flex flex-col space-y-5 w-full">
-            <FilterComponent />
             <div className="w-full grid grid-cols-3 gap-5">
               {projects?.map(
                 ({

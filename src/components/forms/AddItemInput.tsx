@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Input from "./Input";
-import { WithTooltip } from "../ui/WithTooltip";
 
 interface IAddItemInput {
   item?: any;
@@ -35,7 +34,7 @@ const AddItemInput: React.FC<IAddItemInput> = ({
             </div>
           </div>
           <p
-            className="mb-1 cursor-pointer h-10 px-2 flex items-center text-xs rounded bg-black text-white"
+            className="mb-1 cursor-pointer h-10 px-3 flex items-center text-xs rounded bg-gray-600 text-white"
             onClick={() => setItems((prev: any) => [...prev, item])}
           >
             Add

@@ -3,7 +3,12 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { Profile, Article } from "@/common/constants";
-import { truncateString, formatDateLong, timeAgo } from "@/lib/helpers";
+import {
+  truncateString,
+  formatDateLong,
+  timeAgo,
+  stripHtml,
+} from "@/lib/helpers";
 
 interface IArticleCardPreviewProps {
   id: string;
@@ -27,7 +32,7 @@ export const ArticleCardPreview: React.FC<IArticleCardPreviewProps> = ({
   like_count,
   createdAt,
   owner,
-  body_limit = 140,
+  body_limit = 120,
   isPreview,
 }) => {
   return (
@@ -57,11 +62,13 @@ export const ArticleCardPreview: React.FC<IArticleCardPreviewProps> = ({
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="font-app-medium">{title}</span>
+                <span className="font-app-medium">
+                  {truncateString(title, 25)}
+                </span>
               </div>
               {!isPreview && (
                 <span className="text-sm text-custom-gray-paragraph font-light leading-snug">
-                  {truncateString(body as string, body_limit)}
+                  {truncateString(stripHtml(body as string), body_limit)}
                 </span>
               )}
             </div>

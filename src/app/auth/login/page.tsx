@@ -39,8 +39,6 @@ const LoginPage: React.FC = () => {
 
   const [error, setError] = useState<string | null>(null);
 
-  console.log(errors);
-
   const handleSignIn = async (provider: string) => {
     const res = await signIn(provider, { callbackUrl: "/" });
     if (res?.error) {
@@ -49,7 +47,6 @@ const LoginPage: React.FC = () => {
   };
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    console.log("data", data);
     const res = await signIn("credentials", {
       redirect: false,
       email: data.email,
@@ -58,7 +55,6 @@ const LoginPage: React.FC = () => {
     });
 
     if (res?.error) {
-      console.log(res.error, "error");
       setError(res.error);
     }
   };

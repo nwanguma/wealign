@@ -1,12 +1,13 @@
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
 import { Event } from "@/common/constants";
+import NativeSelect from "./NativeSelectComponent";
 
 import Image from "next/image";
 import Input from "./Input";
@@ -24,6 +25,7 @@ const schema = yup.object().shape({
     .required("Title is required")
     .min(3, "Must be at least 2 characters"),
   banner: yup.mixed(),
+  attachment: yup.mixed(),
   // event_start_date: yup
   //   .string()
   //   .required("Start date is required")
@@ -32,10 +34,22 @@ const schema = yup.object().shape({
   //   .string()
   //   .required("End date is required")
   //   .min(2, "Must be at least 2 characters"),
+  type: yup.string().required("Event type is required"),
   website: yup.string().url("Must be a valid URL"),
   ticket_link: yup.string().url("Must be a valid URL"),
-  link: yup.string().url("Must be a valid URL"),
-  location: yup.string().required("Location is required"),
+  link: yup
+    .string()
+    .url("Must be a valid URL")
+    .when("type", (type: any, schema) => {
+      return type === "hybrid" || type === "virtual"
+        ? schema.required("Link is required for hybrid or virtual events")
+        : schema.notRequired();
+    }),
+  location: yup.string().when("type", (type: any, schema) => {
+    return type === "hybrid" || type === "onsite"
+      ? schema.required("Location is required for hybrid or onsite events")
+      : schema.notRequired();
+  }),
   description: yup
     .string()
     .required("Description is required")
@@ -68,19 +82,74 @@ const CreateEventForm: React.FC = () => {
   });
 
   const [banner, setBanner] = useState<File | null>(null);
+  const [attachment, setAttachment] = useState<File | null>(null);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
-  // const handleBannerDrop = (acceptedFiles: File[]) => {
-  //   setAvatar(acceptedFiles[0]);
-  //   setValue("avatar", acceptedFiles[0]);
-  // };
+  const handleBannerDrop = (acceptedFiles: File[]) => {
+    setBanner(acceptedFiles[0]);
 
-  // const { getRootProps, getInputProps } = useDropzone({
-  //   onDrop: handleBannerDrop,
-  //   accept: { "image/*": [] },
-  //   maxFiles: 1,
-  // });
+    (async function () {
+      const formData = new FormData();
+      formData.append("file", acceptedFiles[0]);
+
+      const result = await axiosInstance.post(
+        "/api/proxy/files/upload/images",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setValue("banner", result?.data?.data?.url);
+    })();
+  };
+
+  const handleAttachmentDrop = (acceptedFiles: File[]) => {
+    setAttachment(acceptedFiles[0]);
+
+    (async function () {
+      const formData = new FormData();
+      formData.append("file", acceptedFiles[0]);
+
+      const result = await axiosInstance.post(
+        "/api/proxy/files/upload/documents",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setValue("attachment", result?.data?.data?.url);
+    })();
+  };
+
+  const {
+    getRootProps: getBannerRootProps,
+    getInputProps: getBannerInputProps,
+  } = useDropzone({
+    onDrop: handleBannerDrop,
+    accept: { "image/*": [] },
+    maxFiles: 1,
+  });
+
+  const {
+    getRootProps: getAttachmentRootProps,
+    getInputProps: getAttachmentInputProps,
+  } = useDropzone({
+    onDrop: handleAttachmentDrop,
+    accept: {
+      "application/pdf": [],
+      "application/msword": [],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [],
+    },
+    maxFiles: 1,
+  });
 
   const onSubmit = (data: any) => {
     (async function () {
@@ -108,32 +177,27 @@ const CreateEventForm: React.FC = () => {
             otherClasses={methods.register("title")}
           />
         </div>
-        <Input
-          id="banner"
-          label="Banner"
-          placeholder="https://example.jpg"
-          value={watch("banner") as string}
-          onChange={(e) => setValue("banner", e.target.value)}
-          error={errors.banner?.message as string as string}
-          otherClasses={methods.register("banner")}
-        />
-        {/* <div className="py-3">
+        <div className="py-3">
           <label className="block text-gray-700 text-sm">Banner</label>
           <div
-            {...getRootProps()}
+            {...getBannerRootProps()}
             className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
           >
-            <input {...getInputProps()} />
-            {avatar ? (
-              <p>{avatar.name} kjfg</p>
+            <input {...getBannerInputProps()} />
+            {banner ? (
+              <p>{banner.name}</p>
             ) : (
-              <p>Drag and drop an image, or click to select an avatar</p>
+              <p>
+                Drag and drop an image, or click to select a banner. We
+                recommend uploading or dragging in an image that is 1920x1080
+                pixels.
+              </p>
             )}
           </div>
-          {errors.avatar && (
-            <p className="text-red-500">{errors.avatar.message}</p>
+          {errors.banner && (
+            <p className="text-red-500">{errors.banner?.message as string}</p>
           )}
-        </div> */}
+        </div>
         <div className="grid grid-cols-2 gap-6">
           <div className="w-full">
             <label className="text-sm mb-1 text-gray-600 inline-block">
@@ -201,28 +265,52 @@ const CreateEventForm: React.FC = () => {
             placeholder="https://"
           />
         </div>
-        <div>
-          <Input
-            id="link"
-            label="Event link (for virtual events)"
-            value={watch("link") as string}
-            onChange={(e) => setValue("link", e.target.value)}
-            error={errors.link?.message as string}
-            otherClasses={methods.register("link")}
-            placeholder="https://"
-          />
-        </div>
-        <div>
-          <Input
-            id="location"
-            label="Location"
-            value={watch("location")}
-            onChange={(e) => setValue("location", e.target.value)}
-            error={errors.location?.message as string}
-            otherClasses={methods.register("location")}
-            required
-          />
-        </div>
+        <NativeSelect
+          id="type"
+          label="Event type"
+          placeholder="Select Event type"
+          value={watch("type") as string}
+          onChange={(e: any) => setValue("type", e.target.value)}
+          error={errors?.type?.message}
+          options={[
+            { value: "onsite", label: "Onsite" },
+            {
+              value: "hybrid",
+              label: "Hybrid",
+            },
+            {
+              value: "virtual",
+              label: "Virtual",
+            },
+          ]}
+          otherClasses={methods.register("type")}
+        />
+        {["hybrid", "virtual"].includes(watch("type")) && (
+          <div>
+            <Input
+              id="link"
+              label="Event link (for virtual events)"
+              value={watch("link") as string}
+              onChange={(e) => setValue("link", e.target.value)}
+              error={errors.link?.message as string}
+              otherClasses={methods.register("link")}
+              placeholder="https://"
+            />
+          </div>
+        )}
+        {["hybrid", "onsite"].includes(watch("type")) && (
+          <div>
+            <Input
+              id="location"
+              label="Location"
+              value={watch("location") as string}
+              onChange={(e) => setValue("location", e.target.value)}
+              error={errors.location?.message as string}
+              otherClasses={methods.register("location")}
+              required
+            />
+          </div>
+        )}
         <TextArea
           id="description"
           label="Description"
@@ -231,25 +319,27 @@ const CreateEventForm: React.FC = () => {
           error={errors.description?.message as string}
           otherClasses={methods.register("description")}
         />
-        {/* <div className="py-3">
+        <div className="py-3">
           <label className="block text-gray-700 text-sm">
-            Attachments (.docx, .doc, .pdf)
+            Attachment (.docx, .doc, .pdf)
           </label>
           <div
-            {...getRootProps()}
+            {...getAttachmentRootProps()}
             className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
           >
-            <input {...getInputProps()} />
-            {avatar ? (
-              <p>{avatar.name} kjfg</p>
+            <input {...getAttachmentInputProps()} />
+            {attachment ? (
+              <p>{attachment.name}</p>
             ) : (
               <p>Drag and drop a file, or click to select a document</p>
             )}
           </div>
           {errors.attachment && (
-            <p className="text-red-500">{errors.attachment.message}</p>
+            <p className="text-red-500">
+              {errors.attachment?.message as string}
+            </p>
           )}
-        </div> */}
+        </div>
         <div className="flex items-center space-x-2 justify-end">
           <button
             type="submit"

@@ -1,52 +1,21 @@
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import "react-quill/dist/quill.snow.css";
-import dynamic from "next/dynamic";
 import React, { useState } from "react";
+import DatePicker from "react-datepicker";
 import { useForm, FormProvider, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
+import Image from "next/image";
+import { useMutation } from "@tanstack/react-query";
+
 import NativeSelect from "./NativeSelectComponent";
 import ReactSelectComponent from "./ReactSelectComponent";
-
-import Image from "next/image";
-
+import axiosInstance from "@/lib/axiosInstance";
+import TextArea from "./TextArea";
 import Input from "./Input";
-
-import "react-quill/dist/quill.snow.css";
-// import "tailwindcss/tailwind.css";
-
-import "../../app/globals.css";
-
-import { Skill } from "@/common/constants";
+import { Project } from "@/common/constants";
 import AddItemInput from "./AddItemInput";
-
-// {
-//     "title": "New Project Title",
-//     "description": "This is a description of the project.",
-//     "website": "https://example.com",
-//     "githubUrl": "https://github.com/thenewproject",
-//     "collaborators": [
-//         "c2415009-3c52-4b0d-bb2d-c5cfbaf3c802"
-//     ],
-//     "skills": [
-//         {
-//             "title": "JavaScript"
-//         },
-//         {
-//             "title": "TypeScript"
-//         }
-//     ]
-// }
-
-// Dynamically import ReactQuill with a fallback loader
-const ReactQuill = dynamic(() => import("react-quill"), {
-  ssr: false,
-  loading: () => (
-    <div className="quill-skeleton h-48 border border-gray-300 rounded-lg"></div>
-  ),
-});
+import { useSkills } from "@/app/hooks/useSkills";
+import { WithTooltip } from "../ui/WithTooltip";
 
 const schema = yup.object().shape({
   title: yup
@@ -68,9 +37,22 @@ const schema = yup.object().shape({
   website: yup.string().url("Must be a valid URL"),
   github_url: yup.string().url("Must be a valid URL"),
   skills: yup.array(),
+  attachment: yup.mixed(),
 });
 
-const UpdateProfileForm: React.FC = () => {
+const createProject = async (data: Partial<Project>) => {
+  const response = await axiosInstance.post(`/api/proxy/projects`, data);
+
+  return response.data.data;
+};
+
+interface ICreateProjectForm {
+  handleModalClose?: () => void;
+}
+
+const CreateProjectForm: React.FC<ICreateProjectForm> = ({
+  handleModalClose,
+}) => {
   const methods = useForm({
     resolver: yupResolver(schema),
   });
@@ -82,37 +64,79 @@ const UpdateProfileForm: React.FC = () => {
     setValue,
     formState: { errors },
   } = methods;
-
+  const { data: skills, isLoading, error } = useSkills();
   const [bio, setBio] = useState<string>("");
   const [selectedLanguages, setSelectedLanguages] = useState<any[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<any[]>([]);
-  const [visibilityStatus, setVisibilityStatus] = useState<
-    "public" | "private"
-  >("public");
-  const [attachement, setAttachment] = useState<File | null>(null);
+  const [deletedAttachment, setDeletedAttachment] = useState(false);
+
+  const [requireFeedback, setRequireFeedback] = useState<"no" | "yes">("no");
+  const [attachment, setAttachment] = useState<File | null>(null);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [loading, setLoading] = useState(false);
 
-  const skillsOptions = [
-    { value: "html", label: "HTML" },
-    { value: "css", label: "CSS" },
-    { value: "javascript", label: "JavaScript" },
-  ];
+  const updateProfileMutation = useMutation({
+    mutationFn: (data: Partial<Project>) => createProject(data),
+    onSuccess: (data: Project) => {
+      handleModalClose && handleModalClose();
+    },
+    onError: (error: any) => {},
+    onSettled: () => {
+      setLoading(false);
+    },
+  });
 
-  // const handleAttachmentDrop = (acceptedFiles: File[]) => {
-  //   setAttachment(acceptedFiles[0]);
-  //   setValue("attachement", acceptedFiles[0]);
-  // };
+  const skillsOptions = (skills || [])?.map((skill) => {
+    return { value: skill.title, label: skill.title };
+  });
 
-  // const { getRootProps, getInputProps } = useDropzone({
-  //   onDrop: handleAttachmentDrop,
-  //   accept: { "image/*": [] },
-  //   maxFiles: 1,
-  // });
+  const handleAttachmentDrop = (acceptedFiles: File[]) => {
+    setAttachment(acceptedFiles[0]);
+
+    (async function () {
+      const formData = new FormData();
+      formData.append("file", acceptedFiles[0]);
+
+      const result = await axiosInstance.post(
+        "/api/proxy/files/upload/documents",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setValue("attachment", result?.data?.data?.url);
+    })();
+  };
+
+  const {
+    getRootProps: getAttachmentRootProps,
+    getInputProps: getAttachmentInputProps,
+  } = useDropzone({
+    onDrop: handleAttachmentDrop,
+    accept: {
+      "application/pdf": [],
+      "application/msword": [],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [],
+    },
+    maxFiles: 1,
+  });
 
   const onSubmit = (data: any) => {
-    console.log(data);
-    console.log(selectedSkills.map((s) => ({ title: s.label })));
+    setLoading(true);
+
+    (async function () {
+      await updateProfileMutation.mutate({
+        ...data,
+        skills: selectedSkills.map((s) => ({ title: s.label })),
+        requires_feedback: requireFeedback == "yes",
+        collaborators: [],
+      });
+    })();
   };
 
   return (
@@ -131,6 +155,7 @@ const UpdateProfileForm: React.FC = () => {
             otherClasses={methods.register("title")}
           />
         </div>
+
         <div>
           <Input
             id="website"
@@ -175,13 +200,52 @@ const UpdateProfileForm: React.FC = () => {
             </div>
           </div>
         </div>
+        <Input
+          id="location"
+          label="Location"
+          value={watch("location")}
+          onChange={(e) => setValue("location", e.target.value)}
+          error={errors.location?.message as string}
+          otherClasses={methods.register("location")}
+        />
+        <div className="space-y-2">
+          <label className="block text-sm text-gray-600">Need feedback?</label>
+          <div className="flex items-center space-x-4 mt-1 text-sm">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="yes"
+                checked={requireFeedback === "yes"}
+                onChange={() => setRequireFeedback("yes")}
+                className="form-radio"
+              />
+              <span className="ml-2">Yes</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="no"
+                checked={requireFeedback === "no"}
+                onChange={() => setRequireFeedback("no")}
+                className="form-radio"
+              />
+              <span className="ml-2">No</span>
+            </label>
+          </div>
+        </div>
         <NativeSelect
           id="status"
           label="Status"
           placeholder="Select Status"
           value={watch("status") as string}
+          onChange={(e) => setValue("status", e.target.value)}
           error={errors?.status?.message}
-          options={[{ value: "collaborators", label: "Need collaborators" }]}
+          options={[
+            { value: "need collaborators", label: "Need collaborators" },
+            { value: "paused", label: "Paused" },
+            { value: "completed", label: "Completed" },
+            { value: "in progress", label: "In Progress" },
+          ]}
           otherClasses={methods.register("status")}
         />
         <div>
@@ -200,46 +264,36 @@ const UpdateProfileForm: React.FC = () => {
             )}
           />
         </div>
+        <TextArea
+          id="description"
+          label="Description"
+          value={watch("description") as string}
+          onChange={(e: any) => setValue("description", e.target.value)}
+          error={errors.description?.message as string}
+          otherClasses={methods.register("description")}
+        />
         <AddItemInput label="Collaborators" />
-        {/* <div className="py-3">
+        <div className="py-3">
           <label className="block text-gray-700 text-sm">
-            Attachments (.docx, .doc, .pdf)
+            Attachment (.docx, .doc, .pdf)
           </label>
           <div
-            {...getRootProps()}
+            {...getAttachmentRootProps()}
             className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
           >
-            <input {...getInputProps()} />
-            {avatar ? (
-              <p>{avatar.name} kjfg</p>
+            <input {...getAttachmentInputProps()} />
+            {attachment ? (
+              <p>{attachment.name}</p>
             ) : (
               <p>Drag and drop a file, or click to select a document</p>
             )}
           </div>
-          {errors.avatar && (
-            <p className="text-red-500">{errors.avatar.message}</p>
+          {errors.attachment && (
+            <p className="text-red-500">
+              {errors.attachment?.message as string}
+            </p>
           )}
-        </div> */}
-        {/* <div>
-          <label className="block text-gray-700 text-sm">Description</label>
-          <Controller
-            name="bio"
-            control={control}
-            render={({ field }) => (
-              <ReactQuill
-                value={field.value || bio}
-                onChange={(content) => {
-                  setBio(content);
-                  field.onChange(content);
-                }}
-                className="custom-quill"
-                placeholder="Write a short bio..."
-                theme="snow"
-              />
-            )}
-          />
-          {errors.bio && <p className="text-red-500">{errors.bio.message}</p>}
-        </div> */}
+        </div>
         <div className="flex items-center space-x-2 justify-end">
           <button
             type="submit"
@@ -259,4 +313,4 @@ const UpdateProfileForm: React.FC = () => {
   );
 };
 
-export default UpdateProfileForm;
+export default CreateProjectForm;

@@ -11,7 +11,6 @@ let isRedirecting = false;
 
 axiosInstance.interceptors.request.use(
   async (config) => {
-    console.log(await store.getState());
     const session = await getSession();
     if (session?.accessToken) {
       config.headers.Authorization = `Bearer ${session.accessToken}`;

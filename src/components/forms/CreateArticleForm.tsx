@@ -1,22 +1,28 @@
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import "react-quill/dist/quill.snow.css";
 import React, { useState } from "react";
+import { Controller } from "react-hook-form";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
-import { Event } from "@/common/constants";
+import { useMutation } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
 
-import Image from "next/image";
+import { Article } from "@/common/constants";
 import Input from "./Input";
+import axiosInstance from "@/lib/axiosInstance";
+import { stripHtml } from "@/lib/helpers";
 
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
 
-import TextArea from "./TextArea";
-import axiosInstance from "@/lib/axiosInstance";
-import { useMutation } from "@tanstack/react-query";
+const Loading = () => (
+  <div className="w-full h-96 block border border-gray-300 rounded-lg"></div>
+);
+
+const ReactQuill = dynamic(() => import("react-quill"), {
+  ssr: false,
+  loading: () => <Loading />,
+});
 
 const schema = yup.object().shape({
   title: yup
@@ -24,71 +30,84 @@ const schema = yup.object().shape({
     .required("Title is required")
     .min(3, "Must be at least 2 characters"),
   banner: yup.mixed(),
-  // event_start_date: yup
-  //   .string()
-  //   .required("Start date is required")
-  //   .min(2, "Must be at least 2 characters"),
-  // event_end_date: yup
-  //   .string()
-  //   .required("End date is required")
-  //   .min(2, "Must be at least 2 characters"),
-  website: yup.string().url("Must be a valid URL"),
-  ticket_link: yup.string().url("Must be a valid URL"),
-  link: yup.string().url("Must be a valid URL"),
-  location: yup.string().required("Location is required"),
-  description: yup
+  body: yup
     .string()
-    .required("Description is required")
-    .min(10, "Description must be at least 10 characters"),
+    .required("Content is required")
+    .min(10, "Content must be at least 1000 characters"),
 });
 
-const createEvent = async (data: Partial<Event>) => {
-  const result = await axiosInstance.post("/api/proxy/events", data);
+const createArticle = async (data: Partial<Article>) => {
+  const result = await axiosInstance.post("/api/proxy/articles", data);
 
   return result?.data?.data;
 };
 
-const CreateArticleForm: React.FC = () => {
+interface ICreateArticleForm {
+  handleCloseModal?: () => void;
+}
+
+const CreateArticleForm: React.FC<ICreateArticleForm> = ({
+  handleCloseModal,
+}) => {
   const methods = useForm({
     resolver: yupResolver(schema),
   });
 
   const {
-    // control,
+    control,
     watch,
     handleSubmit,
     setValue,
     formState: { errors },
   } = methods;
 
-  const createEventMutation = useMutation({
-    mutationFn: (data: Partial<Event>) => createEvent(data),
-    onSuccess: (data: Event) => {},
+  const createArticleMutation = useMutation({
+    mutationFn: (data: Partial<Article>) => createArticle(data),
+    onSuccess: (data: Article) => {
+      handleCloseModal && handleCloseModal();
+    },
     onError: (error: any) => {},
+    onSettled: () => {
+      setLoading(false);
+    },
   });
 
   const [banner, setBanner] = useState<File | null>(null);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [body, setBody] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // const handleBannerDrop = (acceptedFiles: File[]) => {
-  //   setAvatar(acceptedFiles[0]);
-  //   setValue("avatar", acceptedFiles[0]);
-  // };
+  const handleBannerDrop = (acceptedFiles: File[]) => {
+    setBanner(acceptedFiles[0]);
 
-  // const { getRootProps, getInputProps } = useDropzone({
-  //   onDrop: handleBannerDrop,
-  //   accept: { "image/*": [] },
-  //   maxFiles: 1,
-  // });
+    (async function () {
+      const formData = new FormData();
+      formData.append("file", acceptedFiles[0]);
+
+      const result = await axiosInstance.post(
+        "/api/proxy/files/upload/images",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setValue("banner", result?.data?.data?.url);
+    })();
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: handleBannerDrop,
+    accept: { "image/*": [] },
+    maxFiles: 1,
+  });
 
   const onSubmit = (data: any) => {
+    setLoading(true);
+
     (async function () {
-      await createEventMutation.mutate({
-        ...data,
-        event_start_date: startDate,
-        event_end_date: endDate,
-      });
+      await createArticleMutation.mutate(data);
     })();
   };
 
@@ -108,148 +127,51 @@ const CreateArticleForm: React.FC = () => {
             otherClasses={methods.register("title")}
           />
         </div>
-        <Input
-          id="banner"
-          label="Banner"
-          placeholder="https://example.jpg"
-          value={watch("banner") as string}
-          onChange={(e) => setValue("banner", e.target.value)}
-          error={errors.banner?.message as string as string}
-          otherClasses={methods.register("banner")}
-        />
-        {/* <div className="py-3">
+        <div className="py-3">
           <label className="block text-gray-700 text-sm">Banner</label>
           <div
             {...getRootProps()}
             className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
           >
             <input {...getInputProps()} />
-            {avatar ? (
-              <p>{avatar.name} kjfg</p>
+            {banner ? (
+              <p>{banner.name}</p>
             ) : (
-              <p>Drag and drop an image, or click to select an avatar</p>
+              <p>
+                Drag and drop an image, or click to select a banner. We
+                recommend uploading or dragging in an image that is 1920x1080
+                pixels.
+              </p>
             )}
           </div>
-          {errors.avatar && (
-            <p className="text-red-500">{errors.avatar.message}</p>
+          {errors.banner && (
+            <p className="text-red-500">{errors.banner?.message as string}</p>
           )}
-        </div> */}
-        <div className="grid grid-cols-2 gap-6">
-          <div className="w-full">
-            <label className="text-sm mb-1 text-gray-600 inline-block">
-              Start Date
-            </label>
-            <div className="relative w-full">
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date as Date)}
-                className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
-                placeholderText="Select start date"
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Image
-                  src="/icons/calendar.svg"
-                  alt="Calendar"
-                  width={22}
-                  height={22}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="w-full">
-            <label className="text-sm mb-1 text-gray-600 inline-block">
-              End Date
-            </label>
-            <div className="relative w-full">
-              <DatePicker
-                selected={endDate}
-                onChange={(date) => setEndDate(date as Date)}
-                className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
-                placeholderText="Select start date"
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Image
-                  src="/icons/calendar.svg" // Path to your SVG file
-                  alt="Calendar"
-                  width={22}
-                  height={22}
-                />
-              </div>
-            </div>
-          </div>
         </div>
         <div>
-          <Input
-            id="website"
-            label="Website"
-            type="url"
-            value={watch("website") as string}
-            onChange={(e) => setValue("website", e.target.value)}
-            error={errors.website?.message as string}
-            otherClasses={methods.register("website")}
-            placeholder="https://"
-          />
-        </div>
-        <div>
-          <Input
-            id="ticket_link"
-            label="Ticket Link"
-            value={watch("ticket_link") as string}
-            onChange={(e) => setValue("ticket_link", e.target.value)}
-            error={errors.ticket_link?.message as string}
-            otherClasses={methods.register("ticket_link")}
-            placeholder="https://"
-          />
-        </div>
-        <div>
-          <Input
-            id="link"
-            label="Event link (for virtual events)"
-            value={watch("link") as string}
-            onChange={(e) => setValue("link", e.target.value)}
-            error={errors.link?.message as string}
-            otherClasses={methods.register("link")}
-            placeholder="https://"
-          />
-        </div>
-        <div>
-          <Input
-            id="location"
-            label="Location"
-            value={watch("location")}
-            onChange={(e) => setValue("location", e.target.value)}
-            error={errors.location?.message as string}
-            otherClasses={methods.register("location")}
-            required
-          />
-        </div>
-        <TextArea
-          id="description"
-          label="Description"
-          value={watch("description")}
-          onChange={(e) => setValue("description", e.target.value)}
-          error={errors.description?.message as string}
-          otherClasses={methods.register("description")}
-        />
-        {/* <div className="py-3">
-          <label className="block text-gray-700 text-sm">
-            Attachments (.docx, .doc, .pdf)
+          <label className="block text-gray-700 text-sm mb-1">
+            Content ({stripHtml(body)?.length || 0} characters)
           </label>
-          <div
-            {...getRootProps()}
-            className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
-          >
-            <input {...getInputProps()} />
-            {avatar ? (
-              <p>{avatar.name} kjfg</p>
-            ) : (
-              <p>Drag and drop a file, or click to select a document</p>
+          <Controller
+            name="body"
+            control={control}
+            render={({ field }) => (
+              <ReactQuill
+                value={field.value || body}
+                onChange={(content) => {
+                  setBody(content);
+                  field.onChange(content);
+                }}
+                className="custom-quill"
+                placeholder="Content goes here..."
+                theme="snow"
+              />
             )}
-          </div>
-          {errors.attachment && (
-            <p className="text-red-500">{errors.attachment.message}</p>
+          />
+          {errors.body && (
+            <p className="text-red-500">{errors.body?.message}</p>
           )}
-        </div> */}
+        </div>
         <div className="flex items-center space-x-2 justify-end">
           <button
             type="submit"
@@ -261,7 +183,7 @@ const CreateArticleForm: React.FC = () => {
             type="submit"
             className="px-6 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Save Changes
+            {loading ? "Loading..." : "Publish"}
           </button>
         </div>
       </form>
