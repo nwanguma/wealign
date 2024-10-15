@@ -1,33 +1,36 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-
-import axiosInstance from "@/lib/axiosInstance";
-import { Event } from "@/common/constants";
-import { EventCardMain, EventCardPreview } from "@/components/ui/EventCard";
 import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
+
+import { Event } from "@/common/constants";
+import { EventCardMain } from "@/components/ui/EventCardMain";
+import { EventCardPreview } from "@/components/ui/EventCard";
 import { RootState } from "@/store";
-
-const fetchEvent = async (id: string): Promise<Event> => {
-  try {
-    const response = await axiosInstance.get(`/api/proxy/events/${id}`);
-
-    return response.data.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
+import { WithTooltip } from "@/components/ui/WithTooltip";
+import { useState } from "react";
+import AppModal from "@/components/ui/Modal";
+import AddEventForm from "@/components/forms/CreateEventForm";
+import {
+  SkeletonCard,
+  SkeletonLoaderPage,
+} from "@/components/ui/SkeletonLoader";
+import { fetchEvent, deleteEvent } from "@/api";
 
 export default function Dashboard() {
-  const { events: eventRecommendations } = useSelector(
-    (state: RootState) => state.recommendations
-  );
+  const { recommendations, user } = useSelector((state: RootState) => ({
+    recommendations: state.recommendations,
+    user: state.user,
+  }));
+  const { isLoading: isRecommendationsLoading, events: eventRecommendations } =
+    recommendations;
   const params = useParams();
   const id = params?.id;
 
   const {
+    refetch,
     data: event,
     error,
     isLoading,
@@ -36,86 +39,98 @@ export default function Dashboard() {
     queryFn: () => fetchEvent(id as string),
   });
 
+  const isOwner = user?.profile?.id === event?.owner?.id;
+  const deleteMutation = useMutation({
+    mutationFn: (eventId: string) => deleteEvent(eventId),
+    onSuccess: () => {},
+    onError: (error: any) => {},
+  });
+
+  const [addEventModalIsOpen, setAddEventModalIsOpen] =
+    useState<boolean>(false);
+
+  const handleToggleAddEventModal = () => {
+    setAddEventModalIsOpen(!addEventModalIsOpen);
+  };
+
+  const handleDelete = (eventId: string) => {
+    deleteMutation.mutate(eventId);
+  };
+
   return (
     <div className="min-h-screen w-full bg-white">
       <div className="flex space-x-5 p-6">
-        <div className="flex-1 p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg">
-          <div className="w-full">
-            {event && (
-              <EventCardMain
-                id={event.id}
-                banner={
-                  "https://nwanguma.github.io/Quick-host/test-event-5.jpg"
-                }
-                title={event.title}
-                location="London, England"
-                event_start_date={event.event_start_date}
-                event_end_date={event.event_end_date}
-                description={event.description}
-                like_count={0}
-                comment_count={event.comments}
-                owner={event.owner}
-              />
-            )}
-          </div>
-        </div>
-        <aside className="w-1/3 space-y-5">
-          <div className="p-4 bg-white rounded-lg border border-gray-300">
-            <h3 className="font-app-medium mb-3 text-gray-700">
-              Upcoming events
-            </h3>
-            <div className="space-y-4">
-              {eventRecommendations &&
-                eventRecommendations.slice(0, 4).map((event) => {
-                  return (
-                    <div
-                      key={event.id}
-                      className="border-b border-b-gray-200 py-3"
-                    >
-                      <EventCardPreview
-                        id={event.id}
-                        banner={event.banner}
-                        title={event.title}
-                        location={event.location as string}
-                        event_start_date={event.event_start_date}
-                        isPreview
+        <div className="flex-1 p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg relative">
+          {isLoading && <SkeletonLoaderPage />}
+          {!isLoading && event && (
+            <div className="w-full">
+              {isOwner && (
+                <div className="absolute top-4 right-4">
+                  {WithTooltip(
+                    "Edit event",
+                    <div onClick={() => handleToggleAddEventModal()}>
+                      <Image
+                        src="/icons/edit.svg"
+                        alt=""
+                        width={20}
+                        height={20}
                       />
                     </div>
-                  );
-                })}
-              <div className="space-x-4">
-                <div className="flex items-center space-x-5">
-                  <div className="max-w-20">
-                    <div className="flex flex-col justify-center items-center">
-                      <span className="text-xs text-custom-gray-paragraph">
-                        Mon
-                      </span>
-                      <span className="text-lg font-bold text-gray-900">4</span>
-                      <span className="text-xs text-custom-gray-paragraph">
-                        April
-                      </span>
-                    </div>
-                  </div>
-                  <div className="w-1/3 h-20 relative rounded-lg">
-                    <Image
-                      src="/images/test-event-3.jpg"
-                      alt="avatar"
-                      className="rounded-lg"
-                      layout="fill"
-                    />
-                  </div>
-                  <div className="flex flex-col flex-1">
-                    <span className="font-medium">A futuristic tech event</span>
-                    <span className="text-xs text-custom-gray-paragraph">
-                      London, England
-                    </span>
-                  </div>
+                  )}
                 </div>
+              )}
+              <div className="w-full">
+                <EventCardMain event={event} />
+              </div>
+              {event && isOwner && (
+                <div
+                  className="w-full text-center cursor-pointer"
+                  onClick={() => handleDelete(event.id)}
+                >
+                  <span className="inline-block rounded text-xs text-red-500 bg-red-50 px-3 py-2">
+                    Delete this event
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <aside className="w-1/3 space-y-5">
+          {isRecommendationsLoading && <SkeletonCard />}
+          {!isRecommendationsLoading && (
+            <div className="p-4 bg-white rounded-lg border border-gray-300">
+              <h3 className="font-app-medium mb-3 text-gray-700">
+                Upcoming events
+              </h3>
+              <div className="space-y-4">
+                {eventRecommendations &&
+                  eventRecommendations.slice(0, 4).map((event) => {
+                    return (
+                      <div
+                        key={event.id}
+                        className="border-b border-b-gray-200 py-3"
+                      >
+                        <EventCardPreview event={event} isPreview />
+                      </div>
+                    );
+                  })}
               </div>
             </div>
-          </div>
+          )}
         </aside>
       </div>
+      <AppModal
+        title="Create event"
+        isOpen={addEventModalIsOpen}
+        onClose={() => handleToggleAddEventModal()}
+        width="w-5/12"
+      >
+        <AddEventForm
+          data={event as Event}
+          handleModalClose={handleToggleAddEventModal}
+          triggerRefetch={refetch}
+        />
+      </AppModal>
     </div>
   );
 }

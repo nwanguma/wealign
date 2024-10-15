@@ -10,10 +10,13 @@ import dynamic from "next/dynamic";
 import { Article } from "@/common/constants";
 import Input from "./Input";
 import axiosInstance from "@/lib/axiosInstance";
-import { stripHtml } from "@/lib/helpers";
+import { getFilenameAndExtension, stripHtml } from "@/lib/helpers";
 
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
+import Link from "next/link";
+import { WithTooltip } from "../ui/WithTooltip";
+import Image from "next/image";
 
 const Loading = () => (
   <div className="w-full h-96 block border border-gray-300 rounded-lg"></div>
@@ -43,14 +46,24 @@ const createArticle = async (data: Partial<Article>) => {
 };
 
 interface ICreateArticleForm {
-  handleCloseModal?: () => void;
+  data?: Partial<Article>;
+  triggerRefetch?: () => void;
+  handleModalClose?: () => void;
 }
 
 const CreateArticleForm: React.FC<ICreateArticleForm> = ({
-  handleCloseModal,
+  data: articlesData,
+  handleModalClose,
+  triggerRefetch,
 }) => {
+  const defaultValues = {
+    title: articlesData?.title || "",
+    body: articlesData?.body || "",
+    banner: articlesData?.banner || "",
+  };
   const methods = useForm({
     resolver: yupResolver(schema),
+    defaultValues,
   });
 
   const {
@@ -64,7 +77,8 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
   const createArticleMutation = useMutation({
     mutationFn: (data: Partial<Article>) => createArticle(data),
     onSuccess: (data: Article) => {
-      handleCloseModal && handleCloseModal();
+      handleModalClose && handleModalClose();
+      triggerRefetch && triggerRefetch();
     },
     onError: (error: any) => {},
     onSettled: () => {
@@ -73,6 +87,7 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
   });
 
   const [banner, setBanner] = useState<File | null>(null);
+  const [deletedBanner, setDeletedBanner] = useState(false);
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -146,6 +161,58 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
           </div>
           {errors.banner && (
             <p className="text-red-500">{errors.banner?.message as string}</p>
+          )}
+          {!deletedBanner && articlesData?.banner && (
+            <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50 mt-2 flex items-center justify-between space-x-2">
+              <div className="flex items-center space-x-2">
+                <Image
+                  src="/icons/file.svg"
+                  width={20}
+                  height={20}
+                  alt="file icon"
+                />
+                <span className="">
+                  {getFilenameAndExtension(articlesData?.banner)}
+                </span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Link
+                  href={articlesData?.banner as string}
+                  download
+                  target="_blank"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {WithTooltip(
+                        "Download",
+                        <Image
+                          src="/icons/download.svg"
+                          width={20}
+                          height={20}
+                          alt="file icon"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </Link>
+                {WithTooltip(
+                  "Remove",
+                  <span
+                    onClick={() => {
+                      setValue("banner", "");
+                      setDeletedBanner(true);
+                    }}
+                  >
+                    <Image
+                      src="/icons/bin.svg"
+                      width={20}
+                      height={20}
+                      alt="file icon"
+                    />
+                  </span>
+                )}
+              </div>
+            </div>
           )}
         </div>
         <div>

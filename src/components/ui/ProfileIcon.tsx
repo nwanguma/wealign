@@ -71,6 +71,14 @@ export default function ProfileIcon({ avatar }: { avatar?: string | null }) {
               </li>
               <li className="p-2 bg-slate-50 rounded-lg flex items-start space-x-2">
                 <Link
+                  href="/dashboard/me/articles"
+                  className="text-gray-800 cursor-pointer"
+                >
+                  My Articles
+                </Link>
+              </li>
+              <li className="p-2 bg-slate-50 rounded-lg flex items-start space-x-2">
+                <Link
                   href="/dashboard/me"
                   className="text-gray-800 cursor-pointer"
                 >

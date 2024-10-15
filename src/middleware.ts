@@ -11,8 +11,6 @@ export async function middleware(req: NextRequest) {
   if (isProtected && !token) {
     const url = new URL("/", req.url);
 
-    // url.searchParams.set("action", "login");
-
     return NextResponse.redirect(url);
   }
 

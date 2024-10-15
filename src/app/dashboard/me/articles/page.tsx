@@ -1,22 +1,49 @@
 "use client";
 
 import { useState } from "react";
-import AppModal from "@/components/ui/Modal";
+import { useSelector } from "react-redux";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
+import AppModal from "@/components/ui/Modal";
 import FilterComponent from "@/components/ui/Filter";
 import AddItemButton from "@/components/ui/AddItemButton";
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
 import AddArticleForm from "@/components/forms/CreateArticleForm";
 import { ArticleCardPreview } from "@/components/ui/ArticleCard";
-import { Article, ArticlesWithPagination } from "@/common/constants";
+import { Article } from "@/common/constants";
+import axiosInstance from "@/lib/axiosInstance";
 import ContentWrapper from "@/components/ui/ContentWrapper";
+import {
+  ArticlesWithPagination,
+  IFilters,
+  IPagination,
+} from "@/common/constants";
 import PaginationComponent from "@/components/ui/PaginationComponent";
 import { WithTooltip } from "@/components/ui/WithTooltip";
+import { RootState } from "@/store";
 import { SkeletonLoaderGrid } from "@/components/ui/SkeletonLoader";
-import { fetchArticles } from "@/api";
+
+const fetchArticles = async (
+  pagination: IPagination,
+  filters: IFilters
+): Promise<ArticlesWithPagination> => {
+  try {
+    const response = await axiosInstance.get("/api/proxy/articles", {
+      params: {
+        contentType: "user",
+        ...pagination,
+        ...filters,
+      },
+    });
+
+    return response.data.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
 
 export default function Articles() {
+  const user = useSelector((state: RootState) => state.user);
   const [pagination, setPagination] = useState({ page: 1, limit: 5 });
   const [filters, setFilters] = useState({
     keyword: "",
@@ -31,7 +58,7 @@ export default function Articles() {
     isLoading,
     refetch,
   } = useQuery<ArticlesWithPagination, Error>({
-    queryKey: ["articles", pagination],
+    queryKey: ["articles", user?.profile?.id, pagination],
     queryFn: () => fetchArticles(pagination, filters),
     placeholderData: keepPreviousData,
   });
@@ -104,7 +131,7 @@ export default function Articles() {
                 ],
               }}
             />{" "}
-            {isLoading && (
+            {!isLoading && (
               <ContentWrapper data={articles as Article[]}>
                 {articlesData &&
                   articles?.map((article: Article) => (

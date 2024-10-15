@@ -8,7 +8,7 @@ import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
 import { Event } from "@/common/constants";
 import NativeSelect from "./NativeSelectComponent";
-
+import Link from "next/link";
 import Image from "next/image";
 import Input from "./Input";
 
@@ -18,22 +18,16 @@ import "../../app/globals.css";
 import TextArea from "./TextArea";
 import axiosInstance from "@/lib/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
+import { getFilenameAndExtension } from "@/lib/helpers";
+import { WithTooltip } from "../ui/WithTooltip";
 
 const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")
     .min(3, "Must be at least 2 characters"),
-  banner: yup.mixed(),
-  attachment: yup.mixed(),
-  // event_start_date: yup
-  //   .string()
-  //   .required("Start date is required")
-  //   .min(2, "Must be at least 2 characters"),
-  // event_end_date: yup
-  //   .string()
-  //   .required("End date is required")
-  //   .min(2, "Must be at least 2 characters"),
+  banner: yup.string().required(),
+  attachment: yup.string(),
   type: yup.string().required("Event type is required"),
   website: yup.string().url("Must be a valid URL"),
   ticket_link: yup.string().url("Must be a valid URL"),
@@ -62,9 +56,38 @@ const createEvent = async (data: Partial<Event>) => {
   return result?.data?.data;
 };
 
-const CreateEventForm: React.FC = () => {
+const updateEvent = async (data: Partial<Event>, id: string) => {
+  const result = await axiosInstance.put(`/api/proxy/events/${id}`, data);
+
+  return result?.data?.data;
+};
+
+interface ICreateEventForm {
+  data?: Partial<Project>;
+  handleModalClose?: () => void;
+  triggerRefetch?: () => void;
+}
+
+const CreateEventForm: React.FC<ICreateEventForm> = ({
+  data: eventsData,
+  handleModalClose,
+  triggerRefetch,
+}) => {
+  const defaultValues = {
+    title: eventsData?.title || "",
+    banner: eventsData?.banner || "",
+    attachment: eventsData?.attachment || "",
+    type: eventsData?.type || "",
+    website: eventsData?.website || "",
+    ticket_link: eventsData?.ticket_link || "",
+    link: eventsData?.link || "",
+    location: eventsData?.location || "",
+    description: eventsData?.description || "",
+  };
+
   const methods = useForm({
     resolver: yupResolver(schema),
+    defaultValues,
   });
 
   const {
@@ -76,15 +99,31 @@ const CreateEventForm: React.FC = () => {
   } = methods;
 
   const createEventMutation = useMutation({
-    mutationFn: (data: Partial<Event>) => createEvent(data),
-    onSuccess: (data: Event) => {},
+    mutationFn: (data: Partial<Event>) =>
+      eventsData ? updateEvent(data, eventsData?.id) : createEvent(data),
+    onSuccess: (data: Event) => {
+      handleModalClose && handleModalClose();
+      triggerRefetch && triggerRefetch();
+    },
     onError: (error: any) => {},
   });
 
+  console.log(eventsData, "******");
+
   const [banner, setBanner] = useState<File | null>(null);
   const [attachment, setAttachment] = useState<File | null>(null);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(
+    eventsData?.event_start_date
+      ? new Date(eventsData.event_start_date)
+      : new Date()
+  );
+  const [endDate, setEndDate] = useState(
+    eventsData?.event_end_date
+      ? new Date(eventsData.event_end_date)
+      : new Date()
+  );
+  const [deletedAttachment, setDeletedAttachment] = useState(false);
+  const [deletedBanner, setDeletedBanner] = useState(false);
 
   const handleBannerDrop = (acceptedFiles: File[]) => {
     setBanner(acceptedFiles[0]);
@@ -196,6 +235,58 @@ const CreateEventForm: React.FC = () => {
           </div>
           {errors.banner && (
             <p className="text-red-500">{errors.banner?.message as string}</p>
+          )}
+          {!deletedBanner && eventsData?.banner && (
+            <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50 mt-2 flex items-center justify-between space-x-2">
+              <div className="flex items-center space-x-2">
+                <Image
+                  src="/icons/file.svg"
+                  width={20}
+                  height={20}
+                  alt="file icon"
+                />
+                <span className="">
+                  {getFilenameAndExtension(eventsData?.banner)}
+                </span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Link
+                  href={eventsData?.banner as string}
+                  download
+                  target="_blank"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {WithTooltip(
+                        "Download",
+                        <Image
+                          src="/icons/download.svg"
+                          width={20}
+                          height={20}
+                          alt="file icon"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </Link>
+                {WithTooltip(
+                  "Remove",
+                  <span
+                    onClick={() => {
+                      setValue("banner", "");
+                      setDeletedBanner(true);
+                    }}
+                  >
+                    <Image
+                      src="/icons/bin.svg"
+                      width={20}
+                      height={20}
+                      alt="file icon"
+                    />
+                  </span>
+                )}
+              </div>
+            </div>
           )}
         </div>
         <div className="grid grid-cols-2 gap-6">
@@ -338,6 +429,58 @@ const CreateEventForm: React.FC = () => {
             <p className="text-red-500">
               {errors.attachment?.message as string}
             </p>
+          )}
+          {!deletedAttachment && eventsData?.attachment && (
+            <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50 mt-2 flex items-center justify-between space-x-2">
+              <div className="flex items-center space-x-2">
+                <Image
+                  src="/icons/file.svg"
+                  width={20}
+                  height={20}
+                  alt="file icon"
+                />
+                <span className="">
+                  {getFilenameAndExtension(eventsData?.attachment)}
+                </span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Link
+                  href={eventsData?.attachment as string}
+                  download
+                  target="_blank"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {WithTooltip(
+                        "Download",
+                        <Image
+                          src="/icons/download.svg"
+                          width={20}
+                          height={20}
+                          alt="file icon"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </Link>
+                {WithTooltip(
+                  "Remove",
+                  <span
+                    onClick={() => {
+                      setValue("attachment", "");
+                      setDeletedAttachment(true);
+                    }}
+                  >
+                    <Image
+                      src="/icons/bin.svg"
+                      width={20}
+                      height={20}
+                      alt="file icon"
+                    />
+                  </span>
+                )}
+              </div>
+            </div>
           )}
         </div>
         <div className="flex items-center space-x-2 justify-end">

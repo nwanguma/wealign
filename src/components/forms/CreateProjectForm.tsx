@@ -6,6 +6,7 @@ import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
 
 import NativeSelect from "./NativeSelectComponent";
 import ReactSelectComponent from "./ReactSelectComponent";
@@ -16,6 +17,10 @@ import { Project } from "@/common/constants";
 import AddItemInput from "./AddItemInput";
 import { useSkills } from "@/app/hooks/useSkills";
 import { WithTooltip } from "../ui/WithTooltip";
+import { getFilenameAndExtension } from "@/lib/helpers";
+
+import "react-datepicker/dist/react-datepicker.css";
+import "../../app/globals.css";
 
 const schema = yup.object().shape({
   title: yup
@@ -27,13 +32,7 @@ const schema = yup.object().shape({
     .required("Description is required")
     .min(2, "Must be at least 2 characters"),
   location: yup.string().required("Location is required"),
-  status: yup.string().required("Location is required"),
-  phone: yup
-    .string()
-    .matches(
-      /^\+\d{1,14}$/,
-      "Phone number must be in international format (+1234567890)"
-    ),
+  status: yup.string().required("Status is required"),
   website: yup.string().url("Must be a valid URL"),
   github_url: yup.string().url("Must be a valid URL"),
   skills: yup.array(),
@@ -46,15 +45,38 @@ const createProject = async (data: Partial<Project>) => {
   return response.data.data;
 };
 
+const updateProject = async (data: Partial<Project>, id: string) => {
+  console.log(data, "projectdata ****");
+  const response = await axiosInstance.put(`/api/proxy/projects/${id}`, data);
+
+  return response.data.data;
+};
+
 interface ICreateProjectForm {
+  data?: Partial<Project>;
   handleModalClose?: () => void;
+  triggerRefetch?: () => void;
 }
 
 const CreateProjectForm: React.FC<ICreateProjectForm> = ({
+  data,
   handleModalClose,
+  triggerRefetch,
 }) => {
+  const defaultValues = {
+    title: data?.title || "",
+    website: data?.website || "",
+    github_url: data?.github_url || "",
+    location: data?.location || "",
+    status: data?.status || "",
+    skills: data?.skills?.map((skill) => skill.title as string) || [],
+    description: data?.description || "",
+    attachment: data?.attachment || "",
+  };
+
   const methods = useForm({
     resolver: yupResolver(schema),
+    defaultValues,
   });
 
   const {
@@ -66,20 +88,30 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
   } = methods;
   const { data: skills, isLoading, error } = useSkills();
   const [bio, setBio] = useState<string>("");
-  const [selectedLanguages, setSelectedLanguages] = useState<any[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<any[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<any[]>(
+    data?.skills?.map((skill) => ({
+      value: skill.title,
+      label: skill.title,
+    })) || []
+  );
   const [deletedAttachment, setDeletedAttachment] = useState(false);
-
-  const [requireFeedback, setRequireFeedback] = useState<"no" | "yes">("no");
+  const [requireFeedback, setRequireFeedback] = useState<string>(
+    data?.requires_feeback || "no"
+  );
   const [attachment, setAttachment] = useState<File | null>(null);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(
+    data?.start_date ? new Date(data?.start_date as string) : new Date()
+  );
   const [loading, setLoading] = useState(false);
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data: Partial<Project>) => createProject(data),
+    mutationFn: (projectData: Partial<Project>) =>
+      data
+        ? updateProject(projectData, data?.id as string)
+        : createProject(projectData),
     onSuccess: (data: Project) => {
       handleModalClose && handleModalClose();
+      triggerRefetch && triggerRefetch();
     },
     onError: (error: any) => {},
     onSettled: () => {
@@ -135,6 +167,7 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
         skills: selectedSkills.map((s) => ({ title: s.label })),
         requires_feedback: requireFeedback == "yes",
         collaborators: [],
+        start_date: startDate,
       });
     })();
   };
@@ -272,7 +305,7 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
           error={errors.description?.message as string}
           otherClasses={methods.register("description")}
         />
-        <AddItemInput label="Collaborators" />
+        {/* <AddItemInput label="Collaborators" /> */}
         <div className="py-3">
           <label className="block text-gray-700 text-sm">
             Attachment (.docx, .doc, .pdf)
@@ -292,6 +325,58 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
             <p className="text-red-500">
               {errors.attachment?.message as string}
             </p>
+          )}
+          {!deletedAttachment && data?.attachment && (
+            <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50 mt-2 flex items-center justify-between space-x-2">
+              <div className="flex items-center space-x-2">
+                <Image
+                  src="/icons/file.svg"
+                  width={20}
+                  height={20}
+                  alt="file icon"
+                />
+                <span className="">
+                  {getFilenameAndExtension(data?.attachment)}
+                </span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Link
+                  href={data?.attachment as string}
+                  download
+                  target="_blank"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {WithTooltip(
+                        "Download",
+                        <Image
+                          src="/icons/download.svg"
+                          width={20}
+                          height={20}
+                          alt="file icon"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </Link>
+                {WithTooltip(
+                  "Remove",
+                  <span
+                    onClick={() => {
+                      setValue("attachment", "");
+                      setDeletedAttachment(true);
+                    }}
+                  >
+                    <Image
+                      src="/icons/bin.svg"
+                      width={20}
+                      height={20}
+                      alt="file icon"
+                    />
+                  </span>
+                )}
+              </div>
+            </div>
           )}
         </div>
         <div className="flex items-center space-x-2 justify-end">

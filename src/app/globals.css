@@ -247,3 +247,14 @@ body {
 .react-datepicker-wrapper {
   display: block !important;
 }
+
+/* Hide main feed overflow scrollbar */
+.main-feed {
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.main-feed::-webkit-scrollbar {
+  display: none;
+}

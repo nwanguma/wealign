@@ -18,11 +18,12 @@ export interface Event {
   event_start_date: string;
   event_end_date: string;
   created_at: string;
-  owner: string | null;
+  owner: Profile | null;
   location: string | null;
   link: string | null;
   comments: [];
   reactions: [];
+  attachment?: string;
 }
 
 export interface Article {
@@ -32,8 +33,8 @@ export interface Article {
   banner: string;
   created_at: string;
   owner: Profile;
-  comments: [];
-  reactions: [];
+  comments?: [];
+  reactions?: [];
 }
 
 export interface Project {
@@ -45,7 +46,7 @@ export interface Project {
   created_at: string;
   collaborators?: Profile[];
   skills?: Skill[];
-  likes?: any[];
+  reactions?: any[];
   comments?: any[];
   owner: Profile;
   start_date?: string;
@@ -53,6 +54,8 @@ export interface Project {
   location?: string;
   views?: number | null;
   updated_at: string;
+  attachment?: string;
+  requires_feeback?: string;
 }
 
 export interface Job {
@@ -65,6 +68,7 @@ export interface Job {
   skills?: Skill[];
   likes?: any[];
   comments?: any[];
+  reactions?: any[];
   owner: Profile;
   deadline?: string;
   status?: string;
@@ -100,6 +104,7 @@ export interface Profile {
   reactions?: any[];
   events?: Event[];
   jobs?: Job[];
+  articles?: Article[];
   projects?: Project[];
   user_id?: string;
   status?: string;
@@ -195,4 +200,22 @@ export interface ProfilesWithPagination {
   total: number;
   totalPages: number;
   data: Profile[];
+}
+
+export interface IFilters {
+  skills?: string[] | string;
+  status?: string;
+  keyword?: string;
+  is_mentor?: undefined | boolean;
+  order?: string;
+  sortBy?: string;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  type?: string;
+  createdAt?: string | Date;
+}
+
+export interface IPagination {
+  page: number;
+  limit: number;
 }

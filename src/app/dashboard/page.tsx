@@ -19,7 +19,7 @@ import AppModal from "@/components/ui/Modal";
 import CreateProjectForm from "@/components/forms/CreateProjectForm";
 import AddEventForm from "@/components/forms/CreateEventForm";
 import { EventCardPreview } from "@/components/ui/EventCard";
-import { ProfilePreviewCard } from "@/components/ui/ProfileCard";
+import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
 import { ActivityComponent } from "@/components/ui/Activity";
 import AddItemButton from "@/components/ui/AddItemButton";
 import {
@@ -40,73 +40,19 @@ import {
 import { WithTooltip } from "@/components/ui/WithTooltip";
 import CreateArticleForm from "@/components/forms/CreateArticleForm";
 import { ArticleCardPreview } from "@/components/ui/ArticleCard";
+import {
+  SkeletonCardRounded,
+  SkeletonLoader,
+} from "@/components/ui/SkeletonLoader";
 
-const fetchActivities = async (): Promise<Activity[]> => {
-  try {
-    const response = await axiosInstance.get("/api/proxy/activities");
+import {
+  fetchActivities,
+  fetchProjectsData,
+  fetchEventsData,
+  fetchArticlesData,
+} from "@/api";
 
-    return response.data.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
-
-const fetchEventsData = async (
-  pagination: any,
-  contentType: string
-): Promise<EventWithPagination> => {
-  try {
-    const response = await axiosInstance.get("/api/proxy/events", {
-      params: {
-        limit: pagination.limit,
-        page: pagination.page,
-        contentType,
-      },
-    });
-
-    return response.data.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
-
-const fetchProjectsData = async (
-  pagination: any,
-  contentType: string
-): Promise<ProjectsWithPagination[]> => {
-  try {
-    const response = await axiosInstance.get("/api/proxy/projects", {
-      params: {
-        limit: pagination.limit,
-        page: pagination.page,
-        contentType,
-      },
-    });
-
-    return response.data.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
-
-const fetchArticlesData = async (
-  pagination: any,
-  contentType: string
-): Promise<ArticlesWithPagination[]> => {
-  try {
-    const response = await axiosInstance.get("/api/proxy/articles", {
-      params: {
-        limit: pagination.limit,
-        page: pagination.page,
-        contentType,
-      },
-    });
-
-    return response.data.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
+import "../../app/globals.css";
 
 const MainFeed: React.FC = () => {
   const [followersModalIsOpen, setFollowersModalIsOpen] = useState(false);
@@ -177,6 +123,11 @@ const MainFeed: React.FC = () => {
     UseQueryResult<EventWithPagination, unknown>,
     UseQueryResult<ArticlesWithPagination, unknown>
   ];
+
+  const isMainfeedContentLoading = results.some((result) => result.isLoading);
+  const isMainFeedContentError = results.find(
+    (result) => result.isError
+  )?.error;
 
   const [activitiesResult, projectsResult, eventsResult, articlesResult] =
     results as [
@@ -304,7 +255,7 @@ const MainFeed: React.FC = () => {
   return (
     <div className="min-h-screen w-full bg-white p-6">
       <div className="flex space-x-5">
-        <aside className="w-96 space-y-5">
+        <aside className="w-96 space-y-5 sticky top-0 self-start">
           <div className="p-4 bg-white rounded-lg border border-gray-300">
             <h3 className="font-app-medium mb-3">Upcoming events</h3>
             <div className="space-y-4">
@@ -313,15 +264,7 @@ const MainFeed: React.FC = () => {
                   className="border-b border-b-gray-200 last:border-b-0 py-3"
                   key={event.id}
                 >
-                  <EventCardPreview
-                    id={event.id}
-                    banner={event.banner}
-                    title={event.title}
-                    location={event.location as string}
-                    event_start_date={event.event_start_date}
-                    description={event.description}
-                    comment_count={event.comments?.length}
-                  />
+                  <EventCardPreview event={event} isPreview />
                 </div>
               ))}
               {!eventsRecommendations.length && (
@@ -335,11 +278,9 @@ const MainFeed: React.FC = () => {
             </div>
           </div>
         </aside>
-        <div className="flex-1 space-y-6">
+        <div className="flex-1 space-y-6 sticky top-0 self-start">
           <div
-            className={`p-4 rounded-lg border border-gray-300 space-y-3 flex items-center ${
-              currentUser.id ? "justify-between" : "justify-end"
-            }`}
+            className={`p-4 rounded-lg border border-gray-300 space-y-3 flex items-center justify-between`}
           >
             {currentUser.id && (
               <div className="flex-1 space-y-4">
@@ -381,6 +322,7 @@ const MainFeed: React.FC = () => {
                 </div>
               </div>
             )}
+            {!currentUser.id && <SkeletonCardRounded />}
             <div className="space-y-6 w-5/12">
               <div className="">
                 <div className="flex items-center space-x-2">
@@ -395,30 +337,22 @@ const MainFeed: React.FC = () => {
                             "New Project",
                             <svg
                               className="w-6 h-6"
-                              viewBox="0 0 512 512"
-                              version="1.1"
+                              viewBox="0 0 24 24"
+                              fill="none"
                               xmlns="http://www.w3.org/2000/svg"
-                              xmlnsXlink="http://www.w3.org/1999/xlink"
                             >
-                              <title>work-case-filled</title>
-                              <g
-                                id="Page-1"
-                                stroke="none"
-                                strokeWidth="1"
-                                fill="none"
+                              <path
+                                d="M16 3L16 6M8 3L8 6"
+                                stroke="#ffffff"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                              />
+                              <path
                                 fillRule="evenodd"
-                              >
-                                <g
-                                  id="work-case"
-                                  fill="#1D4ED8"
-                                  transform="translate(42.666667, 64.000000)"
-                                >
-                                  <path
-                                    d="M1.20792265e-13,197.76 C54.5835501,218.995667 112.186031,231.452204 170.666667,234.666667 L170.666667,277.333333 L256,277.333333 L256,234.666667 C314.339546,231.013 371.833936,218.86731 426.666667,198.613333 L426.666667,362.666667 L1.20792265e-13,362.666667 L1.20792265e-13,197.76 Z M277.333333,-1.42108547e-14 L298.666667,21.3333333 L298.666667,64 L426.666667,64 L426.666667,175.146667 C361.254942,199.569074 292.110481,212.488551 222.293333,213.333333 L222.293333,213.333333 L206.933333,213.333333 C136.179047,212.568604 66.119345,199.278929 7.10542736e-15,174.08 L7.10542736e-15,174.08 L7.10542736e-15,64 L128,64 L128,21.3333333 L149.333333,-1.42108547e-14 L277.333333,-1.42108547e-14 Z M256,42.6666667 L170.666667,42.6666667 L170.666667,64 L256,64 L256,42.6666667 Z"
-                                    id="Combined-Shape-Copy"
-                                  ></path>
-                                </g>
-                              </g>
+                                clipRule="evenodd"
+                                d="M14 4H10L10 6C10 7.10457 9.10457 8 8 8C6.89543 8 6 7.10457 6 6L6 4.07612C5.02492 4.17203 4.36857 4.38879 3.87868 4.87868C3 5.75736 3 7.17157 3 10V15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15V10C21 7.17157 21 5.75736 20.1213 4.87868C19.6314 4.38879 18.9751 4.17203 18 4.07612L18 6C18 7.10457 17.1046 8 16 8C14.8954 8 14 7.10457 14 6L14 4ZM7 12C7 11.4477 7.44772 11 8 11L16 11C16.5523 11 17 11.4477 17 12C17 12.5523 16.5523 13 16 13L8 13C7.44772 13 7 12.5523 7 12ZM8 15C7.44772 15 7 15.4477 7 16C7 16.5523 7.44772 17 8 17L16 17C16.5523 17 17 16.5523 17 16C17 15.4477 16.5523 15 16 15L8 15Z"
+                                fill="#1D4ED8"
+                              />
                             </svg>
                           )}
                         </div>
@@ -523,73 +457,39 @@ const MainFeed: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="space-y-5">
-            {mainFeedSettings.contentType === "projects" &&
-              projects &&
-              projects?.map(
-                ({
-                  id,
-                  title,
-                  description,
-                  website,
-                  github_url,
-                  created_at,
-                  skills,
-                  status,
-                }) => (
-                  <ProjectCard
-                    key={id}
-                    id={id}
-                    title={title}
-                    description={description}
-                    website={website}
-                    github_url={github_url}
-                    created_at={created_at}
-                    skills={skills}
-                    status={status}
-                  />
-                )
-              )}
-            {mainFeedSettings.contentType === "events" &&
-              events &&
-              events?.map((event) => (
-                <div
-                  key={event.id}
-                  className="w-full border border-gray-300 rounded-lg p-4 h-48"
-                >
-                  <EventCardPreview
-                    id={event.id}
-                    banner={event.banner}
-                    title={event.title}
-                    location={event.location as string}
-                    event_start_date={event.event_start_date}
-                    description={event.description}
-                    comment_count={event.comments?.length}
-                    description_limit={50}
-                  />
-                </div>
-              ))}
-            {mainFeedSettings.contentType === "articles" &&
-              articles &&
-              articles?.map((article) => (
-                <div
-                  key={article.id}
-                  className="w-full border border-gray-300 rounded-lg p-4 h-48"
-                >
-                  <ArticleCardPreview
-                    id={article.id}
-                    body={article.body}
-                    banner={article.banner}
-                    title={article.title}
-                    createdAt={article.created_at}
-                    owner={article.owner}
-                  />
-                </div>
-              ))}
-            {/* <ProjectCard /> */}
-          </div>
+          {isMainfeedContentLoading && <SkeletonLoader />}
+          {!isMainfeedContentLoading && (
+            <div className="space-y-5 overflow-y-auto main-feed h-screen">
+              {mainFeedSettings.contentType === "projects" &&
+                projects &&
+                projects?.map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              {mainFeedSettings.contentType === "events" &&
+                events &&
+                events?.map((event) => (
+                  <div
+                    key={event.id}
+                    className="w-full border border-gray-300 rounded-lg p-4 h-48"
+                  >
+                    <EventCardPreview event={event} isPreview />
+                  </div>
+                ))}
+              {mainFeedSettings.contentType === "articles" &&
+                articles &&
+                articles?.map((article) => (
+                  <div
+                    key={article.id}
+                    className="w-full border border-gray-300 rounded-lg p-4 h-48"
+                  >
+                    <ArticleCardPreview article={article} />
+                  </div>
+                ))}
+              {/* <ProjectCard /> */}
+            </div>
+          )}
         </div>
-        <aside className="w-1/4 space-y-5">
+        <aside className="w-1/4 space-y-5 sticky top-0 self-start">
           {activities && !!activities.length && (
             <div className="p-4 bg-white rounded-lg border border-gray-300">
               <h3 className="font-app-medium mb-3 text-gray-700 text-base">
@@ -660,7 +560,7 @@ const MainFeed: React.FC = () => {
         isOpen={addArticleModalIsOpen}
         onClose={() => handleToggleAddArticleModal()}
       >
-        <CreateArticleForm handleCloseModal={handleToggleAddArticleModal} />
+        <CreateArticleForm handleModalClose={handleToggleAddArticleModal} />
       </AppModal>
       <AppModal
         title="Following"

@@ -1,37 +1,37 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-
-import axiosInstance from "@/lib/axiosInstance";
-import { Article } from "@/common/constants";
-import {
-  ArticleCardMain,
-  ArticleCardPreview,
-} from "@/components/ui/ArticleCard";
 import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
+
+import { Article } from "@/common/constants";
+import { ArticleCardPreview } from "@/components/ui/ArticleCard";
 import { RootState } from "@/store";
-import { Profile } from "@/common/constants";
-
-const fetchArticle = async (id: string): Promise<Article> => {
-  try {
-    const response = await axiosInstance.get(`/api/proxy/articles/${id}`);
-
-    return response.data.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
+import AddArticleForm from "@/components/forms/CreateArticleForm";
+import AppModal from "@/components/ui/Modal";
+import { WithTooltip } from "@/components/ui/WithTooltip";
+import {
+  SkeletonCard,
+  SkeletonLoaderPage,
+} from "@/components/ui/SkeletonLoader";
+import { ArticleCardMain } from "@/components/ui/ArticleCardMain";
+import { fetchArticle, deleteArticle } from "@/api";
 
 export default function Dashboard() {
-  const { articles: articleRecommendations } = useSelector(
-    (state: RootState) => state.recommendations
-  );
+  const { recommendations, user } = useSelector((state: RootState) => ({
+    recommendations: state.recommendations,
+    user: state.user,
+  }));
+  const {
+    isLoading: isRecommendationsLoading,
+    articles: articleRecommendations,
+  } = recommendations;
   const params = useParams();
   const id = params?.id;
-
   const {
+    refetch,
     data: article,
     error,
     isLoading,
@@ -39,74 +39,104 @@ export default function Dashboard() {
     queryKey: ["articles", id],
     queryFn: () => fetchArticle(id as string),
   });
+  const isOwner = user?.profile?.id === article?.owner?.id;
+  const deleteMutation = useMutation({
+    mutationFn: (articleId: string) => deleteArticle(articleId),
+    onSuccess: () => {},
+    onError: (error: any) => {},
+  });
+  const [addArticleModalIsOpen, setAddArticleModalIsOpen] =
+    useState<boolean>(false);
+  const handleToggleAddArticleModal = () => {
+    setAddArticleModalIsOpen(!addArticleModalIsOpen);
+  };
+  const handleDelete = (articleId: string) => {
+    deleteMutation.mutate(articleId);
+  };
 
   return (
     <div className="min-h-screen w-full bg-white">
       <div className="flex space-x-5 p-6">
-        <div className="flex-1 p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg">
-          <div className="w-full">
-            {article && <ArticleCardMain article={article} />}
-          </div>
-        </div>
-        <aside className="w-1/3 space-y-5">
-          <div className="p-4 bg-white rounded-lg border border-gray-300">
-            <h3 className="font-app-medium mb-3 text-gray-700">
-              Upcoming articles
-            </h3>
-            <div className="space-y-4">
-              {articleRecommendations &&
-                articleRecommendations.slice(0, 4).map((article) => {
-                  return (
-                    <div
-                      key={article.id}
-                      className="border-b border-b-gray-200 py-3"
-                    >
-                      <ArticleCardPreview
-                        id={article.id}
-                        banner={article.banner}
-                        title={article.title}
-                        created_at={article.created_at}
-                        body={article.body}
-                        isPreview
+        <div className="flex-1 p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg relative">
+          {isLoading && <SkeletonLoaderPage />}
+          {!isLoading && article && (
+            <div className="w-full">
+              {isOwner && (
+                <div
+                  className="absolute top-4 right-4 cursor-pointer z-10"
+                  onClick={() => handleToggleAddArticleModal()}
+                >
+                  {WithTooltip(
+                    "Edit article",
+                    <div>
+                      <Image
+                        src="/icons/edit.svg"
+                        alt=""
+                        width={20}
+                        height={20}
                       />
                     </div>
-                  );
-                })}
-              <div className="space-x-4">
-                <div className="flex items-center space-x-5">
-                  <div className="max-w-20">
-                    <div className="flex flex-col justify-center items-center">
-                      <span className="text-xs text-custom-gray-paragraph">
-                        Mon
-                      </span>
-                      <span className="text-lg font-bold text-gray-900">4</span>
-                      <span className="text-xs text-custom-gray-paragraph">
-                        April
-                      </span>
-                    </div>
-                  </div>
-                  <div className="w-1/3 h-20 relative rounded-lg">
-                    <Image
-                      src="/images/test-article-3.jpg"
-                      alt="avatar"
-                      className="rounded-lg"
-                      layout="fill"
-                    />
-                  </div>
-                  <div className="flex flex-col flex-1">
-                    <span className="font-medium">
-                      A futuristic tech article
-                    </span>
-                    <span className="text-xs text-custom-gray-paragraph">
-                      London, England
-                    </span>
-                  </div>
+                  )}
                 </div>
+              )}
+              <div className="w-full">
+                <ArticleCardMain article={article} />
+              </div>
+              {isOwner && (
+                <div
+                  className="w-full text-center cursor-pointer"
+                  onClick={() => handleDelete(article.id as string)}
+                >
+                  <span className="inline-block rounded text-xs text-red-500 bg-red-50 px-3 py-2">
+                    Delete this article
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <aside className="w-1/3 space-y-5">
+          {isRecommendationsLoading && <SkeletonCard />}
+          {!isRecommendationsLoading && (
+            <div className="p-4 bg-white rounded-lg border border-gray-300">
+              <h3 className="font-app-medium mb-3 text-gray-700">
+                More articles
+              </h3>
+              <div className="space-y-4">
+                {articleRecommendations &&
+                  articleRecommendations.length > 0 &&
+                  [...articleRecommendations].slice(0, 4).map((article) => {
+                    return (
+                      <div
+                        key={article.id}
+                        className="border-b border-b-gray-200 py-3"
+                      >
+                        <ArticleCardPreview article={article} isPreview />
+                      </div>
+                    );
+                  })}
+                {articleRecommendations.length == 0 && (
+                  <div className="text-sm text-gray-600 pt-2">
+                    There are no articles yet
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+          )}
         </aside>
       </div>
+      <AppModal
+        title="Update article"
+        isOpen={addArticleModalIsOpen}
+        onClose={() => handleToggleAddArticleModal()}
+        width="w-5/12"
+      >
+        <AddArticleForm
+          triggerRefetch={refetch}
+          data={article}
+          handleModalClose={handleToggleAddArticleModal}
+        />
+      </AppModal>
     </div>
   );
 }

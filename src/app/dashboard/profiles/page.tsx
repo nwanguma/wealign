@@ -1,44 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import axiosInstance from "@/lib/axiosInstance";
 
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
 import { ProfileCard } from "@/components/ui/ProfileCard";
 import FilterComponent from "@/components/ui/Filter";
-import { Skill, Profile } from "@/common/constants";
-import AddItemButton from "@/components/ui/AddItemButton";
-import { ProfilesWithPagination } from "@/common/constants";
-import { useState } from "react";
+import {
+  Skill,
+  Profile,
+  ProfilesWithPagination,
+  IFilters,
+} from "@/common/constants";
 import { useSkills } from "@/app/hooks/useSkills";
 import PaginationComponent from "@/components/ui/PaginationComponent";
-
-import { IFilters, IPagination } from "../events/page";
 import ContentWrapper from "@/components/ui/ContentWrapper";
-
-const fetchProfiles = async (
-  pagination: IPagination,
-  filters: IFilters
-): Promise<ProfilesWithPagination> => {
-  try {
-    const { skills, type, ...rest } = filters;
-    const response = await axiosInstance.get("/api/proxy/profiles", {
-      params: {
-        ...pagination,
-        ...rest,
-        ...(skills && { skills: [skills] }),
-        ...(type && { is_mentor: true }),
-      },
-    });
-
-    return response.data.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
+import { SkeletonLoaderGrid } from "@/components/ui/SkeletonLoader";
+import { fetchProfiles } from "@/api";
 
 export default function Profiles() {
-  const [pagination, setPagination] = useState({ page: 1, limit: 2 });
+  const [pagination, setPagination] = useState({ page: 1, limit: 5 });
   const [filters, setFilters] = useState({
     skills: [],
     status: "",
@@ -59,17 +40,13 @@ export default function Profiles() {
     placeholderData: keepPreviousData,
   });
 
-  const {
-    data: skills,
-    isLoading: skillsIsLoading,
-    error: skillsError,
-  } = useSkills();
+  const { data: skills } = useSkills();
 
   let profiles: Profile[] | unknown[] = [];
   let total = 0;
 
   if (profilesData) {
-    const { page, perPage, total: pageTotal, totalPages, data } = profilesData;
+    const { total: pageTotal } = profilesData;
     profiles = profilesData.data;
     total = pageTotal;
   }
@@ -86,7 +63,7 @@ export default function Profiles() {
             title="Explore Professional Profiles"
             description="Browse through profiles of skilled individuals across various fields. Discover potential collaborators, connect with experts, and expand your network to bring your projects to success. Whether you're looking for developers, designers, or strategists, find the right talent to meet your project needs and build lasting professional relationships."
           />
-          <div className="h-14 py-5 flex flex-col space-y-5 w-full">
+          <div className="py-5 flex flex-col space-y-5 w-full">
             <FilterComponent
               filters={filters}
               setFilters={setFilters}
@@ -102,36 +79,39 @@ export default function Profiles() {
                 sortByOptions: [{ value: "views", label: "Views" }],
               }}
             />
-            <ContentWrapper data={profiles as Profile[]}>
-              {profilesData &&
-                (profiles as Profile[])?.map(
-                  ({
-                    first_name,
-                    last_name,
-                    avatar,
-                    id,
-                    bio,
-                    title,
-                    heading,
-                    skills,
-                  }) => (
-                    <div
-                      key={id}
-                      className="w-full border border-gray-300 rounded-lg p-3"
-                    >
-                      <ProfileCard
-                        name={`${first_name} ${last_name}`}
-                        title={title}
-                        heading={heading}
-                        avatar={avatar as string}
-                        id={id}
-                        bio={bio}
-                        skills={skills as Skill[]}
-                      />
-                    </div>
-                  )
-                )}
-            </ContentWrapper>
+            {!isLoading && (
+              <ContentWrapper data={profiles as Profile[]}>
+                {profilesData &&
+                  (profiles as Profile[])?.map(
+                    ({
+                      first_name,
+                      last_name,
+                      avatar,
+                      id,
+                      bio,
+                      title,
+                      heading,
+                      skills,
+                    }) => (
+                      <div
+                        key={id}
+                        className="w-full border border-gray-300 rounded-lg p-3"
+                      >
+                        <ProfileCard
+                          name={`${first_name} ${last_name}`}
+                          title={title}
+                          heading={heading}
+                          avatar={avatar as string}
+                          id={id}
+                          bio={bio}
+                          skills={skills as Skill[]}
+                        />
+                      </div>
+                    )
+                  )}
+              </ContentWrapper>
+            )}
+            {isLoading && <SkeletonLoaderGrid />}
             {profilesData && profiles && (
               <PaginationComponent
                 data={profiles as Profile[]}

@@ -1,82 +1,70 @@
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import "react-quill/dist/quill.snow.css";
-import dynamic from "next/dynamic";
 import React, { useState } from "react";
-import { useForm, FormProvider, Controller } from "react-hook-form";
+import DatePicker from "react-datepicker";
+import Image from "next/image";
+import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useDropzone } from "react-dropzone";
+import { Controller } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+
+import { Event, Job } from "@/common/constants";
 import NativeSelect from "./NativeSelectComponent";
 import ReactSelectComponent from "./ReactSelectComponent";
-
-import Image from "next/image";
-
 import Input from "./Input";
+import TextArea from "./TextArea";
+import axiosInstance from "@/lib/axiosInstance";
+import { useSkills } from "@/app/hooks/useSkills";
 
-import "react-quill/dist/quill.snow.css";
-// import "tailwindcss/tailwind.css";
-
+import "react-datepicker/dist/react-datepicker.css";
 import "../../app/globals.css";
 
-// {
-//     "title": "New Project Title",
-//     "description": "This is a description of the project.",
-//     "website": "https://example.com",
-//     "githubUrl": "https://github.com/thenewproject",
-//     "collaborators": [
-//         "c2415009-3c52-4b0d-bb2d-c5cfbaf3c802"
-//     ],
-//     "skills": [
-//         {
-//             "title": "JavaScript"
-//         },
-//         {
-//             "title": "TypeScript"
-//         }
-//     ]
-// }
-
-// Dynamically import ReactQuill with a fallback loader
-const ReactQuill = dynamic(() => import("react-quill"), {
-  ssr: false,
-  loading: () => (
-    <div className="quill-skeleton h-48 border border-gray-300 rounded-lg"></div>
-  ),
-});
-
 const schema = yup.object().shape({
-  first_name: yup
+  title: yup
     .string()
-    .required("First name is required")
-    .min(2, "Must be at least 2 characters"),
-  last_name: yup
+    .required("Title is required")
+    .min(3, "Must be at least 2 characters"),
+  description: yup
     .string()
-    .required("Last name is required")
-    .min(2, "Must be at least 2 characters"),
-  location: yup.string().required("Location is required"),
-  phone: yup
-    .string()
-    .matches(
-      /^\+\d{1,14}$/,
-      "Phone number must be in international format (+1234567890)"
-    ),
+    .required("Description is required")
+    .min(10, "Description must be at least 10 characters"),
+  status: yup.string().required("Status is required"),
   website: yup.string().url("Must be a valid URL"),
-  linkedin: yup.string().url("Must be a valid URL"),
-  github: yup.string().url("Must be a valid URL"),
-  resume: yup.string().url("Must be a valid URL"),
-  bio: yup
-    .string()
-    .required("Bio is required")
-    .min(10, "Bio must be at least 10 characters"),
-  avatar: yup.mixed().required("Avatar is required"),
+  application_url: yup.string().url("Must be a valid URL"),
+  location: yup.string().required("Location is required"),
+  skills: yup.array(),
 });
 
-const UpdateProfileForm: React.FC = () => {
+const createJob = async (data: Partial<Job>) => {
+  const result = await axiosInstance.post("/api/proxy/jobs", data);
+
+  return result?.data?.data;
+};
+
+interface ICreateJobForm {
+  data?: Partial<Job>;
+  triggerRefetch?: () => void;
+  handleModalClose?: () => void;
+}
+
+const CreateJobForm: React.FC<ICreateJobForm> = ({
+  data: jobsData,
+  handleModalClose,
+  triggerRefetch,
+}) => {
+  const defaultValues = {
+    title: jobsData?.title || "",
+    description: jobsData?.description || "",
+    status: jobsData?.status || "",
+    website: jobsData?.website || "",
+    application_url: jobsData?.application_url || "",
+    location: jobsData?.location || "",
+    skills: jobsData?.skills?.map((skill) => skill.title as string) || [],
+  };
+  const { data: skills, isLoading, error } = useSkills();
   const methods = useForm({
     resolver: yupResolver(schema),
+    defaultValues,
   });
-
   const {
     control,
     watch,
@@ -84,47 +72,33 @@ const UpdateProfileForm: React.FC = () => {
     setValue,
     formState: { errors },
   } = methods;
+  const createJobMutation = useMutation({
+    mutationFn: (data: Partial<Job>) => createJob(data),
+    onSuccess: (data: Event) => {},
+    onError: (error: any) => {},
+  });
+  const [deadline, setDeadline] = useState(
+    jobsData?.deadline ? new Date(jobsData?.deadline as string) : new Date()
+  );
+  const [selectedSkills, setSelectedSkills] = useState<any[]>(
+    jobsData?.skills?.map((skill) => ({
+      value: skill.title,
+      label: skill.title,
+    })) || []
+  );
 
-  const [bio, setBio] = useState<string>("");
-  const [selectedLanguages, setSelectedLanguages] = useState<any[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<any[]>([]);
-  const [visibilityStatus, setVisibilityStatus] = useState<
-    "public" | "private"
-  >("public");
-  const [avatar, setAvatar] = useState<File | null>(null);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-
-  const languagesOptions = [
-    { value: "english", label: "English" },
-    { value: "spanish", label: "Spanish" },
-    { value: "french", label: "French" },
-  ];
-
-  const skillsOptions = [
-    { value: "html", label: "HTML" },
-    { value: "css", label: "CSS" },
-    { value: "javascript", label: "JavaScript" },
-  ];
-
-  const handleAvatarDrop = (acceptedFiles: File[]) => {
-    setAvatar(acceptedFiles[0]);
-    setValue("avatar", acceptedFiles[0]);
-  };
-
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop: handleAvatarDrop,
-    accept: { "image/*": [] },
-    maxFiles: 1,
+  const skillsOptions = (skills || [])?.map((skill) => {
+    return { value: skill.title, label: skill.title };
   });
 
   const onSubmit = (data: any) => {
-    const profileData = {
-      ...data,
-      avatar,
-      languages: selectedLanguages.map((l) => l.value),
-      skills: selectedSkills.map((s) => ({ title: s.label })),
-    };
+    (async function () {
+      await createJobMutation.mutate({
+        ...data,
+        deadline,
+        skills: selectedSkills.map((s) => ({ title: s.label })),
+      });
+    })();
   };
 
   return (
@@ -135,92 +109,104 @@ const UpdateProfileForm: React.FC = () => {
       >
         <div>
           <Input
-            id="first_name"
+            id="title"
             label="Title"
-            placeholder="Kayode"
-            value={watch("first_name")}
-            onChange={(e) => setValue("first_name", e.target.value)}
-            error={errors.first_name?.message}
-            otherClasses={methods.register("first_name")}
+            value={watch("title")}
+            onChange={(e) => setValue("title", e.target.value)}
+            error={errors.title?.message as string}
+            otherClasses={methods.register("title")}
           />
         </div>
-        <div>
-          <Input
-            id="first_name"
-            label="Website"
-            type="url"
-            value={watch("first_name")}
-            onChange={(e) => setValue("first_name", e.target.value)}
-            error={errors.first_name?.message}
-            otherClasses={methods.register("first_name")}
-            placeholder="https://"
-          />
+        <div className="w-full">
+          <label className="text-sm mb-1 text-gray-600 inline-block">
+            Deadline
+          </label>
+          <div className="relative w-full">
+            <DatePicker
+              selected={deadline}
+              onChange={(date) => setDeadline(date as Date)}
+              className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
+              placeholderText="Select start date"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Image
+                src="/icons/calendar.svg"
+                alt="Calendar"
+                width={22}
+                height={22}
+              />
+            </div>
+          </div>
         </div>
-        <div>
-          <Input
-            id="last_name"
-            label="Repository URL"
-            value={watch("last_name")}
-            onChange={(e) => setValue("last_name", e.target.value)}
-            error={errors.last_name?.message}
-            otherClasses={methods.register("last_name")}
-            placeholder="https://github.com/user/your-project-url"
-          />
-        </div>
+        <NativeSelect
+          id="status"
+          label="Status"
+          placeholder="Select Status"
+          value={watch("status") as string}
+          onChange={(e) => setValue("status", e.target.value)}
+          error={errors?.status?.message}
+          options={[
+            { value: "hiring", label: "Hiring" },
+            { value: "paused", label: "Paused" },
+            { value: "closed", label: "Closed" },
+          ]}
+          otherClasses={methods.register("status")}
+        />
         <div>
           <Controller
             name="skills"
             control={control}
             render={({ field }) => (
               <ReactSelectComponent
-                name="skills"
                 label="Skills"
                 options={skillsOptions}
-                isMulti={true}
-                error={errors.skills?.message}
+                placeholder="Select skills"
+                error={errors.skills?.message as string}
+                setSelectedOption={setSelectedSkills}
+                selectedOption={selectedSkills}
               />
             )}
           />
-        </div>
-        <div className="py-3">
-          <label className="block text-gray-700 text-sm">
-            Attachments (.docx, .doc, .pdf)
-          </label>
-          <div
-            {...getRootProps()}
-            className="mt-1 p-6 border border-gray-300 border-dashed rounded-md flex justify-center items-center cursor-pointer text-sm text-gray-600 hover:border hover:border-solid hover:border-gray-400 active:border-blue-700"
-          >
-            <input {...getInputProps()} />
-            {avatar ? (
-              <p>{avatar.name} kjfg</p>
-            ) : (
-              <p>Drag and drop a file, or click to select a document</p>
-            )}
-          </div>
-          {errors.avatar && (
-            <p className="text-red-500">{errors.avatar.message}</p>
-          )}
         </div>
         <div>
-          <label className="block text-gray-700 text-sm">Description</label>
-          <Controller
-            name="bio"
-            control={control}
-            render={({ field }) => (
-              <ReactQuill
-                value={field.value || bio}
-                onChange={(content) => {
-                  setBio(content);
-                  field.onChange(content);
-                }}
-                className="custom-quill"
-                placeholder="Write a short bio..."
-                theme="snow"
-              />
-            )}
+          <Input
+            id="website"
+            label="Website"
+            type="url"
+            value={watch("website") as string}
+            onChange={(e) => setValue("website", e.target.value)}
+            error={errors.website?.message as string}
+            otherClasses={methods.register("website")}
+            placeholder="https://"
           />
-          {errors.bio && <p className="text-red-500">{errors.bio.message}</p>}
         </div>
+        <Input
+          id="location"
+          label="Location"
+          value={watch("location")}
+          onChange={(e) => setValue("location", e.target.value)}
+          error={errors.location?.message as string}
+          otherClasses={methods.register("location")}
+        />
+        <div>
+          <Input
+            id="application_url"
+            label="Application Url"
+            value={watch("application_url") as string}
+            onChange={(e) => setValue("application_url", e.target.value)}
+            error={errors.application_url?.message as string}
+            otherClasses={methods.register("application_url")}
+            placeholder="https://"
+          />
+        </div>
+        <TextArea
+          id="description"
+          label="Description"
+          value={watch("description")}
+          onChange={(e) => setValue("description", e.target.value)}
+          error={errors.description?.message as string}
+          otherClasses={methods.register("description")}
+        />
         <div className="flex items-center space-x-2 justify-end">
           <button
             type="submit"
@@ -240,4 +226,4 @@ const UpdateProfileForm: React.FC = () => {
   );
 };
 
-export default UpdateProfileForm;
+export default CreateJobForm;
