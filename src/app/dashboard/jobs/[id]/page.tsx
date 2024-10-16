@@ -3,19 +3,17 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import Image from "next/image";
 import { useSelector } from "react-redux";
 
 import { Job } from "@/common/constants";
 import { RootState } from "@/store";
-import { WithTooltip } from "@/components/ui/WithTooltip";
 import { fetchJob, deleteJob } from "@/api";
 import { JobCardMain } from "@/components/ui/JobCardMain";
 import { SkeletonLoaderPage } from "@/components/ui/SkeletonLoader";
 import AppModal from "@/components/ui/Modal";
 import CreateJobForm from "@/components/forms/CreateJobForm";
-import { JobCard } from "@/components/ui/JobCard";
 import { SkeletonCard } from "@/components/ui/SkeletonLoader";
+import { JobCard } from "@/components/ui/JobCard";
 
 export default function JobPage() {
   const { recommendations, user } = useSelector((state: RootState) => ({
@@ -56,22 +54,11 @@ export default function JobPage() {
           {isLoading && <SkeletonLoaderPage />}
           {!isLoading && job && (
             <div className="w-full">
-              {isOwner && (
-                <div className="absolute top-4 right-4">
-                  {WithTooltip(
-                    "Edit job",
-                    <div onClick={() => handleToggleAddJobModal()}>
-                      <Image
-                        src="/icons/edit.svg"
-                        alt=""
-                        width={20}
-                        height={20}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-              <div className="w-full">{job && <JobCardMain job={job} />}</div>
+              <JobCardMain
+                job={job}
+                isOwner={isOwner}
+                toggleModal={handleToggleAddJobModal}
+              />
               {isOwner && (
                 <div
                   className="w-full text-center cursor-pointer"

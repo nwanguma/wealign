@@ -144,7 +144,7 @@ export default function Events() {
                 ],
               }}
             />
-            {isLoading && (
+            {!isLoading && (
               <ContentWrapper data={events as Event[]}>
                 {eventsData &&
                   events?.map((event: Event) => (
@@ -152,7 +152,7 @@ export default function Events() {
                       key={event.id}
                       className="w-full border border-gray-300 rounded-lg p-4 h-48"
                     >
-                      <EventCardPreview event={event} />
+                      <EventCardPreview event={event} isPreview />
                     </div>
                   ))}
               </ContentWrapper>

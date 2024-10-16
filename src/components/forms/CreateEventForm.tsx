@@ -1,32 +1,32 @@
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import "react-quill/dist/quill.snow.css";
-import React, { ChangeEvent, useState } from "react";
+
+import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
-import { Event } from "@/common/constants";
-import NativeSelect from "./NativeSelectComponent";
 import Link from "next/link";
 import Image from "next/image";
+import { useMutation } from "@tanstack/react-query";
+
+import { Event } from "@/common/constants";
+import NativeSelect from "./NativeSelectComponent";
 import Input from "./Input";
-
-import "react-quill/dist/quill.snow.css";
-import "../../app/globals.css";
-
 import TextArea from "./TextArea";
 import axiosInstance from "@/lib/axiosInstance";
-import { useMutation } from "@tanstack/react-query";
 import { getFilenameAndExtension } from "@/lib/helpers";
 import { WithTooltip } from "../ui/WithTooltip";
+
+import "react-datepicker/dist/react-datepicker.css";
+import "react-quill/dist/quill.snow.css";
+import "../../app/globals.css";
 
 const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")
-    .min(3, "Must be at least 2 characters"),
-  banner: yup.string().required(),
+    .min(3, "Must be at least 3 characters"),
+  banner: yup.string(),
   attachment: yup.string(),
   type: yup.string().required("Event type is required"),
   website: yup.string().url("Must be a valid URL"),
@@ -48,6 +48,8 @@ const schema = yup.object().shape({
     .string()
     .required("Description is required")
     .min(10, "Description must be at least 10 characters"),
+  start_date: yup.mixed(),
+  end_date: yup.mixed(),
 });
 
 const createEvent = async (data: Partial<Event>) => {
@@ -63,7 +65,7 @@ const updateEvent = async (data: Partial<Event>, id: string) => {
 };
 
 interface ICreateEventForm {
-  data?: Partial<Project>;
+  data?: Partial<Event>;
   handleModalClose?: () => void;
   triggerRefetch?: () => void;
 }
@@ -83,6 +85,12 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
     link: eventsData?.link || "",
     location: eventsData?.location || "",
     description: eventsData?.description || "",
+    event_start_date: eventsData?.event_start_date
+      ? new Date(eventsData?.event_start_date as string)
+      : new Date(),
+    event_end_date: eventsData?.event_end_date
+      ? new Date(eventsData?.event_end_date as string)
+      : new Date(),
   };
 
   const methods = useForm({
@@ -100,33 +108,26 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
 
   const createEventMutation = useMutation({
     mutationFn: (data: Partial<Event>) =>
-      eventsData ? updateEvent(data, eventsData?.id) : createEvent(data),
-    onSuccess: (data: Event) => {
+      eventsData
+        ? updateEvent(data, eventsData?.id as string)
+        : createEvent(data),
+    onSuccess: () => {
       handleModalClose && handleModalClose();
       triggerRefetch && triggerRefetch();
     },
-    onError: (error: any) => {},
+    onError: () => {},
   });
-
-  console.log(eventsData, "******");
 
   const [banner, setBanner] = useState<File | null>(null);
   const [attachment, setAttachment] = useState<File | null>(null);
-  const [startDate, setStartDate] = useState(
-    eventsData?.event_start_date
-      ? new Date(eventsData.event_start_date)
-      : new Date()
-  );
-  const [endDate, setEndDate] = useState(
-    eventsData?.event_end_date
-      ? new Date(eventsData.event_end_date)
-      : new Date()
-  );
   const [deletedAttachment, setDeletedAttachment] = useState(false);
   const [deletedBanner, setDeletedBanner] = useState(false);
+  const [fileUploadLoading, setFileUploadLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleBannerDrop = (acceptedFiles: File[]) => {
     setBanner(acceptedFiles[0]);
+    setFileUploadLoading(true);
 
     (async function () {
       const formData = new FormData();
@@ -142,12 +143,14 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
         }
       );
 
+      setFileUploadLoading(false);
       setValue("banner", result?.data?.data?.url);
     })();
   };
 
   const handleAttachmentDrop = (acceptedFiles: File[]) => {
     setAttachment(acceptedFiles[0]);
+    setFileUploadLoading(true);
 
     (async function () {
       const formData = new FormData();
@@ -163,6 +166,7 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
         }
       );
 
+      setFileUploadLoading(false);
       setValue("attachment", result?.data?.data?.url);
     })();
   };
@@ -191,11 +195,11 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
   });
 
   const onSubmit = (data: any) => {
+    setLoading(true);
+
     (async function () {
       await createEventMutation.mutate({
         ...data,
-        event_start_date: startDate,
-        event_end_date: endDate,
       });
     })();
   };
@@ -234,7 +238,9 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
             )}
           </div>
           {errors.banner && (
-            <p className="text-red-500">{errors.banner?.message as string}</p>
+            <p className="text-xs-sm text-red-500 first-letter:capitalize">
+              {errors.banner?.message as string}
+            </p>
           )}
           {!deletedBanner && eventsData?.banner && (
             <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50 mt-2 flex items-center justify-between space-x-2">
@@ -296,8 +302,8 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
             </label>
             <div className="relative w-full">
               <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date as Date)}
+                selected={watch("event_start_date") as Date}
+                onChange={(date) => setValue("event_start_date", date as Date)}
                 className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
                 placeholderText="Select start date"
               />
@@ -317,8 +323,8 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
             </label>
             <div className="relative w-full">
               <DatePicker
-                selected={endDate}
-                onChange={(date) => setEndDate(date as Date)}
+                selected={watch("event_end_date") as Date}
+                onChange={(date) => setValue("event_end_date", date as Date)}
                 className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
                 placeholderText="Select start date"
               />
@@ -485,12 +491,14 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
         </div>
         <div className="flex items-center space-x-2 justify-end">
           <button
-            type="submit"
+            onClick={() => handleModalClose && handleModalClose()}
+            type="button"
             className="px-6 py-2 text-sm bg-white text-gray-600 border border-gray-300 rounded-md hover:bg-slate-100"
           >
             Cancel
           </button>
           <button
+            disabled={loading || fileUploadLoading}
             type="submit"
             className="px-6 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >

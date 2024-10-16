@@ -3,12 +3,19 @@ import Image from "next/image";
 
 import { formatDateLong } from "@/lib/helpers";
 import { Job } from "@/common/constants";
-
+import { ViewsComponent } from "./ViewsComponent";
+import { WithTooltip } from "./WithTooltip";
 interface IJobCardMainProps {
   job: Partial<Job>;
+  isOwner?: boolean;
+  toggleModal?: () => void;
 }
 
-export const JobCardMain: React.FC<IJobCardMainProps> = ({ job }) => {
+export const JobCardMain: React.FC<IJobCardMainProps> = ({
+  job,
+  isOwner,
+  toggleModal,
+}) => {
   const {
     id,
     title,
@@ -23,12 +30,25 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({ job }) => {
     deadline,
     status,
     owner,
+    views,
   } = job;
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [newComment, setNewComment] = useState("");
 
   return (
     <div className="relative space-y-4">
+      <div className="absolute top-0 right-4">
+        <div className="flex space-x-3">
+          <ViewsComponent views={views as number} />
+          {isOwner &&
+            WithTooltip(
+              "Edit event",
+              <div onClick={() => toggleModal && toggleModal()}>
+                <Image src="/icons/edit.svg" alt="" width={20} height={20} />
+              </div>
+            )}
+        </div>
+      </div>
       <div className="flex flex-col space-y-6 border-b border-b-gray-200 pb-4">
         <div className="flex items-center space-x-6">
           <div className="border border-gray-300 p-1 rounded-lg">

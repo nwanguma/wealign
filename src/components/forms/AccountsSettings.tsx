@@ -26,7 +26,13 @@ const handleChangePassword = async (data: {
   return response.data.data;
 };
 
-const AccountSettingsForm: React.FC = () => {
+interface IAccountSettingsFormProps {
+  handleModalClose?: () => void;
+}
+
+const AccountSettingsForm: React.FC<IAccountSettingsFormProps> = ({
+  handleModalClose,
+}) => {
   const methods = useForm({
     resolver: yupResolver(schema),
   });
@@ -37,9 +43,7 @@ const AccountSettingsForm: React.FC = () => {
     mutationFn: (data: { old_password: string; new_password: string }) =>
       handleChangePassword(data),
     onSuccess: (data: any) => {},
-    onError: (error: any) => {
-      // console.error("Error following the user:", error);
-    },
+    onError: (error: any) => {},
     onSettled(data, error, variables, context) {
       setLoading(false);
     },
@@ -69,7 +73,7 @@ const AccountSettingsForm: React.FC = () => {
   // };
 
   const onSubmit = (data: any) => {
-    setLoading(false);
+    setLoading(true);
 
     (async function () {
       await passwordChangeMutation.mutate(data);
@@ -170,12 +174,14 @@ const AccountSettingsForm: React.FC = () => {
         </div> */}
         <div className="flex items-center space-x-2 justify-end">
           <button
-            type="submit"
+            onClick={() => handleModalClose && handleModalClose()}
+            type="button"
             className="px-6 py-2 text-sm bg-white text-gray-600 border border-gray-300 rounded-md hover:bg-slate-100"
           >
             Cancel
           </button>
           <button
+            disabled={loading}
             type="submit"
             className="px-6 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >

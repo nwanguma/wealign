@@ -104,7 +104,7 @@ export default function Articles() {
                 ],
               }}
             />{" "}
-            {isLoading && (
+            {!isLoading && (
               <ContentWrapper data={articles as Article[]}>
                 {articlesData &&
                   articles?.map((article: Article) => (

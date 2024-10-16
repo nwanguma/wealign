@@ -1,31 +1,28 @@
 import React, { useState } from "react";
-import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
 import { useForm, FormProvider, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
+import { useMutation } from "@tanstack/react-query";
+
 import { RootState } from "@/store";
 import ReactSelectComponent from "./ReactSelectComponent";
 import Input from "./Input";
-import { useMutation } from "@tanstack/react-query";
-import "react-quill/dist/quill.snow.css";
-import "../../app/globals.css";
 import { useDispatch, useSelector } from "react-redux";
-// import { WithTooltip } from "../ui/WithTooltip";
-import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
-import { Profile, Skill } from "@/common/constants";
+import { Option, Profile, Skill } from "@/common/constants";
 import { AppDispatch } from "@/store";
-
 import { updateProfile } from "@/store/user";
 import TextArea from "./TextArea";
-import { useRouter } from "next/navigation";
 import { WithTooltip } from "../ui/WithTooltip";
-import Link from "next/link";
 import { getFilenameAndExtension } from "@/lib/helpers";
 import NativeSelect from "./NativeSelectComponent";
 import { useSkills } from "@/app/hooks/useSkills";
+
+import "react-quill/dist/quill.snow.css";
+import "../../app/globals.css";
 
 export enum ProfileStatus {
   HIRING = "hiring",
@@ -33,15 +30,7 @@ export enum ProfileStatus {
 }
 
 const schema = yup.object().shape({
-  avatar: yup.mixed().required("Avatar is required"),
-  // first_name: yup
-  //   .string()
-  //   .required("First name is required")
-  //   .min(2, "Must be at least 2 characters"),
-  // last_name: yup
-  //   .string()
-  //   .required("Last name is required")
-  //   .min(2, "Must be at least 2 characters"),
+  avatar: yup.string(),
   title: yup
     .string()
     .required("Title is required")
@@ -65,17 +54,17 @@ const schema = yup.object().shape({
   website: yup.string().url("Must be a valid URL"),
   linkedin: yup.string().url("Must be a valid URL"),
   github: yup.string().url("Must be a valid URL"),
-  // resume: yup.string().url("Must be a valid URL"),
-  resume: yup.mixed().required("Resume is required"),
-  languages: yup.array(),
-  // .of(yup.string().required("Language is required"))
-  // .min(1, "At least one language is required")
-  // .required("Languages are required"),
-
-  skills: yup.array(),
-  // .of(yup.string().required("Skill is required"))
-  // .min(1, "At least one skill is required")
-  // .required("Skills are required"),
+  resume: yup.string(),
+  languages: yup
+    .array()
+    .of(yup.mixed().required("Language is required"))
+    .min(1, "At least one language is required")
+    .required("Languages are required"),
+  skills: yup
+    .array()
+    .of(yup.mixed().required("Skill is required"))
+    .min(1, "At least one skill is required")
+    .required("Skills are required"),
   is_mentor: yup.boolean(),
   mentor_note: yup.string().min(10, "Note must be at least 10 characters"),
 });
@@ -114,20 +103,26 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
     linkedin: user?.profile?.linkedin || "",
     github: user?.profile?.github || "",
     resume: user?.profile?.resume || "",
-    languages: user?.profile?.languages?.map((lang) => lang) || [],
-    skills: user?.profile?.skills?.map((skill) => skill.title as string) || [],
+    languages:
+      user?.profile?.languages?.map((lang) => ({
+        value: lang,
+        label: lang,
+      })) || [],
+    skills:
+      user?.profile?.skills?.map((skill) => ({
+        value: skill.title,
+        label: skill.title,
+      })) || [],
     is_mentor: user?.profile.is_mentor || false,
     mentor_note: user?.profile.mentor_note || "",
     status: user?.profile.status || "",
   };
-  const router = useRouter();
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues,
   });
-  const { data: skills, isLoading, error } = useSkills();
+  const { data: skills } = useSkills();
   const dispatch = useDispatch<AppDispatch>();
-
   const {
     control,
     watch,
@@ -135,25 +130,11 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
     setValue,
     formState: { errors },
   } = methods;
-
-  const [bio, setBio] = useState<string>("");
-  const [selectedLanguages, setSelectedLanguages] = useState<any[]>(
-    user?.profile?.languages?.map((lang) => ({ value: lang, label: lang })) ||
-      []
-  );
   const [deletedResume, setDeletedResume] = useState(false);
   const [deletedAvatar, setDeletedAvatar] = useState(false);
-  const [selectedSkills, setSelectedSkills] = useState<any[]>(
-    user?.profile?.skills?.map((skill) => ({
-      value: skill.title,
-      label: skill.title,
-    })) || []
-  );
-  const [visibilityStatus, setVisibilityStatus] = useState<string>(
-    (user?.profile?.visibility_status as string) || "public"
-  );
   const [avatar, setAvatar] = useState<File | null>(null);
   const [resume, setResume] = useState<File | null>(null);
+  const [fileUploadLoading, setFileUploadLoading] = useState(false);
 
   const updateProfileMutation = useMutation({
     mutationFn: ({
@@ -168,9 +149,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
       triggerRefetch();
       handleModalClose();
     },
-    onError: (error: any) => {
-      // console.error("Error following the user:", error);
-    },
+    onError: (error: any) => {},
   });
 
   const languagesOptions = [
@@ -193,6 +172,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
 
   const handleAvatarDrop = (acceptedFiles: File[]) => {
     setAvatar(acceptedFiles[0]);
+    setFileUploadLoading(true);
 
     (async function () {
       const formData = new FormData();
@@ -208,12 +188,14 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
         }
       );
 
+      setFileUploadLoading(false);
       setValue("avatar", result?.data?.data?.url);
     })();
   };
 
   const handleResumeDrop = (acceptedFiles: File[]) => {
     setResume(acceptedFiles[0]);
+    setFileUploadLoading(true);
 
     (async function () {
       const formData = new FormData();
@@ -229,6 +211,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
         }
       );
 
+      setFileUploadLoading(false);
       setValue("resume", result?.data?.data?.url);
     })();
   };
@@ -261,10 +244,8 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
 
     const profileData = {
       ...data,
-      bio: data.bio,
-      languages: selectedLanguages.map((l) => l.value),
-      skills: selectedSkills.map((s) => ({ title: s.label })),
-      visibility_status: visibilityStatus,
+      languages: data?.languages.map((l: Option) => l.value),
+      skills: data?.skills.map((s: Option) => ({ title: s.label })),
     };
 
     (async function () {
@@ -347,64 +328,12 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
               )}
             </div>
             {errors.avatar && (
-              <p className="text-red-500">{errors.avatar?.message}</p>
+              <p className="text-xs-sm text-red-500 first-letter:capitalize">
+                {errors.avatar?.message}
+              </p>
             )}
           </div>
         </div>
-        <div className="space-y-2">
-          <label className="block text-sm text-gray-600">
-            Profile Visibility
-          </label>
-          <div className="flex items-center space-x-4 mt-1 text-sm">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="public"
-                checked={visibilityStatus === "public"}
-                onChange={() => setVisibilityStatus("public")}
-                className="form-radio"
-              />
-              <span className="ml-2">Public</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="private"
-                checked={visibilityStatus === "private"}
-                onChange={() => setVisibilityStatus("private")}
-                className="form-radio"
-              />
-              <span className="ml-2">Private</span>
-            </label>
-          </div>
-        </div>
-        {/* <Input
-          id="avatar"
-          label="Avatar"
-          placeholder="https://example.jpg"
-          value={watch("avatar") as string}
-          onChange={(e) => setValue("avatar", e.target.value)}
-          error={errors.avatar?.message as string as string}
-          otherClasses={methods.register("avatar")}
-        /> */}
-        {/* <div className="grid grid-cols-2 gap-6">
-          <Input
-            id="first_name"
-            label="First Name"
-            value={watch("first_name")}
-            onChange={(e) => setValue("first_name", e.target.value)}
-            error={errors.first_name?.message as string as string}
-            otherClasses={methods.register("first_name")}
-          />
-          <Input
-            id="last_name"
-            label="Last Name"
-            value={watch("last_name")}
-            onChange={(e) => setValue("last_name", e.target.value)}
-            error={errors.last_name?.message as string as string}
-            otherClasses={methods.register("last_name")}
-          />
-        </div> */}
         <Input
           id="title"
           label="Title"
@@ -484,12 +413,13 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
             control={control}
             render={({ field }) => (
               <ReactSelectComponent
+                tag="languages"
                 label="Languages"
                 options={languagesOptions}
                 placeholder="Select languages"
                 error={errors.languages?.message as string}
-                setSelectedOption={setSelectedLanguages}
-                selectedOption={selectedLanguages}
+                setSelectedOption={setValue}
+                selectedOption={watch("languages") as Option[]}
               />
             )}
           />
@@ -500,12 +430,13 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
             control={control}
             render={({ field }) => (
               <ReactSelectComponent
+                tag="skills"
                 label="Skills"
                 options={skillsOptions}
                 placeholder="Select skills"
                 error={errors.skills?.message as string}
-                setSelectedOption={setSelectedSkills}
-                selectedOption={selectedSkills}
+                setSelectedOption={setValue}
+                selectedOption={watch("skills") as Option[]}
               />
             )}
           />
@@ -536,7 +467,9 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
             )}
           </div>
           {errors.resume && (
-            <p className="text-red-500">{errors.resume.message}</p>
+            <p className="text-xs-sm text-red-500 first-letter:capitalize">
+              {errors.resume.message}
+            </p>
           )}
           {!deletedResume && user?.profile.resume && (
             <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50 mt-2 flex items-center justify-between space-x-2">
@@ -630,12 +563,14 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
         )}
         <div className="flex items-center space-x-2 justify-end">
           <button
-            type="submit"
+            onClick={() => handleModalClose()}
+            type="button"
             className="px-6 py-2 text-sm bg-white text-gray-600 border border-gray-300 rounded-md hover:bg-slate-100"
           >
             Cancel
           </button>
           <button
+            disabled={loading || fileUploadLoading}
             type="submit"
             className="px-6 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >

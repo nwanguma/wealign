@@ -68,6 +68,8 @@ export default function Events() {
     placeholderData: keepPreviousData,
   });
 
+  console.log(eventsData);
+
   let events;
   let total = 0;
 
@@ -120,7 +122,6 @@ export default function Events() {
               />
             </div>
           </div>
-
           <div className="py-5 flex flex-col space-y-5 w-full">
             <FilterComponent
               filters={filters}
@@ -155,7 +156,7 @@ export default function Events() {
                       key={event.id}
                       className="w-full border border-gray-300 rounded-lg p-4 h-48"
                     >
-                      <EventCardPreview event={event} />
+                      <EventCardPreview event={event} isPreview />
                     </div>
                   ))}
               </ContentWrapper>

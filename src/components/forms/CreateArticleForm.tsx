@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { Controller } from "react-hook-form";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -6,6 +8,7 @@ import * as yup from "yup";
 import { useDropzone } from "react-dropzone";
 import { useMutation } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
+import { WithTooltip } from "../ui/WithTooltip";
 
 import { Article } from "@/common/constants";
 import Input from "./Input";
@@ -14,9 +17,6 @@ import { getFilenameAndExtension, stripHtml } from "@/lib/helpers";
 
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
-import Link from "next/link";
-import { WithTooltip } from "../ui/WithTooltip";
-import Image from "next/image";
 
 const Loading = () => (
   <div className="w-full h-96 block border border-gray-300 rounded-lg"></div>
@@ -31,12 +31,12 @@ const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")
-    .min(3, "Must be at least 2 characters"),
-  banner: yup.mixed(),
+    .min(3, "Must be at least 3 characters"),
+  banner: yup.string(),
   body: yup
     .string()
     .required("Content is required")
-    .min(10, "Content must be at least 1000 characters"),
+    .min(400, "Content must be at least 400 characters"),
 });
 
 const createArticle = async (data: Partial<Article>) => {
@@ -76,11 +76,11 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
 
   const createArticleMutation = useMutation({
     mutationFn: (data: Partial<Article>) => createArticle(data),
-    onSuccess: (data: Article) => {
+    onSuccess: () => {
       handleModalClose && handleModalClose();
       triggerRefetch && triggerRefetch();
     },
-    onError: (error: any) => {},
+    onError: () => {},
     onSettled: () => {
       setLoading(false);
     },
@@ -90,9 +90,11 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
   const [deletedBanner, setDeletedBanner] = useState(false);
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fileUploadLoading, setFileUploadLoading] = useState(false);
 
   const handleBannerDrop = (acceptedFiles: File[]) => {
     setBanner(acceptedFiles[0]);
+    setFileUploadLoading(true);
 
     (async function () {
       const formData = new FormData();
@@ -108,6 +110,7 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
         }
       );
 
+      setFileUploadLoading(false);
       setValue("banner", result?.data?.data?.url);
     })();
   };
@@ -160,7 +163,9 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
             )}
           </div>
           {errors.banner && (
-            <p className="text-red-500">{errors.banner?.message as string}</p>
+            <p className="text-xs-sm text-red-500 first-letter:capitalize">
+              {errors.banner?.message as string}
+            </p>
           )}
           {!deletedBanner && articlesData?.banner && (
             <div className="border border-gray-300 p-3 rounded-lg text-xs bg-slate-50 mt-2 flex items-center justify-between space-x-2">
@@ -236,17 +241,21 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
             )}
           />
           {errors.body && (
-            <p className="text-red-500">{errors.body?.message}</p>
+            <p className="text-xs-sm text-red-500 first-letter:capitalize">
+              {errors.body?.message}
+            </p>
           )}
         </div>
         <div className="flex items-center space-x-2 justify-end">
           <button
-            type="submit"
+            onClick={() => handleModalClose && handleModalClose()}
+            type="button"
             className="px-6 py-2 text-sm bg-white text-gray-600 border border-gray-300 rounded-md hover:bg-slate-100"
           >
             Cancel
           </button>
           <button
+            disabled={loading || fileUploadLoading}
             type="submit"
             className="px-6 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >

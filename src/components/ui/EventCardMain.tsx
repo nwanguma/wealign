@@ -5,12 +5,20 @@ import Link from "next/link";
 import { formatDateLong, getFilenameAndExtension } from "@/lib/helpers";
 import { WithTooltip } from "./WithTooltip";
 import { Event } from "@/common/constants";
+import { ViewsComponent } from "./ViewsComponent";
 
 interface IEventCardMainProps {
   event: Event;
+  isMain?: boolean;
+  isOwner?: boolean;
+  toggleModal?: () => void;
 }
 
-export const EventCardMain: React.FC<IEventCardMainProps> = ({ event }) => {
+export const EventCardMain: React.FC<IEventCardMainProps> = ({
+  event,
+  isOwner,
+  toggleModal,
+}) => {
   const {
     banner,
     title,
@@ -23,6 +31,7 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({ event }) => {
     attachment,
     ticket_link,
     link: meeting_link,
+    views,
   } = event;
 
   const [showCommentInput, setShowCommentInput] = useState(false);
@@ -45,6 +54,18 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({ event }) => {
 
   return (
     <div className="relative space-y-5">
+      <div className="absolute top-0 right-4">
+        <div className="flex space-x-3">
+          <ViewsComponent views={views as number} />
+          {isOwner &&
+            WithTooltip(
+              "Edit event",
+              <div onClick={() => toggleModal && toggleModal()}>
+                <Image src="/icons/edit.svg" alt="" width={20} height={20} />
+              </div>
+            )}
+        </div>
+      </div>
       <div className="flex items-center space-x-5">
         <div className="relative w-2/3 h-80">
           <Image

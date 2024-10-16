@@ -3,10 +3,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import { Article, mapLanguageToFlag, Skill } from "@/common/constants";
 import { getFilenameAndExtension } from "@/lib/helpers";
-import { Profile, Event, Project, Job } from "@/common/constants";
-
+import {
+  Profile,
+  Event,
+  Project,
+  Job,
+  Article,
+  mapLanguageToFlag,
+} from "@/common/constants";
 import { EventCardPreview } from "./EventCard";
 import { ProjectCard } from "./ProjectCard";
 import { JobCard } from "./JobCard";
@@ -14,13 +19,20 @@ import { WithTooltip } from "./WithTooltip";
 import { SkeletonLoader } from "./SkeletonLoader";
 import ShareComponent from "./ShareComponent";
 import { ArticleCardPreview } from "./ArticleCard";
+import { ViewsComponent } from "./ViewsComponent";
 
 interface IProfileCardMainProps {
   profile: Profile;
+  isMain?: boolean;
+  isOwner?: boolean;
+  toggleModal?: () => void;
 }
 
 export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
   profile,
+  isMain,
+  isOwner,
+  toggleModal,
 }) => {
   const {
     first_name,
@@ -46,6 +58,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
     jobs,
     articles,
     is_mentor,
+    views,
     mentor_note,
     requires_update,
   } = profile;
@@ -68,6 +81,18 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
 
   return (
     <div className="relative space-y-4">
+      <div className="absolute top-0 right-4">
+        <div className="flex space-x-3">
+          {!isMain && <ViewsComponent views={views as number} />}
+          {isOwner &&
+            WithTooltip(
+              "Edit event",
+              <div onClick={() => toggleModal && toggleModal()}>
+                <Image src="/icons/edit.svg" alt="" width={20} height={20} />
+              </div>
+            )}
+        </div>
+      </div>
       <div className="flex flex-col space-y-6 border-b border-b-gray-200 py-4">
         <div className="flex items-center space-x-6">
           <div className="border border-gray-300 p-1 rounded-full">
@@ -285,7 +310,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                   href={"/dashboard/me/events"}
                   className="text-xs text-gray-600 flex items-center space-x-2"
                 >
-                  <span> events</span>
+                  <span>View events</span>
                   <Image src="/icons/link.svg" width={15} height={15} alt="" />
                 </Link>
               </div>

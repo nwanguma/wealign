@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
 
@@ -11,7 +10,6 @@ import { ArticleCardPreview } from "@/components/ui/ArticleCard";
 import { RootState } from "@/store";
 import AddArticleForm from "@/components/forms/CreateArticleForm";
 import AppModal from "@/components/ui/Modal";
-import { WithTooltip } from "@/components/ui/WithTooltip";
 import {
   SkeletonCard,
   SkeletonLoaderPage,
@@ -19,7 +17,7 @@ import {
 import { ArticleCardMain } from "@/components/ui/ArticleCardMain";
 import { fetchArticle, deleteArticle } from "@/api";
 
-export default function Dashboard() {
+export default function ArticlePage() {
   const { recommendations, user } = useSelector((state: RootState) => ({
     recommendations: state.recommendations,
     user: state.user,
@@ -45,10 +43,10 @@ export default function Dashboard() {
     onSuccess: () => {},
     onError: (error: any) => {},
   });
-  const [addArticleModalIsOpen, setAddArticleModalIsOpen] =
+  const [updateArticleModalIsOpen, setUpdateArticleModalIsOpen] =
     useState<boolean>(false);
-  const handleToggleAddArticleModal = () => {
-    setAddArticleModalIsOpen(!addArticleModalIsOpen);
+  const handleToggleUpdateArticleModal = () => {
+    setUpdateArticleModalIsOpen(!updateArticleModalIsOpen);
   };
   const handleDelete = (articleId: string) => {
     deleteMutation.mutate(articleId);
@@ -61,27 +59,11 @@ export default function Dashboard() {
           {isLoading && <SkeletonLoaderPage />}
           {!isLoading && article && (
             <div className="w-full">
-              {isOwner && (
-                <div
-                  className="absolute top-4 right-4 cursor-pointer z-10"
-                  onClick={() => handleToggleAddArticleModal()}
-                >
-                  {WithTooltip(
-                    "Edit article",
-                    <div>
-                      <Image
-                        src="/icons/edit.svg"
-                        alt=""
-                        width={20}
-                        height={20}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-              <div className="w-full">
-                <ArticleCardMain article={article} />
-              </div>
+              <ArticleCardMain
+                article={article}
+                isOwner={isOwner}
+                toggleModal={handleToggleUpdateArticleModal}
+              />
               {isOwner && (
                 <div
                   className="w-full text-center cursor-pointer"
@@ -127,14 +109,14 @@ export default function Dashboard() {
       </div>
       <AppModal
         title="Update article"
-        isOpen={addArticleModalIsOpen}
-        onClose={() => handleToggleAddArticleModal()}
+        isOpen={updateArticleModalIsOpen}
+        onClose={() => handleToggleUpdateArticleModal()}
         width="w-5/12"
       >
         <AddArticleForm
           triggerRefetch={refetch}
           data={article}
-          handleModalClose={handleToggleAddArticleModal}
+          handleModalClose={handleToggleUpdateArticleModal}
         />
       </AppModal>
     </div>

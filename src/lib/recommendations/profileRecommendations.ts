@@ -23,7 +23,7 @@ const recommendProfiles = ({
         score += 3;
       }
 
-      const activityScore = Math.min(profile.views, 100) / 10;
+      const activityScore = Math.min(profile.views as number, 100) / 10;
       score += activityScore;
 
       return { profile, score };

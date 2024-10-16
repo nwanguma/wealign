@@ -10,20 +10,21 @@ export interface User {
 export interface Event {
   id: string;
   title: string;
-  description: string;
-  website: string;
-  ticket_link: string;
-  views: number;
-  banner: string;
-  event_start_date: string;
-  event_end_date: string;
-  created_at: string;
+  description?: string;
+  website?: string;
+  ticket_link?: string;
+  views?: number;
+  banner?: string;
+  event_start_date?: string;
+  event_end_date?: string;
+  created_at?: string;
   owner: Profile | null;
-  location: string | null;
-  link: string | null;
-  comments: [];
-  reactions: [];
+  location?: string | null;
+  link?: string | null;
+  comments?: [];
+  reactions?: [];
   attachment?: string;
+  type?: string;
 }
 
 export interface Article {
@@ -35,6 +36,7 @@ export interface Article {
   owner: Profile;
   comments?: [];
   reactions?: [];
+  views?: number;
 }
 
 export interface Project {
@@ -85,6 +87,7 @@ export interface Profile {
   id: string;
   first_name: string;
   last_name: string;
+  email: string;
   avatar: string | null;
   bio: string | null;
   location: string | null;
@@ -218,4 +221,9 @@ export interface IFilters {
 export interface IPagination {
   page: number;
   limit: number;
+}
+
+export interface Option {
+  value: string;
+  label: string;
 }

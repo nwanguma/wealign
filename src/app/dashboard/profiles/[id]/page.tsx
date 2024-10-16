@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 
+import { RootState } from "@/store";
 import { SkeletonCard } from "@/components/ui/SkeletonLoader";
 import { Profile } from "@/common/constants";
 import { fetchProfile } from "@/api";

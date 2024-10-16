@@ -7,9 +7,10 @@ import {
   useQueries,
   UseQueryResult,
   UseQueryOptions,
+  keepPreviousData,
 } from "@tanstack/react-query";
 
-import axiosInstance from "@/lib/axiosInstance";
+import PaginationComponent from "@/components/ui/PaginationComponent";
 import { RootState, AppDispatch } from "@/store";
 import { fetchCurrentUser } from "@/store/user";
 import { fetchConversations } from "@/store/conversations";
@@ -68,7 +69,7 @@ const MainFeed: React.FC = () => {
   });
   const [projectsPagination, setProjectsPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 1,
   });
   const [articlesPagination, setArticlesPagination] = useState({
     page: 1,
@@ -83,8 +84,7 @@ const MainFeed: React.FC = () => {
       {
         queryKey: [
           "projects",
-          projectsPagination.page,
-          projectsPagination.limit,
+          projectsPagination,
           mainFeedSettings.contentTypeFrom,
         ],
         queryFn: () =>
@@ -92,6 +92,7 @@ const MainFeed: React.FC = () => {
             projectsPagination,
             mainFeedSettings.contentTypeFrom
           ),
+        placeholderData: keepPreviousData,
       },
       {
         queryKey: [
@@ -102,6 +103,7 @@ const MainFeed: React.FC = () => {
         ],
         queryFn: () =>
           fetchEventsData(eventsPagination, mainFeedSettings.contentTypeFrom),
+        placeholderData: keepPreviousData,
       },
       {
         queryKey: [
@@ -115,6 +117,7 @@ const MainFeed: React.FC = () => {
             articlesPagination,
             mainFeedSettings.contentTypeFrom
           ),
+        placeholderData: keepPreviousData,
       },
     ] as UseQueryOptions<unknown, unknown, unknown>[],
   }) as [
@@ -222,21 +225,6 @@ const MainFeed: React.FC = () => {
     setFollowingModalIsOpen((o) => !o);
   };
 
-  const handleEventsPageChange = (newPage: number, limit: number) => {
-    if (limit < eventsTotal)
-      setEventsPagination({ limit: limit, page: newPage || 1 });
-  };
-
-  const handleProjectsPageChange = (newPage: number, limit: number) => {
-    if (limit < projectsTotal)
-      setProjectsPagination({ limit: limit, page: newPage || 1 });
-  };
-
-  const handleArticlesPageChange = (newPage: number, limit: number) => {
-    if (limit < articlesTotal)
-      setArticlesPagination({ limit: limit, page: newPage || 1 });
-  };
-
   useEffect(() => {
     if (!profilesRecommendations || !profilesRecommendations?.length)
       dispatch(fetchProfiles());
@@ -310,7 +298,7 @@ const MainFeed: React.FC = () => {
                     onClick={handleToggleFollowersModal}
                   >
                     <span>{currentUser.profile.followers?.length}</span>{" "}
-                    <span>Followers</span>
+                    <span>Folltowers</span>
                   </span>
                   <span
                     className="underline cursor-pointer"
@@ -459,33 +447,59 @@ const MainFeed: React.FC = () => {
           </div>
           {isMainfeedContentLoading && <SkeletonLoader />}
           {!isMainfeedContentLoading && (
-            <div className="space-y-5 overflow-y-auto main-feed h-screen">
-              {mainFeedSettings.contentType === "projects" &&
-                projects &&
-                projects?.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
-                ))}
-              {mainFeedSettings.contentType === "events" &&
-                events &&
-                events?.map((event) => (
-                  <div
-                    key={event.id}
-                    className="w-full border border-gray-300 rounded-lg p-4 h-48"
-                  >
-                    <EventCardPreview event={event} isPreview />
-                  </div>
-                ))}
-              {mainFeedSettings.contentType === "articles" &&
-                articles &&
-                articles?.map((article) => (
-                  <div
-                    key={article.id}
-                    className="w-full border border-gray-300 rounded-lg p-4 h-48"
-                  >
-                    <ArticleCardPreview article={article} />
-                  </div>
-                ))}
-              {/* <ProjectCard /> */}
+            <div className="overflow-y-auto main-feed h-screen">
+              {mainFeedSettings.contentType === "projects" && (
+                <div className="space-y-3">
+                  {projects &&
+                    projects?.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  <PaginationComponent
+                    data={projects || []}
+                    total={projectsTotal}
+                    setPagination={setProjectsPagination}
+                    limit={projectsPagination.limit}
+                  />
+                </div>
+              )}
+              {mainFeedSettings.contentType === "events" && (
+                <div className="space-y-3">
+                  {events &&
+                    events?.map((event) => (
+                      <div
+                        key={event.id}
+                        className="w-full border border-gray-300 rounded-lg p-4 h-48"
+                      >
+                        <EventCardPreview event={event} isPreview />
+                      </div>
+                    ))}
+                  <PaginationComponent
+                    data={events || []}
+                    total={eventsTotal}
+                    setPagination={setEventsPagination}
+                    limit={eventsPagination.limit}
+                  />
+                </div>
+              )}
+              {mainFeedSettings.contentType === "articles" && (
+                <div>
+                  {articles &&
+                    articles?.map((article) => (
+                      <div
+                        key={article.id}
+                        className="w-full border border-gray-300 rounded-lg p-4 h-48"
+                      >
+                        <ArticleCardPreview article={article} />
+                      </div>
+                    ))}
+                  <PaginationComponent
+                    data={articles || []}
+                    total={articlesTotal}
+                    setPagination={setArticlesPagination}
+                    limit={articlesPagination.limit}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -553,7 +567,7 @@ const MainFeed: React.FC = () => {
         isOpen={addProjectModalIsOpen}
         onClose={() => handleToggleAddProjectModal()}
       >
-        <CreateProjectForm />
+        <CreateProjectForm handleModalClose={handleToggleAddProjectModal} />
       </AppModal>
       <AppModal
         title="Create Article"

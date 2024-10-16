@@ -49,10 +49,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-white w-full">
       <div className="min-h-screen w-5/12 mx-auto">
-        {/* <UpdateProfileForm /> */}
         <AccountSettings />
-        {/* <CreateProjectForm /> */}
-        {/* <CreateEventForm /> */}
       </div>
     </div>
   );

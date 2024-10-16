@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import Image from "next/image";
 
 interface InputProps {
-  id: string;
+  id?: string;
   label?: string;
   type?: string;
-  value: string;
+  value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   otherClasses?: any;
   error?: string;
@@ -34,9 +33,6 @@ const Input: React.FC<InputProps> = ({
         {label && (
           <label
             htmlFor={id}
-            // className={`absolute flex  items-center space-x-2 text-sm text-custom-gray-paragraph duration-300 transform -translate-y-6 scale-75 top-3 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-8 ${
-            //   isFocused || value !== "" ? "scale-75 -translate-y-6" : ""
-            // }`}
             className="text-sm mb-1 text-gray-600 inline-block"
           >
             {icon}
@@ -59,10 +55,14 @@ const Input: React.FC<InputProps> = ({
           onBlur={() => setIsFocused(value !== "")}
           className="block py-3 rounded-xl pl-4 w-full text-sm text-gray-900 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
           placeholder={placeholder}
-          required
+          required={required}
         />
       </div>
-      {error && <p className="text-xs-sm text-red-500">{error}</p>}
+      {error && (
+        <p className="text-xs-sm text-red-500 first-letter:capitalize">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

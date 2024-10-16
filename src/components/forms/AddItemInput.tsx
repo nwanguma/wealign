@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Input from "./Input";
+import { useState } from "react";
 
 interface IAddItemInput {
   item?: any;
@@ -7,15 +8,19 @@ interface IAddItemInput {
   setItem?: any;
   setItems?: any;
   label: string;
+  tag?: string;
+  userEmail?: string;
 }
 
 const AddItemInput: React.FC<IAddItemInput> = ({
   label,
-  item,
   items,
-  setItem,
   setItems,
+  tag,
+  userEmail,
 }) => {
+  const [item, setItem] = useState("");
+
   return (
     <div className="w-full">
       <div>
@@ -24,48 +29,49 @@ const AddItemInput: React.FC<IAddItemInput> = ({
             <div className="w-full">
               <Input
                 label={label}
-                name=""
-                type=""
+                type="email"
                 onChange={(e) => {
                   setItem(e.target.value);
                 }}
-                required
               />
             </div>
           </div>
           <p
             className="mb-1 cursor-pointer h-10 px-3 flex items-center text-xs rounded bg-gray-600 text-white"
-            onClick={() => setItems((prev: any) => [...prev, item])}
+            onClick={() =>
+              setItems(
+                tag,
+                items.includes(item) || userEmail === item
+                  ? items
+                  : [...items, item]
+              )
+            }
           >
             Add
           </p>
         </div>
-        <div className="flex gap-1 flex-wrap">
+        <div className="mt-2 flex gap-1 flex-wrap">
           {items &&
-            items.map((tag: any, index: any) => {
+            items.map((email: string) => {
               return (
                 <div
-                  key={index}
-                  className="py-2 px-3 text-xs bg-primary rounded-2xl flex items-center justify-center space-x-2"
-                  onClick={() =>
-                    setItems((prev: any) =>
-                      prev.filter((item: any) => item === tag)
-                    )
-                  }
+                  key={email}
+                  className="py-1 px-3 text-xs bg-blue-100 text-blue-700 rounded flex items-center justify-center space-x-2"
                 >
-                  <span className="">{tag}</span>
+                  <span className="">{email}</span>
                   <span
                     className="cursor-pointer"
                     onClick={() => {
-                      setItems((prev: any) =>
-                        prev.filter((c: any) => item !== c)
+                      setItems(
+                        tag,
+                        items.filter((item: string) => item !== email)
                       );
                     }}
                   >
                     <Image
-                      width={10}
-                      height={10}
-                      src="/images/icons/cross.svg"
+                      width={15}
+                      height={15}
+                      src="/icons/cross.svg"
                       alt=""
                     />
                   </span>

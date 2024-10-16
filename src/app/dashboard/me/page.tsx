@@ -9,7 +9,7 @@ import { RootState } from "@/store";
 import AppModal from "@/components/ui/Modal";
 import UpdateProfileForm from "@/components/forms/UpdateProfileForm";
 import AccountsSettings from "@/components/forms/AccountsSettings";
-import { ProfileCardMain } from "@/components/ui/ProfileCard";
+import { ProfileCardMain } from "@/components/ui/ProfileCardMain";
 import { WithTooltip } from "@/components/ui/WithTooltip";
 import { Profile } from "@/common/constants";
 import { fetchProfile } from "@/api";
@@ -44,7 +44,7 @@ export default function ProfilePage() {
           <div className="flex space-x-5 p-6">
             <div className="flex-1 p-4 flex flex-col space-y-5 w-full rounded-lg">
               <div className="w-full relative">
-                <ProfileCardMain profile={profile} />
+                <ProfileCardMain profile={profile} isMain />
                 <div className="absolute -top-4 right-0">
                   <div className="flex space-x-5">
                     <div
@@ -101,7 +101,9 @@ export default function ProfilePage() {
             setUpdateProfileModalIsOpen(false);
           }}
         >
-          <AccountsSettings />
+          <AccountsSettings
+            handleModalClose={() => setAccountsSettingsModalIsOpen(false)}
+          />
         </AppModal>
       </div>
     </div>

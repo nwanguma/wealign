@@ -65,23 +65,12 @@ export default function ProjectPage() {
             {isLoading && <SkeletonLoaderPage />}
             {!isLoading && project && (
               <div className="w-full">
-                {isOwner && (
-                  <div className="absolute top-4 right-4">
-                    {WithTooltip(
-                      "Edit project",
-                      <div onClick={() => handleToggleAddProjectModal()}>
-                        <Image
-                          src="/icons/edit.svg"
-                          alt=""
-                          width={20}
-                          height={20}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
                 <div className="w-full">
-                  <ProjectCardMain project={project} />
+                  <ProjectCardMain
+                    project={project}
+                    isOwner={isOwner}
+                    toggleModal={handleToggleAddProjectModal}
+                  />
                 </div>
                 {isOwner && project && (
                   <div

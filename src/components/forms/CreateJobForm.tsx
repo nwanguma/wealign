@@ -7,7 +7,7 @@ import * as yup from "yup";
 import { Controller } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 
-import { Event, Job } from "@/common/constants";
+import { Job, Option } from "@/common/constants";
 import NativeSelect from "./NativeSelectComponent";
 import ReactSelectComponent from "./ReactSelectComponent";
 import Input from "./Input";
@@ -32,6 +32,7 @@ const schema = yup.object().shape({
   application_url: yup.string().url("Must be a valid URL"),
   location: yup.string().required("Location is required"),
   skills: yup.array(),
+  deadline: yup.mixed(),
 });
 
 const createJob = async (data: Partial<Job>) => {
@@ -58,13 +59,21 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
     website: jobsData?.website || "",
     application_url: jobsData?.application_url || "",
     location: jobsData?.location || "",
-    skills: jobsData?.skills?.map((skill) => skill.title as string) || [],
+    skills:
+      jobsData?.skills?.map((skill) => ({
+        value: skill.title,
+        label: skill.title,
+      })) || [],
+    deadline: jobsData?.deadline
+      ? new Date(jobsData?.deadline as string)
+      : new Date(),
   };
-  const { data: skills, isLoading, error } = useSkills();
+  const { data: skills } = useSkills();
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues,
   });
+  const [loading, setLoading] = useState(false);
   const {
     control,
     watch,
@@ -74,29 +83,24 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
   } = methods;
   const createJobMutation = useMutation({
     mutationFn: (data: Partial<Job>) => createJob(data),
-    onSuccess: (data: Event) => {},
+    onSuccess: () => {
+      handleModalClose && handleModalClose();
+      triggerRefetch && triggerRefetch();
+    },
     onError: (error: any) => {},
   });
-  const [deadline, setDeadline] = useState(
-    jobsData?.deadline ? new Date(jobsData?.deadline as string) : new Date()
-  );
-  const [selectedSkills, setSelectedSkills] = useState<any[]>(
-    jobsData?.skills?.map((skill) => ({
-      value: skill.title,
-      label: skill.title,
-    })) || []
-  );
 
   const skillsOptions = (skills || [])?.map((skill) => {
     return { value: skill.title, label: skill.title };
   });
 
   const onSubmit = (data: any) => {
+    setLoading(true);
+
     (async function () {
       await createJobMutation.mutate({
         ...data,
-        deadline,
-        skills: selectedSkills.map((s) => ({ title: s.label })),
+        skills: data.map((s: Option) => ({ title: s.value })),
       });
     })();
   };
@@ -123,8 +127,8 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
           </label>
           <div className="relative w-full">
             <DatePicker
-              selected={deadline}
-              onChange={(date) => setDeadline(date as Date)}
+              selected={watch("deadline") as Date}
+              onChange={(date) => setValue("deadline", date as Date)}
               className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
               placeholderText="Select start date"
             />
@@ -158,12 +162,13 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
             control={control}
             render={({ field }) => (
               <ReactSelectComponent
+                tag="skills"
                 label="Skills"
                 options={skillsOptions}
                 placeholder="Select skills"
                 error={errors.skills?.message as string}
-                setSelectedOption={setSelectedSkills}
-                selectedOption={selectedSkills}
+                setSelectedOption={setValue}
+                selectedOption={watch("skills") as Option[]}
               />
             )}
           />
@@ -209,7 +214,8 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
         />
         <div className="flex items-center space-x-2 justify-end">
           <button
-            type="submit"
+            onClick={() => handleModalClose && handleModalClose()}
+            type="button"
             className="px-6 py-2 text-sm bg-white text-gray-600 border border-gray-300 rounded-md hover:bg-slate-100"
           >
             Cancel
@@ -217,6 +223,7 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
           <button
             type="submit"
             className="px-6 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            disabled={loading}
           >
             Save Changes
           </button>

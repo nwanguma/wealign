@@ -1,10 +1,7 @@
-import React, { useState } from "react";
-import Select, { components, MultiValueProps, OptionProps } from "react-select";
+import React from "react";
 
-interface Option {
-  value: string;
-  label: string;
-}
+import Select, { components, MultiValueProps, OptionProps } from "react-select";
+import { Option } from "@/common/constants";
 
 const CustomMultiValue = (props: MultiValueProps<Option>) => {
   return (
@@ -67,6 +64,7 @@ const customStyles = {
 };
 
 const CustomSelect = ({
+  tag,
   options,
   placeholder,
   label,
@@ -80,6 +78,7 @@ const CustomSelect = ({
   error: string;
   selectedOption: Option[];
   setSelectedOption: any;
+  tag?: string;
 }) => {
   return (
     <div className="w-full">
@@ -89,7 +88,9 @@ const CustomSelect = ({
         options={options}
         value={selectedOption}
         onChange={(selected) => {
-          setSelectedOption(selected as Option[] | null);
+          tag
+            ? setSelectedOption(tag, selected)
+            : setSelectedOption(selected as Option[] | null);
         }}
         closeMenuOnSelect={false}
         placeholder={placeholder}

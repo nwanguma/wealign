@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
 
@@ -9,7 +8,6 @@ import { Event } from "@/common/constants";
 import { EventCardMain } from "@/components/ui/EventCardMain";
 import { EventCardPreview } from "@/components/ui/EventCard";
 import { RootState } from "@/store";
-import { WithTooltip } from "@/components/ui/WithTooltip";
 import { useState } from "react";
 import AppModal from "@/components/ui/Modal";
 import AddEventForm from "@/components/forms/CreateEventForm";
@@ -64,24 +62,11 @@ export default function Dashboard() {
           {isLoading && <SkeletonLoaderPage />}
           {!isLoading && event && (
             <div className="w-full">
-              {isOwner && (
-                <div className="absolute top-4 right-4">
-                  {WithTooltip(
-                    "Edit event",
-                    <div onClick={() => handleToggleAddEventModal()}>
-                      <Image
-                        src="/icons/edit.svg"
-                        alt=""
-                        width={20}
-                        height={20}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-              <div className="w-full">
-                <EventCardMain event={event} />
-              </div>
+              <EventCardMain
+                event={event}
+                isOwner={isOwner}
+                toggleModal={handleToggleAddEventModal}
+              />
               {event && isOwner && (
                 <div
                   className="w-full text-center cursor-pointer"

@@ -13,7 +13,7 @@ import ReactSelectComponent from "./ReactSelectComponent";
 import axiosInstance from "@/lib/axiosInstance";
 import TextArea from "./TextArea";
 import Input from "./Input";
-import { Project } from "@/common/constants";
+import { Project, Profile, Option } from "@/common/constants";
 import AddItemInput from "./AddItemInput";
 import { useSkills } from "@/app/hooks/useSkills";
 import { WithTooltip } from "../ui/WithTooltip";
@@ -21,22 +21,27 @@ import { getFilenameAndExtension } from "@/lib/helpers";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "../../app/globals.css";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")
-    .min(2, "Must be at least 2 characters"),
+    .min(3, "Must be at least 3 characters"),
   description: yup
     .string()
     .required("Description is required")
-    .min(2, "Must be at least 2 characters"),
+    .min(30, "Must be at least 30 characters"),
   location: yup.string().required("Location is required"),
   status: yup.string().required("Status is required"),
   website: yup.string().url("Must be a valid URL"),
   github_url: yup.string().url("Must be a valid URL"),
   skills: yup.array(),
-  attachment: yup.mixed(),
+  attachment: yup.string(),
+  collaborators: yup.array(),
+  start_date: yup.mixed(),
+  requires_feedback: yup.string(),
 });
 
 const createProject = async (data: Partial<Project>) => {
@@ -46,7 +51,6 @@ const createProject = async (data: Partial<Project>) => {
 };
 
 const updateProject = async (data: Partial<Project>, id: string) => {
-  console.log(data, "projectdata ****");
   const response = await axiosInstance.put(`/api/proxy/projects/${id}`, data);
 
   return response.data.data;
@@ -63,15 +67,28 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
   handleModalClose,
   triggerRefetch,
 }) => {
+  const user = useSelector((state: RootState) => state.user);
   const defaultValues = {
     title: data?.title || "",
     website: data?.website || "",
     github_url: data?.github_url || "",
     location: data?.location || "",
     status: data?.status || "",
-    skills: data?.skills?.map((skill) => skill.title as string) || [],
+    skills:
+      data?.skills?.map((skill) => ({
+        value: skill.title,
+        label: skill.title,
+      })) || [],
     description: data?.description || "",
     attachment: data?.attachment || "",
+    collaborators:
+      data?.collaborators?.map(
+        (collaborator: Profile) => collaborator?.email as string
+      ) || [],
+    start_date: data?.start_date
+      ? new Date(data?.start_date as string)
+      : new Date(),
+    requires_feedback: data?.requires_feeback ? "yes" : "no",
   };
 
   const methods = useForm({
@@ -86,22 +103,10 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
     setValue,
     formState: { errors },
   } = methods;
-  const { data: skills, isLoading, error } = useSkills();
-  const [bio, setBio] = useState<string>("");
-  const [selectedSkills, setSelectedSkills] = useState<any[]>(
-    data?.skills?.map((skill) => ({
-      value: skill.title,
-      label: skill.title,
-    })) || []
-  );
+  const { data: skills } = useSkills();
   const [deletedAttachment, setDeletedAttachment] = useState(false);
-  const [requireFeedback, setRequireFeedback] = useState<string>(
-    data?.requires_feeback || "no"
-  );
+  const [fileUploadLoading, setFileUploadLoading] = useState(false);
   const [attachment, setAttachment] = useState<File | null>(null);
-  const [startDate, setStartDate] = useState(
-    data?.start_date ? new Date(data?.start_date as string) : new Date()
-  );
   const [loading, setLoading] = useState(false);
 
   const updateProfileMutation = useMutation({
@@ -109,11 +114,11 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
       data
         ? updateProject(projectData, data?.id as string)
         : createProject(projectData),
-    onSuccess: (data: Project) => {
+    onSuccess: () => {
       handleModalClose && handleModalClose();
       triggerRefetch && triggerRefetch();
     },
-    onError: (error: any) => {},
+    onError: () => {},
     onSettled: () => {
       setLoading(false);
     },
@@ -124,6 +129,7 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
   });
 
   const handleAttachmentDrop = (acceptedFiles: File[]) => {
+    setFileUploadLoading(true);
     setAttachment(acceptedFiles[0]);
 
     (async function () {
@@ -140,6 +146,7 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
         }
       );
 
+      setFileUploadLoading(false);
       setValue("attachment", result?.data?.data?.url);
     })();
   };
@@ -164,10 +171,8 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
     (async function () {
       await updateProfileMutation.mutate({
         ...data,
-        skills: selectedSkills.map((s) => ({ title: s.label })),
-        requires_feedback: requireFeedback == "yes",
-        collaborators: [],
-        start_date: startDate,
+        skills: data?.skills.map((s: any) => ({ title: s.label })),
+        requires_feedback: data?.requires_feeback === "yes",
       });
     })();
   };
@@ -218,8 +223,8 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
           </label>
           <div className="relative w-full">
             <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date as Date)}
+              selected={watch("start_date") as Date}
+              onChange={(date) => setValue("start_date", date as Date)}
               className="block py-3 pl-10 rounded-xl !pr-0 !w-full text-sm text-gray-600 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
               placeholderText="Select start date"
             />
@@ -248,8 +253,8 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
               <input
                 type="radio"
                 value="yes"
-                checked={requireFeedback === "yes"}
-                onChange={() => setRequireFeedback("yes")}
+                checked={watch("requires_feedback") === "no"}
+                onChange={() => setValue("requires_feedback", "no")}
                 className="form-radio"
               />
               <span className="ml-2">Yes</span>
@@ -258,8 +263,8 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
               <input
                 type="radio"
                 value="no"
-                checked={requireFeedback === "no"}
-                onChange={() => setRequireFeedback("no")}
+                checked={watch("requires_feedback") === "yes"}
+                onChange={() => setValue("requires_feedback", "yes")}
                 className="form-radio"
               />
               <span className="ml-2">No</span>
@@ -287,12 +292,13 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
             control={control}
             render={({ field }) => (
               <ReactSelectComponent
+                tag="skills"
                 label="Skills"
                 options={skillsOptions}
                 placeholder="Select skills"
                 error={errors.skills?.message as string}
-                setSelectedOption={setSelectedSkills}
-                selectedOption={selectedSkills}
+                setSelectedOption={setValue}
+                selectedOption={watch("skills") as Option[]}
               />
             )}
           />
@@ -305,7 +311,13 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
           error={errors.description?.message as string}
           otherClasses={methods.register("description")}
         />
-        {/* <AddItemInput label="Collaborators" /> */}
+        <AddItemInput
+          label="Collaborators (if users are on the platform, they will be added)"
+          items={watch("collaborators") as any[]}
+          setItems={setValue}
+          tag="collaborators"
+          userEmail={user?.profile?.email}
+        />
         <div className="py-3">
           <label className="block text-gray-700 text-sm">
             Attachment (.docx, .doc, .pdf)
@@ -322,7 +334,7 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
             )}
           </div>
           {errors.attachment && (
-            <p className="text-red-500">
+            <p className="text-xs-sm text-red-500 first-letter:capitalize">
               {errors.attachment?.message as string}
             </p>
           )}
@@ -381,16 +393,18 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
         </div>
         <div className="flex items-center space-x-2 justify-end">
           <button
-            type="submit"
+            onClick={() => handleModalClose && handleModalClose()}
+            type="button"
             className="px-6 py-2 text-sm bg-white text-gray-600 border border-gray-300 rounded-md hover:bg-slate-100"
           >
             Cancel
           </button>
           <button
+            disabled={loading || fileUploadLoading}
             type="submit"
             className="px-6 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Save Changes
+            {data ? "Save Changes" : "Submit"}
           </button>
         </div>
       </form>

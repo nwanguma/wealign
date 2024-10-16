@@ -45,7 +45,7 @@ export const SkeletonCardRounded = () => {
 
 export const SkeletonLoader = () => {
   return (
-    <div className="flex flex-wrap gap-6">
+    <div className="flex flex-wrap gap-3">
       <SkeletonCard />
       <SkeletonCard />
       <SkeletonCard />

@@ -4,13 +4,19 @@ import DOMPurify from "dompurify";
 
 import { Article, Profile } from "@/common/constants";
 import { formatDateLong } from "@/lib/helpers";
+import { ViewsComponent } from "./ViewsComponent";
+import { WithTooltip } from "./WithTooltip";
 
 interface IArticleCardMainProps {
   article: Article;
+  isOwner?: boolean;
+  toggleModal?: () => void;
 }
 
 export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
   article,
+  isOwner,
+  toggleModal,
 }) => {
   const {
     id,
@@ -21,6 +27,7 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
     reactions: articleReactions,
     created_at,
     owner,
+    views,
   } = article;
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -42,6 +49,18 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
 
   return (
     <div className="relative space-y-5">
+      <div className="absolute top-0 right-4">
+        <div className="flex space-x-3">
+          <ViewsComponent views={views as number} />
+          {isOwner &&
+            WithTooltip(
+              "Edit event",
+              <div onClick={() => toggleModal && toggleModal()}>
+                <Image src="/icons/edit.svg" alt="" width={20} height={20} />
+              </div>
+            )}
+        </div>
+      </div>
       <div className="flex items-center space-x-5">
         <div className="relative w-2/3 h-80">
           <Image

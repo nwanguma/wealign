@@ -177,7 +177,7 @@ export default function Projects() {
         isOpen={addProjectModalIsOpen}
         onClose={() => handleToggleAddProjectModal()}
       >
-        <CreateProjectForm />
+        <CreateProjectForm handleModalClose={handleToggleAddProjectModal} />
       </AppModal>
     </div>
   );

@@ -1,6 +1,12 @@
-import { IPagination } from "@/app/dashboard/events/page";
-import { Project, Event, Profile, Job, Article } from "@/common/constants";
 import { useRef } from "react";
+import {
+  Project,
+  Event,
+  Profile,
+  Job,
+  Article,
+  IPagination,
+} from "@/common/constants";
 
 interface IPaginationComponentProps {
   data: Project[] | Event[] | Profile[] | Job[] | Article[];
@@ -15,7 +21,7 @@ const PaginationComponent: React.FC<IPaginationComponentProps> = ({
   setPagination,
   limit,
 }) => {
-  const paginationRef = useRef(limit);
+  const paginationRef = useRef<number>(limit);
   const fixedLimit = paginationRef.current;
 
   return (
