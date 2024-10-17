@@ -6,8 +6,9 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { User } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
 import { Job } from "@/common/constants";
-import { ProfilePreviewCard } from "@/components/ui/ProfileCard";
-import { JobCard, JobCardMain } from "@/components/ui/JobCard";
+import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
+import { JobCard } from "@/components/ui/JobCard";
+import { JobCardMain } from "@/components/ui/JobCardMain";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 

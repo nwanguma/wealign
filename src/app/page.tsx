@@ -17,14 +17,9 @@ import { AppDispatch, RootState } from "@/store";
 import CreateProjectForm from "@/components/forms/CreateProjectForm";
 import AddEventForm from "@/components/forms/CreateEventForm";
 import { EventCardPreview } from "@/components/ui/EventCard";
-import { ProfilePreviewCard } from "@/components/ui/ProfileCard";
+import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
 import { ActivityComponent } from "@/components/ui/Activity";
-import {
-  fetchProfiles,
-  fetchEvents,
-  fetchProjects,
-  fetchJobs,
-} from "@/store/recommendations";
+import { fetchRecommendations } from "@/store/recommendations";
 import { User } from "@/common/constants";
 import AddItemButton from "@/components/ui/AddItemButton";
 import { Activity } from "@/common/constants";

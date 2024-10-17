@@ -66,6 +66,7 @@ export default function Dashboard() {
                 event={event}
                 isOwner={isOwner}
                 toggleModal={handleToggleAddEventModal}
+                triggerRefetch={refetch}
               />
               {event && isOwner && (
                 <div

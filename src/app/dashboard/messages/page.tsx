@@ -70,7 +70,6 @@ export default function MessagesPage() {
 
   useEffect(() => {
     const handleReceiveMessage = (message: any) => {
-      console.log("yes", message);
       if (activeConversation) {
         setActiveConversation((prev: Conversation) => ({
           ...prev!,
@@ -82,7 +81,6 @@ export default function MessagesPage() {
 
     socket.on("connect", () => {
       if (activeConversation) {
-        console.log(activeConversation, "lllll");
         const roomId = activeConversation.id;
         socket.emit("joinRoom", roomId);
       }

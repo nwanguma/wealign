@@ -63,6 +63,7 @@ export default function ArticlePage() {
                 article={article}
                 isOwner={isOwner}
                 toggleModal={handleToggleUpdateArticleModal}
+                triggerRefetch={refetch}
               />
               {isOwner && (
                 <div
@@ -93,7 +94,10 @@ export default function ArticlePage() {
                         key={article.id}
                         className="border-b border-b-gray-200 py-3"
                       >
-                        <ArticleCardPreview article={article} isPreview />
+                        <ArticleCardPreview
+                          article={article}
+                          descriptionLimit={40}
+                        />
                       </div>
                     );
                   })}

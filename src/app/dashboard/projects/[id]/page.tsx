@@ -70,6 +70,7 @@ export default function ProjectPage() {
                     project={project}
                     isOwner={isOwner}
                     toggleModal={handleToggleAddProjectModal}
+                    triggerRefetch={refetch}
                   />
                 </div>
                 {isOwner && project && (

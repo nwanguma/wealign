@@ -7,18 +7,20 @@ import { truncateString, timeAgo, stripHtml } from "@/lib/helpers";
 interface IArticleCardPreviewProps {
   article: Partial<Article>;
   isPreview?: boolean;
+  descriptionLimit?: number;
 }
 
 export const ArticleCardPreview: React.FC<IArticleCardPreviewProps> = ({
   article,
   isPreview,
+  descriptionLimit,
 }) => {
   const { id, banner, title, body, comments, reactions, created_at, owner } =
     article;
   return (
     <div className="space-x-4 h-full relative">
       <Link href={`/dashboard/articles/${id}`}>
-        <div className="h-full flex items-start space-x-5">
+        <div className="h-full flex items-center space-x-5">
           <div className="max-w-20"></div>
           <div className="w-1/3 h-full min-h-20 relative rounded-lg">
             <Image
@@ -50,7 +52,10 @@ export const ArticleCardPreview: React.FC<IArticleCardPreviewProps> = ({
               </div>
               {!isPreview && (
                 <span className="text-sm text-custom-gray-paragraph font-light leading-snug">
-                  {truncateString(stripHtml(body as string), 80)}
+                  {truncateString(
+                    stripHtml(body as string),
+                    descriptionLimit || 80
+                  )}
                 </span>
               )}
             </div>

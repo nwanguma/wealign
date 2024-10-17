@@ -6,20 +6,24 @@ import { formatDateLong, getFilenameAndExtension } from "@/lib/helpers";
 import { WithTooltip } from "./WithTooltip";
 import { Event } from "@/common/constants";
 import { ViewsComponent } from "./ViewsComponent";
+import { Comments } from "./Comments";
 
 interface IEventCardMainProps {
   event: Event;
   isMain?: boolean;
   isOwner?: boolean;
   toggleModal?: () => void;
+  triggerRefetch?: () => void;
 }
 
 export const EventCardMain: React.FC<IEventCardMainProps> = ({
   event,
   isOwner,
   toggleModal,
+  triggerRefetch,
 }) => {
   const {
+    id,
     banner,
     title,
     location,
@@ -27,30 +31,14 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
     website,
     event_start_date,
     event_end_date,
+    comments,
+    reactions,
     owner,
     attachment,
     ticket_link,
     link: meeting_link,
     views,
   } = event;
-
-  const [showCommentInput, setShowCommentInput] = useState(false);
-  const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState([
-    { id: 1, author: "John Doe", text: "This event looks amazing!" },
-    { id: 2, author: "Jane Smith", text: "Can't wait to attend!" },
-    { id: 3, author: "Emily Rose", text: "What a fantastic initiative!" },
-  ]);
-
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      setComments([
-        ...comments,
-        { id: comments.length + 1, author: "You", text: newComment },
-      ]);
-      setNewComment("");
-    }
-  };
 
   return (
     <div className="relative space-y-5">
@@ -80,14 +68,16 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
             <h3 className="text-sm text-gray-600 font-bold">Starts</h3>
             <div className="flex space-x-2 items-center">
               <span className="text-xs">
-                {formatDateLong(event_start_date)}
+                {formatDateLong(event_start_date as string)}
               </span>
             </div>
           </div>
           <div className="space-y-1">
             <h3 className="text-sm text-gray-600 font-bold">Ends</h3>
             <div className="flex space-x-2 items-center">
-              <span className="text-xs">{formatDateLong(event_end_date)}</span>
+              <span className="text-xs">
+                {formatDateLong(event_end_date as string)}
+              </span>
             </div>
           </div>
           <div className="space-y-1">
@@ -128,9 +118,9 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
       </div>
       <div className="space-y-2 py-2 border-b border-gray-200">
         <span className="text-xs font-medium rounded text-gray-700 bg-green-200 py-1 px-1">
-          {new Date(event_start_date) > new Date()
+          {new Date(event_start_date as string) > new Date()
             ? "Not started"
-            : new Date(event_end_date) < new Date()
+            : new Date(event_end_date as string) < new Date()
             ? "Event Ended"
             : "In progress"}
         </span>
@@ -183,74 +173,13 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
           </div>
         </div>
       )}
-      {/* Comments Section */}
-      <div className="space-y-2 p-3 rounded-lg">
-        <h3 className="text-sm font-semibold underline">
-          Comments ({comments.length})
-        </h3>
-        <div className="space-y-3 border border-gray-300 rounded-lg p-1">
-          {comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="px-3 py-2 rounded-lg flex items-center space-x-3 border-b border-gray-100  justify-between"
-            >
-              <div className="flex items-center space-x-2">
-                <div className="border border-gray-300 p-1 rounded-full">
-                  <Image
-                    src="/images/test-avatar-3.jpg"
-                    width={35}
-                    height={35}
-                    alt="avatar"
-                    className="rounded-full"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <p className="text-xs text-custom-gray-paragraph font-normal">
-                      {comment.author}
-                    </p>
-                    <span
-                      className="inline-block w-0.5 h-0.5 rounded-full bg-gray-900"
-                      style={{ width: "3px", height: "3px" }}
-                    ></span>
-                    <span
-                      className="text-xs text-custom-gray-paragraph"
-                      style={{ fontSize: "11px" }}
-                    >
-                      30th Jul 2024
-                    </span>
-                  </div>
-                  <p
-                    className="text-gray-800 text-xs"
-                    style={{ fontSize: "13px" }}
-                  >
-                    {comment.text}
-                  </p>
-                </div>
-              </div>
-              <div className="text-xs">
-                {/* <Image src="/icons/bin.svg" width={18} height={18} alt="" /> */}
-                <span className="text-red-400 underline">Delete</span>
-              </div>
-            </div>
-          ))}
-          <div className="flex items-center space-x-3 px-3 pb-2 border-green-500">
-            <input
-              type="text"
-              placeholder="Add a comment..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-custom-gray-paragraph rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
-            />
-            {/* <button
-              onClick={handleAddComment}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-            >
-              Post
-            </button> */}
-          </div>
-        </div>
-      </div>
+      <Comments
+        triggerRefetch={triggerRefetch}
+        resource="events"
+        resourceId={id}
+        comments={comments}
+        reactions={reactions}
+      />
     </div>
   );
 };

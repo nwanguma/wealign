@@ -48,6 +48,7 @@ async function handler(req: Request) {
         "X-Content-Type-Options": "nosniff",
         "X-Frame-Options": "DENY",
         "X-XSS-Protection": "1; mode=block",
+        "x-client-api-key": process.env.CLIENT_API_KEY,
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "Content-Security-Policy": `default-src 'self'; script-src 'nonce-${nonce}'`,
         Authorization:

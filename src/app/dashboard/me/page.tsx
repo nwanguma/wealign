@@ -44,7 +44,11 @@ export default function ProfilePage() {
           <div className="flex space-x-5 p-6">
             <div className="flex-1 p-4 flex flex-col space-y-5 w-full rounded-lg">
               <div className="w-full relative">
-                <ProfileCardMain profile={profile} isMain />
+                <ProfileCardMain
+                  profile={profile}
+                  isMain
+                  triggerRefetch={refetch}
+                />
                 <div className="absolute -top-4 right-0">
                   <div className="flex space-x-5">
                     <div

@@ -40,6 +40,11 @@ export const authOptions: NextAuthOptions = {
             {
               email: credentials.email,
               password: credentials.password,
+            },
+            {
+              headers: {
+                "x-client-api-key": process.env.CLIENT_API_KEY,
+              },
             }
           );
 
@@ -125,11 +130,12 @@ async function refreshAccessToken(token: Token): Promise<Token> {
       {
         headers: {
           Authorization: `Bearer ${token?.accessToken}`,
+          "x-client-api-key": process.env.CLIENT_API_KEY,
         },
       }
     );
 
-    const refreshedTokens = response.data;
+    const refreshedTokens = response.data.data;
 
     return {
       ...token,

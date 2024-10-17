@@ -7,7 +7,7 @@ import { User } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
 import { Project } from "@/common/constants";
 import { ProjectCard } from "@/components/ui/ProjectCard";
-import { ProjectCardMain } from "@/components/ui/ProjectCard";
+import { ProjectCardMain } from "@/components/ui/ProjectCardMain";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 
@@ -69,30 +69,14 @@ export default function EventPage() {
           <div className="flex space-x-5 p-6">
             <div className="flex-1 p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg">
               <div className="w-full">
-                <ProjectCardMain
-                  id={project.id as string}
-                  title={project.title}
-                  description={project.description}
-                  website={project.website}
-                  github_url={project.github_url}
-                  created_at={project.created_at}
-                  collaborators={project.collaborators}
-                  skills={project.skills}
-                  like_count={project.likes?.length}
-                  comment_count={project.comments?.length}
-                  likes={project.likes}
-                  comments={project.comments}
-                  owner={project.owner}
-                  start_date={project.start_date}
-                  status={project.status}
-                />
+                <ProjectCardMain project={project} />
               </div>
             </div>
             <aside className="w-1/3 space-y-5">
               {projectRecommendations?.length > 0 && (
                 <div className="p-4 bg-white rounded-lg border border-gray-300">
                   <h3 className="font-semibold mb-3 text-gray-700 text-base">
-                    Who to Follow
+                    Projects for you
                   </h3>
                   <div className="space-y-4">
                     {projectRecommendations &&
@@ -102,13 +86,7 @@ export default function EventPage() {
                             key={project.id}
                             className="border-b border-b-gray-200 pb-4 last:border-0"
                           >
-                            <ProjectCard
-                              id={project.id}
-                              title={project.title}
-                              description={project.description}
-                              website={project.website}
-                              created_at={project.created_at}
-                            />
+                            <ProjectCard project={project} />
                           </div>
                         );
                       })}

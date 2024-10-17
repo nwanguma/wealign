@@ -12,6 +12,7 @@ import {
   ProfilesWithPagination,
   IPagination,
   IFilters,
+  Comment,
 } from "@/common/constants";
 
 export const fetchActivities = async (): Promise<Activity[]> => {
@@ -46,7 +47,7 @@ export const fetchEventsData = async (
 export const fetchProjectsData = async (
   pagination: any,
   contentType: string
-): Promise<ProjectsWithPagination[]> => {
+): Promise<ProjectsWithPagination> => {
   try {
     const response = await axiosInstance.get("/api/proxy/projects", {
       params: {
@@ -65,7 +66,7 @@ export const fetchProjectsData = async (
 export const fetchArticlesData = async (
   pagination: any,
   contentType: string
-): Promise<ArticlesWithPagination[]> => {
+): Promise<ArticlesWithPagination> => {
   try {
     const response = await axiosInstance.get("/api/proxy/articles", {
       params: {
@@ -234,4 +235,40 @@ export const initiateConversation = async (recipientId: string) => {
   );
 
   return response.data?.data;
+};
+
+export const createComment = async (
+  resource: string,
+  resourceId: string,
+  data: Partial<Comment>
+) => {
+  const response = await axiosInstance.post(
+    `/api/proxy/${resource}/${resourceId}/comments`,
+    data
+  );
+
+  return response.data.data;
+};
+
+export const createReaction = async (resource: string, resourceId: string) => {
+  const response = await axiosInstance.post(
+    `/api/proxy/${resource}/${resourceId}/reactions`,
+    {
+      type: "like",
+    }
+  );
+
+  return response.data.data;
+};
+
+export const deleteComment = async (
+  resource: string,
+  resourceId: string,
+  commentId: string
+) => {
+  const response = await axiosInstance.delete(
+    `/api/proxy/${resource}/${resourceId}/${commentId}/comments`
+  );
+
+  return response.data.data;
 };

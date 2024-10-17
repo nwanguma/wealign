@@ -17,6 +17,8 @@ import PaginationComponent from "@/components/ui/PaginationComponent";
 import ContentWrapper from "@/components/ui/ContentWrapper";
 import { SkeletonLoaderGrid } from "@/components/ui/SkeletonLoader";
 import { fetchProfiles } from "@/api";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export default function Profiles() {
   const [pagination, setPagination] = useState({ page: 1, limit: 5 });
@@ -39,6 +41,7 @@ export default function Profiles() {
     queryFn: () => fetchProfiles(pagination, filters as IFilters),
     placeholderData: keepPreviousData,
   });
+  const user = useSelector((state: RootState) => state.user);
 
   const { data: skills } = useSkills();
 
@@ -82,8 +85,8 @@ export default function Profiles() {
             {!isLoading && (
               <ContentWrapper data={profiles as Profile[]}>
                 {profilesData &&
-                  (profiles as Profile[])?.map(
-                    ({
+                  (profiles as Profile[])?.map((profile) => {
+                    const {
                       first_name,
                       last_name,
                       avatar,
@@ -92,7 +95,16 @@ export default function Profiles() {
                       title,
                       heading,
                       skills,
-                    }) => (
+                      user_id,
+                    } = profile;
+                    let hasFollowed = false;
+
+                    if (user)
+                      hasFollowed = (user.profile?.following || [])
+                        .map((following) => following.profile_id)
+                        .includes(id);
+
+                    return (
                       <div
                         key={id}
                         className="w-full border border-gray-300 rounded-lg p-3"
@@ -105,10 +117,12 @@ export default function Profiles() {
                           id={id}
                           bio={bio}
                           skills={skills as Skill[]}
+                          user_id={user_id}
+                          hasFollowed={hasFollowed}
                         />
                       </div>
-                    )
-                  )}
+                    );
+                  })}
               </ContentWrapper>
             )}
             {isLoading && <SkeletonLoaderGrid />}

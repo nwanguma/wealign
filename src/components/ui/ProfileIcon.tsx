@@ -88,6 +88,8 @@ export default function ProfileIcon({ avatar }: { avatar?: string | null }) {
               <li
                 className="p-2 bg-slate-50 rounded-lg flex items-start space-x-2 justify-between"
                 onClick={() => {
+                  localStorage.removeItem("initialDataFetched");
+
                   signOut();
                   handleSignOut();
                 }}

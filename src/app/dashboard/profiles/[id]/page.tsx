@@ -11,6 +11,7 @@ import { fetchProfile } from "@/api";
 import { SkeletonLoaderPage } from "@/components/ui/SkeletonLoader";
 import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
 import { ProfileCardMain } from "@/components/ui/ProfileCardMain";
+import { getHasFollowed } from "@/lib/helpers";
 
 export default function ProfilePage() {
   const { recommendations, user } = useSelector((state: RootState) => ({
@@ -25,6 +26,7 @@ export default function ProfilePage() {
   const id = params?.id;
 
   const {
+    refetch,
     data: profile,
     error,
     isLoading,
@@ -35,16 +37,16 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen w-full bg-white">
-      <div className="flex space-x-5 p-6">
-        <div className="flex-1 p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg">
+      <div className="flex space-x-5 p-6 w-9/12 mx-auto">
+        <div className="flex-1 p-4 flex flex-col space-y-5 w-full rounded-lg">
           {isLoading && <SkeletonLoaderPage />}
           {!isLoading && profile && (
             <div className="w-full">
-              <ProfileCardMain profile={profile} />
+              <ProfileCardMain profile={profile} triggerRefetch={refetch} />
             </div>
           )}
         </div>
-        <aside className="w-1/3 space-y-5">
+        {/* <aside className="w-4/12 space-y-5">
           {isRecommendationsLoading && <SkeletonCard />}
           {!isRecommendationsLoading && (
             <div className="p-4 bg-white rounded-lg border border-gray-300">
@@ -56,6 +58,11 @@ export default function ProfilePage() {
                   [...profileRecommendations]
                     .slice(0, 4)
                     .map((profile: Profile) => {
+                      const hasFollowed = getHasFollowed(
+                        user?.profile,
+                        profile.id
+                      );
+
                       return (
                         <div
                           key={profile.id}
@@ -65,6 +72,9 @@ export default function ProfilePage() {
                             name={profile.first_name + " " + profile.last_name}
                             title={profile.title}
                             profile_id={profile.id}
+                            hasFollowed={hasFollowed}
+                            user_id={profile.user_id}
+                            avatar={profile.avatar || ""}
                           />
                         </div>
                       );
@@ -72,7 +82,7 @@ export default function ProfilePage() {
               </div>
             </div>
           )}
-        </aside>
+        </aside> */}
       </div>
     </div>
   );

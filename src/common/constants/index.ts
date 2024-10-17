@@ -21,10 +21,17 @@ export interface Event {
   owner: Profile | null;
   location?: string | null;
   link?: string | null;
-  comments?: [];
-  reactions?: [];
+  comments: Comment[];
+  reactions: [];
   attachment?: string;
   type?: string;
+}
+
+export interface Comment {
+  text: string;
+  owner: Partial<Profile>;
+  created_at: string;
+  id: string;
 }
 
 export interface Article {
@@ -34,7 +41,7 @@ export interface Article {
   banner: string;
   created_at: string;
   owner: Profile;
-  comments?: [];
+  comments: Comment[];
   reactions?: [];
   views?: number;
 }
@@ -49,7 +56,7 @@ export interface Project {
   collaborators?: Profile[];
   skills?: Skill[];
   reactions?: any[];
-  comments?: any[];
+  comments?: Comment[];
   owner: Profile;
   start_date?: string;
   status?: string;
@@ -69,8 +76,8 @@ export interface Job {
   created_at: string;
   skills?: Skill[];
   likes?: any[];
-  comments?: any[];
-  reactions?: any[];
+  comments: Comment[];
+  reactions: any[];
   owner: Profile;
   deadline?: string;
   status?: string;
@@ -101,8 +108,8 @@ export interface Profile {
   title: string;
   heading: string;
   views?: number;
-  followers?: Profile[];
-  following?: Profile[];
+  followers?: Follower[];
+  following?: Follower[];
   comments?: any[];
   reactions?: any[];
   events?: Event[];
@@ -115,6 +122,16 @@ export interface Profile {
   mentor_note?: string;
   requires_update?: boolean;
   visibility_status?: string;
+}
+
+export interface Follower {
+  profile_id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  avatar?: string;
+  title?: string;
+  user_id?: string;
 }
 
 export enum ActivityTypes {

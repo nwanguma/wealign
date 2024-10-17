@@ -5,7 +5,6 @@ import userReducer from "./user";
 import uiReducer from "./ui";
 import recommendationsReducer from "./recommendations";
 import conversationsReducer from "./conversations";
-import { signOut } from "next-auth/react";
 
 const persistConfig = {
   key: "root",

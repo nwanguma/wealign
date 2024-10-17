@@ -11,7 +11,7 @@ const recommendJobs = ({
   const today = new Date();
 
   return jobs
-    .map((job) => {
+    ?.map((job) => {
       let score = 0;
 
       const daysUntilJobDeadline =
@@ -22,7 +22,7 @@ const recommendJobs = ({
       const skillMatches = job.description
         ?.split(" ")
         .filter((word) =>
-          userProfile.skills.map((skill: Skill) => skill.title).includes(word)
+          userProfile.skills?.map((skill: Skill) => skill.title).includes(word)
         ).length;
       score += skillMatches * 5;
 
@@ -42,7 +42,7 @@ const recommendJobs = ({
       return { job, score };
     })
     .sort((a, b) => b.score - a.score)
-    .map((result) => result.job);
+    ?.map((result) => result.job);
 };
 
 export default recommendJobs;

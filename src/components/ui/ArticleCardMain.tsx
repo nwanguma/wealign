@@ -1,56 +1,41 @@
 import Image from "next/image";
-import { useState } from "react";
 import DOMPurify from "dompurify";
 
 import { Article, Profile } from "@/common/constants";
 import { formatDateLong } from "@/lib/helpers";
 import { ViewsComponent } from "./ViewsComponent";
 import { WithTooltip } from "./WithTooltip";
+import { Comments } from "./Comments";
 
 interface IArticleCardMainProps {
   article: Article;
   isOwner?: boolean;
   toggleModal?: () => void;
+  triggerRefetch?: () => void;
 }
 
 export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
   article,
   isOwner,
   toggleModal,
+  triggerRefetch,
 }) => {
   const {
     id,
     banner,
     title,
     body,
-    comments: articleComments,
-    reactions: articleReactions,
+    comments,
+    reactions,
     created_at,
     owner,
     views,
   } = article;
-  const [showCommentInput, setShowCommentInput] = useState(false);
-  const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState([
-    { id: 1, author: "John Doe", text: "This event looks amazing!" },
-    { id: 2, author: "Jane Smith", text: "Can't wait to attend!" },
-    { id: 3, author: "Emily Rose", text: "What a fantastic initiative!" },
-  ]);
-
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      setComments([
-        ...comments,
-        { id: comments.length + 1, author: "You", text: newComment },
-      ]);
-      setNewComment("");
-    }
-  };
 
   return (
     <div className="relative space-y-5">
       <div className="absolute top-0 right-4">
-        <div className="flex space-x-3">
+        <div className="flex space-x-2">
           <ViewsComponent views={views as number} />
           {isOwner &&
             WithTooltip(
@@ -64,31 +49,31 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
       <div className="flex items-center space-x-5">
         <div className="relative w-2/3 h-80">
           <Image
-            src={`/images/test-event-5.png`}
+            src={banner || `/images/test-event-5.png`}
             alt="event banner"
             className="rounded-lg"
             layout="fill"
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-4">
           <div className="space-y-1">
-            <h3 className="text-sm text-gray-600 font-bold">Author</h3>
+            <h3 className="text-sm text-gray-400">Author</h3>
             <div className="flex space-x-2 items-center">
-              <span className="text-sm text-gray-400 font-bold">
+              <span className="text-sm text-gray-600">
                 {(owner as Profile).first_name} {(owner as Profile).last_name}
               </span>
             </div>
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm text-gray-600 font-bold">Posted</h3>
+            <h3 className="text-sm text-gray-400">Posted</h3>
             <div className="flex space-x-2 items-center">
-              <span className="text-sm text-gray-400 font-bold">
+              <span className="text-sm text-gray-600">
                 {formatDateLong(created_at)}
               </span>
             </div>
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm text-gray-600 font-bold">Share</h3>
+            <h3 className="text-sm text-gray-400">Share</h3>
             <div className="flex space-x-3">
               {["linkedin", "google", "facebook", "twitter"].map((platform) => (
                 <Image
@@ -115,74 +100,13 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(body) }}
         />
       </div>
-      {/* Comments Section */}
-      <div className="space-y-2 p-3 rounded-lg">
-        <h3 className="text-sm font-semibold underline">
-          Comments ({comments.length})
-        </h3>
-        <div className="space-y-3 border border-gray-300 rounded-lg p-1">
-          {comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="px-3 py-2 rounded-lg flex items-center space-x-3 border-b border-gray-100  justify-between"
-            >
-              <div className="flex items-center space-x-2">
-                <div className="border border-gray-300 p-1 rounded-full">
-                  <Image
-                    src="/images/test-avatar-3.jpg"
-                    width={35}
-                    height={35}
-                    alt="avatar"
-                    className="rounded-full"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <p className="text-xs text-custom-gray-paragraph font-normal">
-                      {comment.author}
-                    </p>
-                    <span
-                      className="inline-block w-0.5 h-0.5 rounded-full bg-gray-900"
-                      style={{ width: "3px", height: "3px" }}
-                    ></span>
-                    <span
-                      className="text-xs text-custom-gray-paragraph"
-                      style={{ fontSize: "11px" }}
-                    >
-                      30th Jul 2024
-                    </span>
-                  </div>
-                  <p
-                    className="text-gray-800 text-xs"
-                    style={{ fontSize: "13px" }}
-                  >
-                    {comment.text}
-                  </p>
-                </div>
-              </div>
-              <div className="text-xs">
-                {/* <Image src="/icons/bin.svg" width={18} height={18} alt="" /> */}
-                <span className="text-red-400 underline">Delete</span>
-              </div>
-            </div>
-          ))}
-          <div className="flex items-center space-x-3 px-3 pb-2 border-green-500">
-            <input
-              type="text"
-              placeholder="Add a comment..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-custom-gray-paragraph rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
-            />
-            {/* <button
-              onClick={handleAddComment}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-            >
-              Post
-            </button> */}
-          </div>
-        </div>
-      </div>
+      <Comments
+        resource="articles"
+        resourceId={id}
+        triggerRefetch={triggerRefetch}
+        comments={comments}
+        reactions={reactions}
+      />
     </div>
   );
 };

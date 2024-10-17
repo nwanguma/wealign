@@ -20,12 +20,14 @@ import { SkeletonLoader } from "./SkeletonLoader";
 import ShareComponent from "./ShareComponent";
 import { ArticleCardPreview } from "./ArticleCard";
 import { ViewsComponent } from "./ViewsComponent";
+import { Comments } from "./Comments";
 
 interface IProfileCardMainProps {
   profile: Profile;
   isMain?: boolean;
   isOwner?: boolean;
   toggleModal?: () => void;
+  triggerRefetch?: () => void;
 }
 
 export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
@@ -33,6 +35,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
   isMain,
   isOwner,
   toggleModal,
+  triggerRefetch,
 }) => {
   const {
     first_name,
@@ -392,58 +395,13 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
               )}
             </div>
           )}
-          {!comments && (
-            <div className="space-y-2 p-3 rounded-lg">
-              <h3 className="text-sm font-medium underline">
-                Comments ({(comments as any[]).length})
-              </h3>
-              <div className="space-y-3 border border-gray-300 rounded-lg p-1">
-                {(comments as any[]).map((comment: any) => (
-                  <div
-                    key={comment.id}
-                    className="px-3 py-2 rounded-lg flex items-center space-x-3 border-b border-gray-100  justify-between"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <div className="border border-gray-300 p-1 rounded-full">
-                        <Image
-                          src="/images/test-avatar-3.jpg"
-                          width={30}
-                          height={30}
-                          alt="avatar"
-                          className="rounded-full"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-custom-gray-paragraph">
-                          {comment.author}
-                        </p>
-                        <p className="text-gray-700 text-sm">{comment.text}</p>
-                      </div>
-                    </div>
-                    <div className="text-xs">
-                      {/* <Image src="/icons/bin.svg" width={18} height={18} alt="" /> */}
-                      <span className="text-red-400 underline">Delete</span>
-                    </div>
-                  </div>
-                ))}
-                <div className="flex items-center space-x-3 px-3 pb-2 border-green-500">
-                  <input
-                    type="text"
-                    placeholder="Add a comment..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-custom-gray-paragraph rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
-                  />
-                  {/* <button
-              onClick={handleAddComment}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-            >
-              Post
-            </button> */}
-                </div>
-              </div>
-            </div>
-          )}
+          <Comments
+            resource="profiles"
+            resourceId={id}
+            triggerRefetch={triggerRefetch}
+            comments={comments}
+            reactions={reactions}
+          />
         </div>
       )}
       {requires_update && <SkeletonLoader />}

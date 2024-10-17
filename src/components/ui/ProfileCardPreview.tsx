@@ -1,38 +1,16 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useMutation } from "@tanstack/react-query";
-import { usePathname, useSearchParams } from "next/navigation";
 
-import { Article, mapLanguageToFlag, Skill } from "@/common/constants";
-import { AppDispatch, RootState } from "@/store";
-import { fetchProfiles } from "@/store/recommendations";
-import { addToConversations } from "@/store/conversations";
-import { getFilenameAndExtension } from "@/lib/helpers";
-import { Profile, Event, Project, Job } from "@/common/constants";
-
-import { EventCardPreview } from "./EventCard";
-import { ProjectCard } from "./ProjectCard";
-import { JobCard } from "./JobCard";
-import { WithTooltip } from "./WithTooltip";
-import { SkeletonLoader } from "./SkeletonLoader";
-import ShareComponent from "./ShareComponent";
-import { ArticleCardPreview } from "./ArticleCard";
-import { initiateConversation, followUser } from "@/api";
+import { useFollow } from "@/app/hooks/useFollow";
 
 interface IProfilePreviewCardProps {
   profile_id: string;
   user_id?: string;
   name: string;
   title: string;
+  avatar?: string;
   isPreview?: boolean;
   hasFollowed?: boolean;
-}
-
-interface JustFollowed {
-  [key: string]: boolean;
 }
 
 export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
@@ -40,64 +18,18 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
   user_id,
   name,
   title,
+  avatar,
   hasFollowed,
 }) => {
-  const router = useRouter();
-  const { conversations } = useSelector((state: RootState) => ({
-    conversations: state.conversations.data,
-  }));
-  const dispatch = useDispatch<AppDispatch>();
-  const [justFollowed, setJustFollowed] = useState<JustFollowed>({});
-  const followMutation = useMutation({
-    mutationFn: (profileId: string) => followUser(profileId),
-    onSuccess: (data, profileId) => {
-      setJustFollowed((prevState) => ({
-        ...prevState,
-        [profileId]: true,
-      }));
-
-      dispatch(fetchProfiles());
-    },
-    onError: (error: any) => {
-      console.error("Error following the user:", error);
-    },
-  });
-  const initiateConversationsMutation = useMutation({
-    mutationFn: (recipientId: string) => initiateConversation(recipientId),
-    onSuccess: (data) => {
-      const isExistingConversation = conversations.find(
-        (conversation) => conversation.id === data.id
-      );
-
-      if (isExistingConversation) {
-        router.push(`/dashboard/messages/${data.id}`);
-      } else {
-        dispatch(addToConversations(data));
-
-        setTimeout(() => {
-          router.push("/dashboard/messages");
-        }, 2000);
-      }
-    },
-    onError: (error: any) => {
-      // console.error("Error following the user:", error);
-    },
-  });
-
-  const handleFollow = (profileId: string) => {
-    followMutation.mutate(profileId);
-  };
-
-  const handleInitiateConversations = (recipientId: string) => {
-    initiateConversationsMutation.mutate(recipientId);
-  };
+  const { handleInitiateConversations, handleFollow, justFollowed } =
+    useFollow();
 
   return (
     <div className="flex items-center justify-between">
       <div className="flex-1 flex items-center space-x-2">
         <div className="border border-gray-300 p-1 rounded-full">
           <Image
-            src="/images/test-avatar-3.jpg"
+            src={avatar || "/images/test-avatar-2"}
             width={40}
             height={40}
             alt="avatar"
@@ -105,7 +37,12 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
           />
         </div>
         <div className="flex flex-col flex-1">
-          <span className="font-app-medium text-sm">{name}</span>
+          <Link
+            className="font-app-medium text-sm"
+            href={`/dashboard/profiles/${profile_id}`}
+          >
+            {name}
+          </Link>
           <span className="text-xs text-custom-gray-paragraph">{title}</span>
         </div>
       </div>
@@ -113,7 +50,7 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
         {!hasFollowed && !justFollowed[profile_id] && (
           <button
             onClick={() => handleFollow(profile_id)}
-            className="flex items-center p-3 shadow bg-white border border-gray-300 text-sm rounded-full hover:bg-gray-100 text-blue-700"
+            className="flex items-center p-2 bg-white border border-gray-300 text-sm rounded-full hover:bg-gray-100 text-blue-700"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +58,7 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
               version="1.1"
               id="Capa_1"
               viewBox="0 0 45.902 45.902"
-              className="w-5 h-5"
+              className="w-4 h-4"
             >
               <g>
                 <g>
@@ -148,12 +85,12 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
         )}
         <button
           onClick={() => handleInitiateConversations(user_id as string)}
-          className="flex items-center p-3 bg-white border  shadow border-gray-300 text-blue-700 text-sm hover:bg-gray-100 rounded-full"
+          className="flex items-center p-2 bg-white border border-gray-300 text-blue-700 text-sm hover:bg-gray-100 rounded-full"
         >
           <svg
             className="w-4 h-4"
             viewBox="0 0 24 24"
-            fill="currentColor"
+            fill="#FFFFFF"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path

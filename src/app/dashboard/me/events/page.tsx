@@ -68,8 +68,6 @@ export default function Events() {
     placeholderData: keepPreviousData,
   });
 
-  console.log(eventsData);
-
   let events;
   let total = 0;
 

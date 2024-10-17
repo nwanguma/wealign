@@ -58,6 +58,7 @@ export default function JobPage() {
                 job={job}
                 isOwner={isOwner}
                 toggleModal={handleToggleAddJobModal}
+                triggerRefetch={refetch}
               />
               {isOwner && (
                 <div
@@ -79,7 +80,7 @@ export default function JobPage() {
               <h3 className="font-semibold mb-3 text-gray-700 text-base">
                 More jobs
               </h3>
-              {/* <div className="space-y-4">
+              <div className="space-y-4">
                 {jobsRecommendations &&
                   jobsRecommendations.map((job) => {
                     return (
@@ -91,7 +92,7 @@ export default function JobPage() {
                       </div>
                     );
                   })}
-              </div> */}
+              </div>
             </div>
           )}
         </aside>

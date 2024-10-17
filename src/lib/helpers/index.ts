@@ -1,3 +1,4 @@
+import { Profile } from "@/common/constants";
 import { DateInfo, FormatDateOptions } from "./constants";
 
 export const formatDateShort = (
@@ -84,4 +85,15 @@ export const stripHtml = (html: string) => {
   const tempElement = document.createElement("div");
   tempElement.innerHTML = html;
   return tempElement.textContent || tempElement.innerText || "";
+};
+
+export const getHasFollowed = (
+  userProfile: Profile,
+  followingProfileId: string
+) => {
+  return (userProfile.following || [])
+    .map((following) => {
+      return following.profile_id as string;
+    })
+    .includes(followingProfileId);
 };

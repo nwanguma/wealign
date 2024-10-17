@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -7,17 +6,20 @@ import { formatDateLong } from "@/lib/helpers";
 import { WithTooltip } from "./WithTooltip";
 import { Project } from "@/common/constants";
 import { ViewsComponent } from "./ViewsComponent";
+import { Comments } from "./Comments";
 
 interface IProjectCardMainProps {
   project: Partial<Project>;
   isOwner?: boolean;
   toggleModal?: () => void;
+  triggerRefetch?: () => void;
 }
 
 export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
   project,
   isOwner,
   toggleModal,
+  triggerRefetch,
 }) => {
   const {
     id,
@@ -37,8 +39,6 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
     owner,
     views,
   } = project;
-  const [showCommentInput, setShowCommentInput] = useState(false);
-  const [newComment, setNewComment] = useState("");
 
   return (
     <div className="relative space-y-4">
@@ -205,61 +205,13 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
           </div>
         </div>
       )}
-
-      <div className="space-y-2 p-3 rounded-lg">
-        {comments && !!comments.length && (
-          <h3 className="text-sm font-medium underline">
-            Comments ({comments.length})
-          </h3>
-        )}
-        <div className="space-y-3 border border-gray-300 rounded-lg p-1">
-          {comments &&
-            !!comments.length &&
-            comments.map((comment) => (
-              <div
-                key={comment.id}
-                className="px-3 py-2 rounded-lg flex items-center space-x-3 border-b border-gray-100  justify-between"
-              >
-                <div className="flex items-center space-x-2">
-                  <div className="border border-gray-300 p-1 rounded-full">
-                    <Image
-                      src="/images/test-avatar-3.jpg"
-                      width={30}
-                      height={30}
-                      alt="avatar"
-                      className="rounded-full"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-custom-gray-paragraph">
-                      {comment.author}
-                    </p>
-                    <p className="text-gray-700 text-sm">{comment.text}</p>
-                  </div>
-                </div>
-                <div className="text-xs">
-                  {/* <Image src="/icons/bin.svg" width={18} height={18} alt="" /> */}
-                  <span className="text-red-400 underline">Delete</span>
-                </div>
-              </div>
-            ))}
-          <div className="flex items-center pt-2 space-x-3 px-3 pb-2 border-green-500">
-            <input
-              type="text"
-              placeholder="Add a comment..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 placeholder:text-sm placeholder:text-custom-gray-paragraph rounded-lg focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
-            />
-            <button
-              onClick={() => console.log("clicked")}
-              className="bg-blue-600 text-white px-4 text-sm py-2 rounded-md hover:bg-blue-700"
-            >
-              Post
-            </button>
-          </div>
-        </div>
-      </div>
+      <Comments
+        resource="projects"
+        resourceId={id}
+        comments={comments}
+        reactions={reactions}
+        triggerRefetch={triggerRefetch}
+      />
     </div>
   );
 };

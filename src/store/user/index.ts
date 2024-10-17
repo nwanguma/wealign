@@ -1,6 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
 import { Profile, User } from "@/common/constants";
 
 const initialState: User = {
@@ -13,6 +12,7 @@ const initialState: User = {
     id: "",
     first_name: "",
     views: 0,
+    email: "string",
     last_name: "",
     avatar: "",
     bio: "",
@@ -48,6 +48,15 @@ export const fetchCurrentUser = createAsyncThunk(
   }
 );
 
+export const fetchFollowing = createAsyncThunk(
+  "user/fetchFollowing",
+  async () => {
+    const response = await axiosInstance.get("api/proxy/profiles/following");
+
+    return response.data.data;
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -55,18 +64,6 @@ const userSlice = createSlice({
     setUser: (state, action: PayloadAction<User>) => {
       return action.payload;
     },
-    // updateFollowers: (state, action: PayloadAction<Profile>) => {
-    //   state.profile.followers = [
-    //     ...state.profile.followers,
-    //     action.payload.followers,
-    //   ];
-    // },
-    // updateFollowing: (state, action: PayloadAction<Profile>) => {
-    //   state.profile.following = [
-    //     ...state.profile.following,
-    //     action.payload.followers,
-    //   ];
-    // },
     updateProfile: (state, action: PayloadAction<Profile>) => {
       state.profile = action.payload;
     },
@@ -84,13 +81,15 @@ const userSlice = createSlice({
         return action.payload;
       }
     );
+    builder.addCase(
+      fetchFollowing.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        state.profile.followers = action.payload.followers as any;
+        state.profile.following = action.payload.following as any;
+      }
+    );
   },
 });
 
-export const {
-  setUser,
-  updateProfile,
-  // updateFollowers,
-  // updateFollowing
-} = userSlice.actions;
+export const { setUser, updateProfile } = userSlice.actions;
 export default userSlice.reducer;
