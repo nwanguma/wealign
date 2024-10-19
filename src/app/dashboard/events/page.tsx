@@ -117,7 +117,6 @@ export default function Events() {
               />
             </div>
           </div>
-
           <div className="py-5 flex flex-col space-y-5 w-full">
             <FilterComponent
               filters={filters}

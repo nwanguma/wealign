@@ -5,11 +5,18 @@ import userReducer from "./user";
 import uiReducer from "./ui";
 import recommendationsReducer from "./recommendations";
 import conversationsReducer from "./conversations";
+import notificationsReducer from "./notifications";
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "recommendations", "conversations", "ui"],
+  whitelist: [
+    "user",
+    "recommendations",
+    "conversations",
+    "ui",
+    "notifications",
+  ],
 };
 
 const rootReducer = combineReducers({
@@ -17,6 +24,7 @@ const rootReducer = combineReducers({
   ui: uiReducer,
   recommendations: recommendationsReducer,
   conversations: conversationsReducer,
+  notifications: notificationsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

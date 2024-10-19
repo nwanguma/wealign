@@ -14,6 +14,7 @@ import { WithTooltip } from "@/components/ui/WithTooltip";
 import { Profile } from "@/common/constants";
 import { fetchProfile } from "@/api";
 import { SkeletonLoaderPage } from "@/components/ui/SkeletonLoader";
+import { getHasFollowed } from "@/lib/helpers";
 
 export default function ProfilePage() {
   const user = useSelector((state: RootState) => state.user);
@@ -35,6 +36,7 @@ export default function ProfilePage() {
     queryFn: () => fetchProfile(id as string),
     enabled: !!id,
   });
+  const hasFollowed = getHasFollowed(user?.profile, profile?.id!);
 
   return (
     <div className="bg-white">
@@ -45,9 +47,11 @@ export default function ProfilePage() {
             <div className="flex-1 p-4 flex flex-col space-y-5 w-full rounded-lg">
               <div className="w-full relative">
                 <ProfileCardMain
+                  isOwner
                   profile={profile}
                   isMain
                   triggerRefetch={refetch}
+                  hasFollowed={hasFollowed}
                 />
                 <div className="absolute -top-4 right-0">
                   <div className="flex space-x-5">

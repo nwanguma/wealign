@@ -4,13 +4,18 @@ import Link from "next/link";
 
 import { formatDateLong } from "@/lib/helpers";
 import { WithTooltip } from "./WithTooltip";
-import { Comment } from "@/common/constants";
+import { Comment, Reaction } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import { createComment, deleteComment, createReaction } from "@/api";
+import { ProfilePreviewCard } from "./ProfileCardPreview";
+import AppModal from "./Modal";
 
 import "../../app/globals.css";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 interface ICommentsProps {
+  isOwner: boolean;
   resource: string;
   resourceId: string;
   comments: Comment[];
@@ -19,15 +24,18 @@ interface ICommentsProps {
 }
 
 export const Comments: React.FC<ICommentsProps> = ({
+  isOwner,
   resource,
   resourceId,
   comments,
   reactions,
   triggerRefetch,
 }) => {
-  const [showCommentInput, setShowCommentInput] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [fansModalIsOpen, setFansModalIsOpen] = useState(false);
+  const user = useSelector((state: RootState) => state.user);
+  const currentUserProfileId = user?.profile?.id;
 
   const commentMutation = useMutation({
     mutationFn: ({
@@ -115,6 +123,10 @@ export const Comments: React.FC<ICommentsProps> = ({
     })();
   };
 
+  const handleToggleFansModal = () => {
+    setFansModalIsOpen((o) => !o);
+  };
+
   return (
     <div className="space-y-4 p-3 rounded-lg">
       <div className="flex items-center space-x-5">
@@ -137,34 +149,40 @@ export const Comments: React.FC<ICommentsProps> = ({
           )}
           <span className="text-xs-sm">({comments!.length})</span>
         </div>
-        <div
-          onClick={() => handleAddReaction()}
-          className="flex space-x-1 items-center"
-        >
+        <div className="flex space-x-1 items-center">
           {WithTooltip(
             "Reactions",
-            <svg
-              version="1.0"
-              id="Layer_1"
-              xmlns="http://www.w3.org/2000/svg"
-              xmlnsXlink="http://www.w3.org/1999/xlink"
-              className="w-5 h-5"
-              viewBox="0 0 64 64"
-              enable-background="new 0 0 64 64"
-              xmlSpace="preserve"
-            >
-              <path
-                fill="#ef4444"
-                d="M48,5c-4.418,0-8.418,1.791-11.313,4.687l-3.979,3.961c-0.391,0.391-1.023,0.391-1.414,0
+            <div onClick={() => handleAddReaction()}>
+              <svg
+                version="1.0"
+                id="Layer_1"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlnsXlink="http://www.w3.org/1999/xlink"
+                className="w-5 h-5"
+                viewBox="0 0 64 64"
+                enable-background="new 0 0 64 64"
+                xmlSpace="preserve"
+              >
+                <path
+                  fill="#ef4444"
+                  d="M48,5c-4.418,0-8.418,1.791-11.313,4.687l-3.979,3.961c-0.391,0.391-1.023,0.391-1.414,0
 	c0,0-3.971-3.97-3.979-3.961C24.418,6.791,20.418,5,16,5C7.163,5,0,12.163,0,21c0,3.338,1.024,6.436,2.773,9
 	c0,0,0.734,1.164,1.602,2.031s24.797,24.797,24.797,24.797C29.953,57.609,30.977,58,32,58s2.047-0.391,2.828-1.172
 	c0,0,23.93-23.93,24.797-24.797S61.227,30,61.227,30C62.976,27.436,64,24.338,64,21C64,12.163,56.837,5,48,5z M57,22
 	c-0.553,0-1-0.447-1-1c0-4.418-3.582-8-8-8c-0.553,0-1-0.447-1-1s0.447-1,1-1c5.522,0,10,4.478,10,10C58,21.553,57.553,22,57,22z"
-              />
-            </svg>
+                />
+              </svg>
+            </div>
           )}
-
-          <span className="text-xs-sm">({reactions!.length})</span>
+          {WithTooltip(
+            "View profiles",
+            <span
+              onClick={() => handleToggleFansModal()}
+              className="text-xs-sm cursor-pointer"
+            >
+              ({reactions!.length})
+            </span>
+          )}
         </div>
       </div>
       <div className="sticky self-start">
@@ -211,25 +229,27 @@ export const Comments: React.FC<ICommentsProps> = ({
                     </p>
                   </div>
                 </div>
-                <div
-                  onClick={() => handleDeleteComment(comment.id)}
-                  className="cursor-pointer"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 32 32"
-                    xmlns="http://www.w3.org/2000/svg"
+                {(isOwner || comment.owner.id === currentUserProfileId) && (
+                  <div
+                    onClick={() => handleDeleteComment(comment.id)}
+                    className="cursor-pointer"
                   >
-                    <g fill="none" fill-rule="evenodd">
-                      <path d="m0 0h32v32h-32z" />
-                      <path
-                        d="m19 0c3.3137085 0 6 2.6862915 6 6h6c.5522847 0 1 .44771525 1 1s-.4477153 1-1 1l-3-.001v18.001c0 3.3137085-2.6862915 6-6 6h-12c-3.3137085 0-6-2.6862915-6-6v-18h-3c-.55228475 0-1-.44771525-1-1s.44771525-1 1-1h6c0-3.3137085 2.6862915-6 6-6zm7 8h-20v18c0 2.1421954 1.68396847 3.8910789 3.80035966 3.9951047l.19964034.0048953h12c2.1421954 0 3.8910789-1.6839685 3.9951047-3.8003597l.0048953-.1996403zm-13 6c.5522847 0 1 .4477153 1 1v7c0 .5522847-.4477153 1-1 1s-1-.4477153-1-1v-7c0-.5522847.4477153-1 1-1zm6 0c.5522847 0 1 .4477153 1 1v7c0 .5522847-.4477153 1-1 1s-1-.4477153-1-1v-7c0-.5522847.4477153-1 1-1zm0-12h-6c-2.1421954 0-3.89107888 1.68396847-3.99510469 3.80035966l-.00489531.19964034h7 7c0-2.14219539-1.6839685-3.89107888-3.8003597-3.99510469z"
-                        fill="#ef4444"
-                        fillRule="nonzero"
-                      />
-                    </g>
-                  </svg>
-                </div>
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 32 32"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g fill="none" fill-rule="evenodd">
+                        <path d="m0 0h32v32h-32z" />
+                        <path
+                          d="m19 0c3.3137085 0 6 2.6862915 6 6h6c.5522847 0 1 .44771525 1 1s-.4477153 1-1 1l-3-.001v18.001c0 3.3137085-2.6862915 6-6 6h-12c-3.3137085 0-6-2.6862915-6-6v-18h-3c-.55228475 0-1-.44771525-1-1s.44771525-1 1-1h6c0-3.3137085 2.6862915-6 6-6zm7 8h-20v18c0 2.1421954 1.68396847 3.8910789 3.80035966 3.9951047l.19964034.0048953h12c2.1421954 0 3.8910789-1.6839685 3.9951047-3.8003597l.0048953-.1996403zm-13 6c.5522847 0 1 .4477153 1 1v7c0 .5522847-.4477153 1-1 1s-1-.4477153-1-1v-7c0-.5522847.4477153-1 1-1zm6 0c.5522847 0 1 .4477153 1 1v7c0 .5522847-.4477153 1-1 1s-1-.4477153-1-1v-7c0-.5522847.4477153-1 1-1zm0-12h-6c-2.1421954 0-3.89107888 1.68396847-3.99510469 3.80035966l-.00489531.19964034h7 7c0-2.14219539-1.6839685-3.89107888-3.8003597-3.99510469z"
+                          fill="#ef4444"
+                          fillRule="nonzero"
+                        />
+                      </g>
+                    </svg>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -251,6 +271,48 @@ export const Comments: React.FC<ICommentsProps> = ({
           </div>
         </div>
       </div>
+      <AppModal
+        title="Reactions"
+        isOpen={fansModalIsOpen}
+        onClose={() => handleToggleFansModal()}
+      >
+        <div className="p-4">
+          <div className="space-y-4">
+            {reactions &&
+              reactions.length > 0 &&
+              reactions.map((reaction: Reaction) => {
+                let hasFollowed = false;
+
+                if (user)
+                  hasFollowed = (user.profile?.following || [])
+                    .map((following) => following.profile_id)
+                    .includes(reaction.owner?.id!);
+                return (
+                  <div
+                    key={reaction.id}
+                    className="border-b border-b-gray-200 pb-4 last:border-0"
+                  >
+                    <ProfilePreviewCard
+                      currentUserProfileId={currentUserProfileId}
+                      name={
+                        reaction.owner.first_name +
+                        " " +
+                        reaction.owner.last_name
+                      }
+                      title={reaction.owner.title || ""}
+                      profile_id={reaction.owner.id!}
+                      user_id={reaction.owner.user_id}
+                      avatar={
+                        reaction.owner.avatar || "/images/test-avatar-3.jpg"
+                      }
+                      hasFollowed={hasFollowed}
+                    />
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      </AppModal>
     </div>
   );
 };

@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import MoreActionsComponent from "./MoreActions";
 import { useFollow } from "@/app/hooks/useFollow";
 
 interface IProfilePreviewCardProps {
+  currentUserProfileId: string;
   profile_id: string;
   user_id?: string;
   name: string;
@@ -14,6 +16,7 @@ interface IProfilePreviewCardProps {
 }
 
 export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
+  currentUserProfileId,
   profile_id,
   user_id,
   name,
@@ -21,8 +24,13 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
   avatar,
   hasFollowed,
 }) => {
-  const { handleInitiateConversations, handleFollow, justFollowed } =
-    useFollow();
+  const {
+    handleInitiateConversations,
+    handleFollow,
+    handleUnfollow,
+    justFollowed,
+  } = useFollow();
+  const isCurrentUser = currentUserProfileId === profile_id;
 
   return (
     <div className="flex items-center justify-between">
@@ -46,8 +54,8 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
           <span className="text-xs text-custom-gray-paragraph">{title}</span>
         </div>
       </div>
-      <div className="flex items-center space-x-2">
-        {!hasFollowed && !justFollowed[profile_id] && (
+      <div className="flex items-center space-x-2 relative">
+        {!hasFollowed && !justFollowed[profile_id] && !isCurrentUser && (
           <button
             onClick={() => handleFollow(profile_id)}
             className="flex items-center p-2 bg-white border border-gray-300 text-sm rounded-full hover:bg-gray-100 text-blue-700"
@@ -83,25 +91,43 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
             </svg>
           </button>
         )}
-        <button
-          onClick={() => handleInitiateConversations(user_id as string)}
-          className="flex items-center p-2 bg-white border border-gray-300 text-blue-700 text-sm hover:bg-gray-100 rounded-full"
-        >
-          <svg
-            className="w-4 h-4"
-            viewBox="0 0 24 24"
-            fill="#FFFFFF"
-            xmlns="http://www.w3.org/2000/svg"
+        {!isCurrentUser && (
+          <button
+            onClick={() => handleInitiateConversations(user_id as string)}
+            className="flex items-center p-2 bg-white border border-gray-300 text-blue-700 text-sm hover:bg-gray-100 rounded-full"
           >
-            <path
-              d="M22 2L2 8.66667L11.5833 12.4167M22 2L15.3333 22L11.5833 12.4167M22 2L11.5833 12.4167"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="#FFFFFF"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M22 2L2 8.66667L11.5833 12.4167M22 2L15.3333 22L11.5833 12.4167M22 2L11.5833 12.4167"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
+        {!isCurrentUser &&
+          (justFollowed[profile_id as string] || hasFollowed) && (
+            <MoreActionsComponent
+              renderWithAction={(toggleMoreActionsModal: any) => (
+                <li
+                  onClick={() => {
+                    handleUnfollow(profile_id as string);
+                    toggleMoreActionsModal();
+                  }}
+                  className="text-xs text-gray-700 text-center px-3 py-2 cursor-pointer"
+                >
+                  Unfollow
+                </li>
+              )}
             />
-          </svg>
-        </button>
+          )}
       </div>
     </div>
   );

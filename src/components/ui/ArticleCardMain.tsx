@@ -101,6 +101,7 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
         />
       </div>
       <Comments
+        isOwner={isOwner!}
         resource="articles"
         resourceId={id}
         triggerRefetch={triggerRefetch}

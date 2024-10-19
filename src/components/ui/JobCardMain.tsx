@@ -158,9 +158,10 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
         </div>
       )}
       <Comments
+        isOwner={isOwner!}
         resource="jobs"
-        resourceId={id}
-        comments={comments}
+        resourceId={id!}
+        comments={comments!}
         reactions={reactions}
         triggerRefetch={triggerRefetch}
       />

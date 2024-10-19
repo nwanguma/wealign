@@ -207,8 +207,9 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
       )}
       <Comments
         resource="projects"
-        resourceId={id}
-        comments={comments}
+        isOwner={isOwner!}
+        resourceId={id!}
+        comments={comments!}
         reactions={reactions}
         triggerRefetch={triggerRefetch}
       />

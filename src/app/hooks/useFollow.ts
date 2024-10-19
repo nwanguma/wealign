@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { AppDispatch, RootState } from "@/store";
 import { addToConversations } from "@/store/conversations";
-import { initiateConversation, followUser } from "@/api";
+import { initiateConversation, followUser, unfollowUser } from "@/api";
 import { fetchFollowing } from "@/store/user";
 
 interface JustFollowed {
@@ -26,6 +26,18 @@ export const useFollow = () => {
       setJustFollowed((prevState) => ({
         ...prevState,
         [profileId]: true,
+      }));
+
+      dispatch(fetchFollowing());
+    },
+    onError: (error: any) => {},
+  });
+  const unfollowMutation = useMutation({
+    mutationFn: (profileId: string) => unfollowUser(profileId),
+    onSuccess: (data, profileId) => {
+      setJustFollowed((prevState) => ({
+        ...prevState,
+        [profileId]: false,
       }));
 
       dispatch(fetchFollowing());
@@ -56,6 +68,10 @@ export const useFollow = () => {
     followMutation.mutate(profileId);
   };
 
+  const handleUnfollow = (profileId: string) => {
+    unfollowMutation.mutate(profileId);
+  };
+
   const handleInitiateConversations = (recipientId: string) => {
     initiateConversationsMutation.mutate(recipientId);
   };
@@ -63,6 +79,7 @@ export const useFollow = () => {
   return {
     handleInitiateConversations,
     handleFollow,
+    handleUnfollow,
     justFollowed,
   };
 };

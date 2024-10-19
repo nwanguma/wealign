@@ -5,11 +5,12 @@ import {
   Profile,
   Job,
   Article,
+  Notification,
   IPagination,
 } from "@/common/constants";
 
 interface IPaginationComponentProps {
-  data: Project[] | Event[] | Profile[] | Job[] | Article[];
+  data: Project[] | Event[] | Profile[] | Job[] | Article[] | Notification[];
   total: number;
   setPagination: any;
   limit: number;

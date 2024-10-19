@@ -55,6 +55,7 @@ export default function JobPage() {
           {!isLoading && job && (
             <div className="w-full">
               <JobCardMain
+                currentUserProfileId={user?.profile?.id}
                 job={job}
                 isOwner={isOwner}
                 toggleModal={handleToggleAddJobModal}

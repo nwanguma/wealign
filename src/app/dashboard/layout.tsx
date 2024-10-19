@@ -1,35 +1,22 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { QueryClientProvider } from "@tanstack/react-query";
+
+import { store, persistor } from "@/store";
 import queryClient from "../../lib/react-query-client";
 import { PersistGate } from "redux-persist/integration/react";
-import Image from "next/image";
-
-import { store, persistor, RootState } from "@/store";
 import DashboadHeader from "@/components/layout/DashboardHeader";
 import DashboardFooter from "@/components/layout/DashboardFooter";
 import DashboardNav from "@/components/layout/DashboardNav";
-
-const Loading = () => {
-  return (
-    <div className="w-full h-dvh flex justify-center bg-white">
-      <div className="mt-40 h-20 flex space-x-3 items-center">
-        <Image src="/icons/page-loader.gif" alt="" width={40} height={40} />
-        <p style={{ fontSize: "15px" }}>
-          Making things cool behind the scenes...{" "}
-          <span className="ml-1">😉</span>
-        </p>
-      </div>
-    </div>
-  );
-};
+import NotificationsPollingComponent from "@/components/ui/NotificationsPolling";
+import PageLoadingComponent from "@/components/ui/PageLoading";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <Provider store={store}>
-      <PersistGate loading={<Loading />} persistor={persistor}>
+      <PersistGate loading={<PageLoadingComponent />} persistor={persistor}>
         <div
           className={`w-full h-screen bg-[#f7f7f7] text-custom-gray font-app-normal`}
         >
@@ -38,6 +25,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </DashboadHeader>
           <main className="min-h-screen">
             <div>
+              <NotificationsPollingComponent />
               <QueryClientProvider client={queryClient}>
                 {children}
               </QueryClientProvider>

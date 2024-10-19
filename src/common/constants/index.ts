@@ -22,12 +22,19 @@ export interface Event {
   location?: string | null;
   link?: string | null;
   comments: Comment[];
-  reactions: [];
+  reactions: Reaction[];
   attachment?: string;
   type?: string;
 }
 
 export interface Comment {
+  text: string;
+  owner: Partial<Profile>;
+  created_at: string;
+  id: string;
+}
+
+export interface Reaction {
   text: string;
   owner: Partial<Profile>;
   created_at: string;
@@ -42,7 +49,7 @@ export interface Article {
   created_at: string;
   owner: Profile;
   comments: Comment[];
-  reactions?: [];
+  reactions: Reaction[];
   views?: number;
 }
 
@@ -77,7 +84,7 @@ export interface Job {
   skills?: Skill[];
   likes?: any[];
   comments: Comment[];
-  reactions: any[];
+  reactions: Reaction[];
   owner: Profile;
   deadline?: string;
   status?: string;
@@ -110,8 +117,8 @@ export interface Profile {
   views?: number;
   followers?: Follower[];
   following?: Follower[];
-  comments?: any[];
-  reactions?: any[];
+  comments?: Comment[];
+  reactions: Reaction[];
   events?: Event[];
   jobs?: Job[];
   articles?: Article[];
@@ -148,6 +155,25 @@ export interface Activity {
   event: Event;
   profile: Profile;
   project: Project;
+}
+
+export interface Notification {
+  id: string;
+  initiator: {
+    id: string;
+    profile: Partial<Profile>;
+  };
+  recipient: {
+    id: string;
+    profile: Partial<Profile>;
+  };
+  category: string;
+  is_read: boolean;
+  article?: Article;
+  event?: Event;
+  project?: Project;
+  job?: Job;
+  profile?: Profile;
 }
 
 export const mapLanguageToFlag = {
@@ -220,6 +246,14 @@ export interface ProfilesWithPagination {
   total: number;
   totalPages: number;
   data: Profile[];
+}
+
+export interface NotificationsWithPagination {
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+  data: Notification[];
 }
 
 export interface IFilters {

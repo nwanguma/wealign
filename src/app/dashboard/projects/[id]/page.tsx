@@ -67,8 +67,9 @@ export default function ProjectPage() {
               <div className="w-full">
                 <div className="w-full">
                   <ProjectCardMain
-                    project={project}
                     isOwner={isOwner}
+                    currentUserProfileId={user?.profile?.id}
+                    project={project}
                     toggleModal={handleToggleAddProjectModal}
                     triggerRefetch={refetch}
                   />

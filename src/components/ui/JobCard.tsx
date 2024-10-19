@@ -24,6 +24,7 @@ export const JobCard: React.FC<IJobCardProps> = ({ job }) => {
     skills,
     status,
   } = job;
+
   return (
     <Link href={`/dashboard/jobs/${id}`} className="block">
       <div className="border border-gray-300 p-3 rounded-lg flex flex-col space-y-4">

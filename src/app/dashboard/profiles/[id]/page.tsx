@@ -35,6 +35,9 @@ export default function ProfilePage() {
     queryFn: () => fetchProfile(id as string),
   });
 
+  const isOwner = user?.profile?.id === profile?.id;
+  const hasFollowed = getHasFollowed(user?.profile, profile?.id!);
+
   return (
     <div className="min-h-screen w-full bg-white">
       <div className="flex space-x-5 p-6 w-9/12 mx-auto">
@@ -42,7 +45,12 @@ export default function ProfilePage() {
           {isLoading && <SkeletonLoaderPage />}
           {!isLoading && profile && (
             <div className="w-full">
-              <ProfileCardMain profile={profile} triggerRefetch={refetch} />
+              <ProfileCardMain
+                profile={profile}
+                triggerRefetch={refetch}
+                isOwner={isOwner}
+                hasFollowed={hasFollowed}
+              />
             </div>
           )}
         </div>

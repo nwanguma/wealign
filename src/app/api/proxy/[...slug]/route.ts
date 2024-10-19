@@ -56,7 +56,7 @@ async function handler(req: Request) {
         ...(isMultipart && { "Content-Type": req.headers.get("content-type") }),
       },
       data,
-      timeout: 5000,
+      timeout: 40000,
     });
 
     console.log(

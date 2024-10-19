@@ -23,6 +23,8 @@ const initialState: User = {
     github: "",
     resume: "",
     languages: [],
+    comments: [],
+    reactions: [],
     heading: "",
     title: "",
     skills: [],

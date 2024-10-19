@@ -534,6 +534,7 @@ const MainFeed: React.FC = () => {
                       className="border-b border-b-gray-200 pb-4 last:border-0"
                     >
                       <ProfilePreviewCard
+                        currentUserProfileId={currentUser?.profile?.id}
                         name={profile.first_name + " " + profile.last_name}
                         title={profile.title}
                         profile_id={profile.id}
@@ -592,6 +593,7 @@ const MainFeed: React.FC = () => {
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
+                      currentUserProfileId={currentUser?.profile?.id}
                       name={profile.first_name + " " + profile.last_name}
                       title={profile.title || ""}
                       profile_id={profile.profile_id}
@@ -626,6 +628,7 @@ const MainFeed: React.FC = () => {
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
+                      currentUserProfileId={currentUser?.profile?.id}
                       name={profile.first_name + " " + profile.last_name}
                       title={profile.title || ""}
                       profile_id={profile.profile_id}

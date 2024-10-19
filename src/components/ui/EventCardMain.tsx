@@ -9,6 +9,7 @@ import { ViewsComponent } from "./ViewsComponent";
 import { Comments } from "./Comments";
 
 interface IEventCardMainProps {
+  currentUserProfileId: string;
   event: Event;
   isMain?: boolean;
   isOwner?: boolean;
@@ -174,6 +175,7 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
         </div>
       )}
       <Comments
+        isOwner={isOwner!}
         triggerRefetch={triggerRefetch}
         resource="events"
         resourceId={id}

@@ -86,38 +86,21 @@ export default function Profiles() {
               <ContentWrapper data={profiles as Profile[]}>
                 {profilesData &&
                   (profiles as Profile[])?.map((profile) => {
-                    const {
-                      first_name,
-                      last_name,
-                      avatar,
-                      id,
-                      bio,
-                      title,
-                      heading,
-                      skills,
-                      user_id,
-                    } = profile;
                     let hasFollowed = false;
 
                     if (user)
                       hasFollowed = (user.profile?.following || [])
                         .map((following) => following.profile_id)
-                        .includes(id);
+                        .includes(profile.id);
 
                     return (
                       <div
-                        key={id}
+                        key={profile.id}
                         className="w-full border border-gray-300 rounded-lg p-3"
                       >
                         <ProfileCard
-                          name={`${first_name} ${last_name}`}
-                          title={title}
-                          heading={heading}
-                          avatar={avatar as string}
-                          id={id}
-                          bio={bio}
-                          skills={skills as Skill[]}
-                          user_id={user_id}
+                          currentUserProfileId={user?.profile?.id}
+                          profile={profile}
                           hasFollowed={hasFollowed}
                         />
                       </div>

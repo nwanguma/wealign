@@ -60,6 +60,7 @@ export default function ArticlePage() {
           {!isLoading && article && (
             <div className="w-full">
               <ArticleCardMain
+                currentUserProfileId={user?.profile?.id}
                 article={article}
                 isOwner={isOwner}
                 toggleModal={handleToggleUpdateArticleModal}

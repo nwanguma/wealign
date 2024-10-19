@@ -229,6 +229,14 @@ export const followUser = async (profileId: string) => {
   return response.data.data;
 };
 
+export const unfollowUser = async (profileId: string) => {
+  const response = await axiosInstance.patch(
+    `/api/proxy/profiles/${profileId}/unfollow`
+  );
+
+  return response.data.data;
+};
+
 export const initiateConversation = async (recipientId: string) => {
   const response = await axiosInstance.post(
     `/api/proxy/conversations/${recipientId}`

@@ -48,7 +48,6 @@ const recommendationsSlice = createSlice({
   name: "recommendations",
   initialState,
   reducers: {},
-
   extraReducers: (builder) => {
     builder.addCase(fetchRecommendations.pending, (state) => {
       state.isLoading = true;

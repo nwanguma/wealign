@@ -63,6 +63,7 @@ export default function Dashboard() {
           {!isLoading && event && (
             <div className="w-full">
               <EventCardMain
+                currentUserProfileId={user?.profile?.id}
                 event={event}
                 isOwner={isOwner}
                 toggleModal={handleToggleAddEventModal}

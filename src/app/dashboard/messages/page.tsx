@@ -430,8 +430,8 @@ export default function MessagesPage() {
                   let hasFollowed = false;
 
                   if (user)
-                    hasFollowed = user.profile.following
-                      .map((following) => following.uuid)
+                    hasFollowed = user.profile
+                      .following!.map((following) => following.profile_id)
                       .includes(profile.id);
                   return (
                     <div
@@ -439,6 +439,7 @@ export default function MessagesPage() {
                       className="border-b border-b-gray-200 pb-4 last:border-0"
                     >
                       <ProfilePreviewCard
+                        currentUserProfileId={user?.profile?.id}
                         name={profile.first_name + " " + profile.last_name}
                         title={profile.title}
                         profile_id={profile.id}
@@ -465,8 +466,8 @@ export default function MessagesPage() {
                 let hasFollowed = false;
 
                 if (user)
-                  hasFollowed = user.profile.following
-                    .map((following) => following.uuid)
+                  hasFollowed = user.profile
+                    .following!.map((following) => following.profile_id)
                     .includes(profile.id);
                 return (
                   <div
@@ -474,6 +475,7 @@ export default function MessagesPage() {
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
+                      currentUserProfileId={user?.profile?.id}
                       name={profile.first_name + " " + profile.last_name}
                       title={profile.title}
                       profile_id={profile.id}
