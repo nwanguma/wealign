@@ -31,7 +31,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
               </QueryClientProvider>
             </div>
           </main>
-          <DashboardFooter />
+          {/* <DashboardFooter /> */}
         </div>
       </PersistGate>
     </Provider>

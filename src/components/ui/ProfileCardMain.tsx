@@ -316,7 +316,10 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
               <div className="grid grid-cols-2 gap-x-5">
                 {[...events]?.splice(0, 2).map((event: Event) => {
                   return (
-                    <div className="border border-gray-300 rounded-lg px-3 py-6">
+                    <div
+                      key={event.id}
+                      className="border border-gray-300 rounded-lg px-3 py-6"
+                    >
                       <EventCardPreview event={event} isPreview />
                     </div>
                   );

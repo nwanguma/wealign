@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 
 import { AppDispatch, RootState } from "@/store";
@@ -35,6 +34,7 @@ export const useFollow = () => {
   const unfollowMutation = useMutation({
     mutationFn: (profileId: string) => unfollowUser(profileId),
     onSuccess: (data, profileId) => {
+      console.log("yes");
       setJustFollowed((prevState) => ({
         ...prevState,
         [profileId]: false,
@@ -42,7 +42,9 @@ export const useFollow = () => {
 
       dispatch(fetchFollowing());
     },
-    onError: (error: any) => {},
+    onError: (error: any) => {
+      console.log(error);
+    },
   });
   const initiateConversationsMutation = useMutation({
     mutationFn: (recipientId: string) => initiateConversation(recipientId),

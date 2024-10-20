@@ -1,7 +1,29 @@
 import axios from "axios";
 import { performance } from "perf_hooks";
 import crypto from "crypto";
+import CryptoJS from "crypto-js";
 import { NextResponse } from "next/server";
+
+interface EncryptedData {
+  iv: string;
+  encryptedData: string;
+}
+
+function encryptData(data: Record<string, any>): EncryptedData {
+  const key = CryptoJS.enc.Hex.parse(process.env.ENCRYPTION_KEY!);
+  const iv = CryptoJS.enc.Hex.parse(process.env.ENCRYPTION_IV!);
+
+  const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
+    iv: iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+
+  return {
+    iv: iv.toString(CryptoJS.enc.Hex),
+    encryptedData: encrypted.ciphertext.toString(CryptoJS.enc.Hex),
+  };
+}
 
 async function parseRequestBody(req: Request) {
   const contentType = req.headers.get("content-type") || "";
@@ -64,6 +86,8 @@ async function handler(req: Request) {
         performance.now() - start
       }ms`
     );
+
+    // const encryptedData = encryptData(response.data);
 
     const responseHeaders = new Headers(response.headers as any);
     const nextResponse = NextResponse.json(response.data, {

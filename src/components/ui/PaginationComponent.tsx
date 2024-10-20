@@ -14,6 +14,7 @@ interface IPaginationComponentProps {
   total: number;
   setPagination: any;
   limit: number;
+  tag?: string;
 }
 
 const PaginationComponent: React.FC<IPaginationComponentProps> = ({
@@ -21,6 +22,7 @@ const PaginationComponent: React.FC<IPaginationComponentProps> = ({
   total,
   setPagination,
   limit,
+  tag,
 }) => {
   const paginationRef = useRef<number>(limit);
   const fixedLimit = paginationRef.current;
@@ -37,7 +39,9 @@ const PaginationComponent: React.FC<IPaginationComponentProps> = ({
         }
         className="cursor-pointer p-2 text-xs-sm border text-gray-700 border-gray-300 bg-slate-50 rounded"
       >
-        {data.length < total ? "Load more" : "You have reached the end"}
+        {data.length < total
+          ? "Load more" + " " + tag
+          : "You have reached the end"}
       </button>
     </div>
   );

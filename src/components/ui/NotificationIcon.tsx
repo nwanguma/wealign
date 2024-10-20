@@ -16,8 +16,6 @@ export default function NotificationIcon() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  console.log(notifications);
-
   return (
     <div
       className="relative"

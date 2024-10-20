@@ -48,10 +48,13 @@ export const Comments: React.FC<ICommentsProps> = ({
       data: Partial<Comment>;
     }) => createComment(resource, resourceId, data),
     onSuccess: () => {
+      console.log("yes");
       triggerRefetch && triggerRefetch();
       setNewComment("");
     },
-    onError: (error: any) => {},
+    onError: (error: any) => {
+      console.log("litty", error);
+    },
     onSettled: () => {
       setIsLoading(false);
     },
@@ -224,7 +227,7 @@ export const Comments: React.FC<ICommentsProps> = ({
                         {formatDateLong(comment.created_at)}
                       </span>
                     </div>
-                    <p className="text-gray-800 text-xs-sm leading-normal">
+                    <p className="text-gray-800 text-sm leading-normal">
                       {comment.text}
                     </p>
                   </div>

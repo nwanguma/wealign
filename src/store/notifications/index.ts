@@ -17,13 +17,8 @@ export const fetchNotifications = createAsyncThunk(
   }
 );
 
-interface Notification {
-  id: string;
-  message: string;
-}
-
 interface NotificationState {
-  data: Notification[];
+  data: string[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }

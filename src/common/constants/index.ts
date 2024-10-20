@@ -174,6 +174,9 @@ export interface Notification {
   project?: Project;
   job?: Job;
   profile?: Profile;
+  resource_type: string;
+  created_at?: string;
+  content?: string;
 }
 
 export const mapLanguageToFlag = {

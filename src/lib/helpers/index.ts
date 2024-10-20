@@ -1,3 +1,4 @@
+import CryptoJS from "crypto-js";
 import { Profile } from "@/common/constants";
 import { DateInfo, FormatDateOptions } from "./constants";
 
@@ -96,4 +97,37 @@ export const getHasFollowed = (
       return following.profile_id as string;
     })
     .includes(followingProfileId);
+};
+
+export const decryptData = (
+  encryptedData: string,
+  iv: string,
+  key: string
+): Record<string, any> | null => {
+  try {
+    const parsedKey = CryptoJS.enc.Hex.parse(key);
+    const parsedIv = CryptoJS.enc.Hex.parse(iv);
+    const encryptedWordArray = CryptoJS.enc.Hex.parse(encryptedData);
+
+    const cipherParams = CryptoJS.lib.CipherParams.create({
+      ciphertext: encryptedWordArray,
+    });
+
+    const decrypted = CryptoJS.AES.decrypt(cipherParams, parsedKey, {
+      iv: parsedIv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+
+    const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+
+    if (!decryptedText) {
+      throw new Error("Failed to decrypt data or invalid UTF-8 output");
+    }
+
+    return JSON.parse(decryptedText);
+  } catch (error: any) {
+    console.error("Decryption error:", error.message);
+    return null;
+  }
 };
