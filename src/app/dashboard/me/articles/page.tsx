@@ -151,6 +151,7 @@ export default function Articles() {
                 total={total}
                 setPagination={setPagination}
                 limit={pagination.limit}
+                tag="articles"
               />
             )}
           </div>

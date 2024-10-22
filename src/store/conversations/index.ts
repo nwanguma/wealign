@@ -6,12 +6,14 @@ import axiosInstance from "@/lib/axiosInstance";
 
 export interface ConversationsSlice {
   data: Conversation[];
+  latestConversation: string;
   isLoading: boolean;
   error: string | null;
 }
 
 const initialState: ConversationsSlice = {
   data: [],
+  latestConversation: "",
   isLoading: false,
   error: null,
 };
@@ -37,6 +39,9 @@ const conversationsSlice = createSlice({
     addToConversations: (state, action: PayloadAction<Conversation>) => {
       state.data = [action.payload, ...state.data];
     },
+    setLatestConversation: (state, action: PayloadAction<string>) => {
+      state.latestConversation = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchConversations.pending, (state) => {
@@ -54,5 +59,6 @@ const conversationsSlice = createSlice({
   },
 });
 
-export const { addToConversations } = conversationsSlice.actions;
+export const { addToConversations, setLatestConversation } =
+  conversationsSlice.actions;
 export default conversationsSlice.reducer;

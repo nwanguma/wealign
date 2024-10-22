@@ -281,3 +281,8 @@ export interface Option {
   value: string;
   label: string;
 }
+
+export interface IMessageFilters {
+  limit: number;
+  page: number;
+}

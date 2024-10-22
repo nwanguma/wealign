@@ -50,12 +50,8 @@ export default function EventPage() {
 
   const followMutation = useMutation({
     mutationFn: (profileId: string) => followUser(profileId),
-    onSuccess: () => {
-      // console.log("User followed successfully");
-    },
-    onError: (error: any) => {
-      // console.error("Error following the user:", error);
-    },
+    onSuccess: () => {},
+    onError: (error: any) => {},
   });
 
   const handleFollow = (profileId: string) => {

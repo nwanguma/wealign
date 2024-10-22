@@ -171,6 +171,7 @@ export default function Jobs() {
                 total={total}
                 setPagination={setPagination}
                 limit={pagination.limit}
+                tag="jobs"
               />
             )}
           </div>

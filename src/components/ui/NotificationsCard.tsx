@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { Notification } from "@/common/constants";
 import { timeAgo } from "@/lib/helpers";
+import { markAsRead, resetNotifications } from "@/store/notifications";
+import { AppDispatch } from "@/store";
 
 const FollowNotification = ({
   notification,
@@ -14,7 +16,7 @@ const FollowNotification = ({
   const isNewNotification = newNotifications.includes(notification.id);
 
   return (
-    <div className="border-b border-gray-200 px-10 py-4 relative">
+    <div className="border-b border-gray-200 px-10 py-4 relative hover:bg-slate-50">
       <div className="flex items-center space-x-3">
         <div className="border border-gray-200 p-1 rounded-full">
           <Image
@@ -60,7 +62,7 @@ const CommentNotification = ({
   const isNewNotification = newNotifications.includes(notification.id);
 
   return (
-    <div className="border-b border-gray-200 px-10 py-4 relative">
+    <div className="border-b border-gray-200 px-10 py-4 relative hover:bg-slate-50">
       <div className="flex items-start space-x-3">
         <div className="border border-gray-200 p-1 rounded-full">
           <Image
@@ -123,7 +125,7 @@ const ReactionNotification = ({
   const isNewNotification = newNotifications.includes(notification.id);
 
   return (
-    <div className="border-b border-gray-200 px-10 py-4 relative">
+    <div className="border-b border-gray-200 px-10 py-4 relative hover:bg-slate-50">
       <div className="flex items-start space-x-3">
         <div className="border border-gray-200 p-1 rounded-full">
           <Image
@@ -171,12 +173,19 @@ const ReactionNotification = ({
 const NotificationsCard = ({
   notification,
   newNotifications,
+  dispatch,
 }: {
   notification: Notification;
   newNotifications: string[];
+  dispatch: AppDispatch;
 }) => {
   return (
-    <>
+    <div
+      onClick={() =>
+        newNotifications.length > 0 && dispatch(markAsRead(notification.id))
+      }
+      className="cursor-pointer"
+    >
       {notification.category.includes("comment") && (
         <CommentNotification
           notification={notification}
@@ -195,7 +204,7 @@ const NotificationsCard = ({
           newNotifications={newNotifications}
         />
       )}
-    </>
+    </div>
   );
 };
 

@@ -2,17 +2,14 @@
 
 import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import Image from "next/image";
-import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
 
 import axiosInstance from "@/lib/axiosInstance";
 import PaginationComponent from "@/components/ui/PaginationComponent";
-
 import { NotificationsWithPagination, IPagination } from "@/common/constants";
 import NotificationsCard from "@/components/ui/NotificationsCard";
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { AppDispatch, RootState } from "@/store";
 
 const fetchNotifications = async (
   pagination: IPagination
@@ -30,10 +27,11 @@ export default function Notifications() {
   const newNotifications = useSelector(
     (state: RootState) => state.notifications
   );
+  const dispatch = useDispatch<AppDispatch>();
 
-  const [pagination, setPagination] = useState({ page: 1, limit: 2 });
+  const [pagination, setPagination] = useState({ page: 1, limit: 10 });
   const { data: notificationsData, isLoading } = useQuery({
-    queryKey: ["notifications", pagination],
+    queryKey: ["notifications", pagination, newNotifications],
     queryFn: () => fetchNotifications(pagination),
     placeholderData: keepPreviousData,
   });
@@ -55,10 +53,19 @@ export default function Notifications() {
           {!isLoading && (
             <>
               <div className="w-full px-10 flex space-x-1 items-center py-5 border-b border-b-gray-200 font-app-medium">
-                <span>Notifications</span>
-                {/* <div className="bg-blue-600 rounded-full text-white h-4 w-4 text-center text-xs">
-                  {notifications ? notifications?.length : 0}
-                </div> */}
+                <h3 className="text-lg">Notifications</h3>
+                {newNotifications.data?.length > 0 && (
+                  <div className="bg-blue-600 rounded-full h-5 w-5 flex items-center justify-center">
+                    <span
+                      className="inline-block text-white"
+                      style={{
+                        fontSize: "11px",
+                      }}
+                    >
+                      {newNotifications.data?.length}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="mb-5">
                 {notifications &&
@@ -67,6 +74,7 @@ export default function Notifications() {
                       key={notification.id}
                       notification={notification}
                       newNotifications={newNotifications.data}
+                      dispatch={dispatch}
                     />
                   ))}
               </div>

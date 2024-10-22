@@ -131,3 +131,19 @@ export const decryptData = (
     return null;
   }
 };
+
+export function isWithinLast10Minutes(lastSeen: Date) {
+  const now = new Date();
+  const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
+  return lastSeen >= tenMinutesAgo;
+}
+
+export function getTime(date: Date) {
+  const neDate = new Date(date);
+  const formattedTime = neDate.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return formattedTime;
+}

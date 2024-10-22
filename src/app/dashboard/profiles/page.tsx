@@ -115,6 +115,7 @@ export default function Profiles() {
                 total={total}
                 setPagination={setPagination}
                 limit={pagination.limit}
+                tag="profiles"
               />
             )}
           </div>

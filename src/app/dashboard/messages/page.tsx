@@ -1,55 +1,29 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import io, { Socket } from "socket.io-client";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useMutation, useQuery } from "@tanstack/react-query";
-
-import { ProfilePreviewCard } from "@/components/ui/ProfileCard";
 import { useSelector } from "react-redux";
+
+import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
 import { RootState } from "@/store";
-import axiosInstance from "@/lib/axiosInstance";
 import AppModal from "@/components/ui/Modal";
 import { Conversation, Message, User } from "@/common/constants";
-import { Profile } from "@/common/constants";
-import { timeAgo } from "@/lib/helpers";
-import { getSession } from "next-auth/react";
-
-interface IMessageFilters {
-  limit: number;
-  page: number;
-}
-
-const fetchMessages = async (
-  conversationId: string,
-  params: IMessageFilters
-) => {
-  const result = await axiosInstance.get(
-    `/api/proxy/conversations/${conversationId}/messages`,
-    {
-      params,
-    }
-  );
-
-  return result.data.data;
-};
-
-const socket: Socket = io("http://localhost:8000", {
-  extraHeaders: {
-    authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiODlhZWJiMi1iODQyLTQ4NjYtYjVjNS1lNDE1YWI2YWVmZTciLCJlbWFpbCI6ImRvcmFvbG9sYWRlbWlAeW9wbWFpbC5jb20iLCJpYXQiOjE3MjcwODIwMzgsImV4cCI6MTcyNzA4NTYzOH0.YFT8O0mUr7ES2VcHPL3nrgvClbxf19DJGgebQvnlINs`,
-  },
-  reconnection: false,
-});
+import { getTime, isWithinLast10Minutes, timeAgo } from "@/lib/helpers";
+import { IMessageFilters } from "@/common/constants";
+import { fetchMessages, sendMessage } from "@/api";
 
 export default function MessagesPage() {
   const {
     user,
     profiles: profilesRecommendations,
     conversations,
+    latestConversation,
   } = useSelector((state: RootState) => ({
     user: state.user,
     profiles: state.recommendations?.profiles,
     conversations: state.conversations.data,
+    latestConversation: state.conversations.latestConversation,
   }));
   const [messagesFilters, setMessagesFilters] = useState<IMessageFilters>({
     limit: 20,
@@ -57,63 +31,46 @@ export default function MessagesPage() {
   });
   const [activeConversation, setActiveConversation] = useState<
     Conversation | any
-  >(conversations?.length > 0 ? conversations[0] : []);
-  const { data: activeConversationMessagesData } = useQuery({
-    queryKey: ["messages", activeConversation.id],
-    queryFn: () => fetchMessages(activeConversation.id, messagesFilters),
+  >(
+    latestConversation && conversations?.length > 0
+      ? conversations.filter(
+          (conversation) => conversation.id == latestConversation
+        )[0]
+      : conversations?.length > 0
+      ? conversations[0]
+      : null
+  );
+  const { data: activeConversationMessagesData, refetch } = useQuery({
+    queryKey: activeConversation?.id
+      ? ["messages", activeConversation?.id]
+      : ["messages"],
+    queryFn: () =>
+      activeConversation.id &&
+      fetchMessages(activeConversation.id, messagesFilters),
   });
   const [followingModalIsOpen, setFollowingModalIsOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
-
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleReceiveMessage = (message: any) => {
-      if (activeConversation) {
-        setActiveConversation((prev: Conversation) => ({
-          ...prev!,
-          messages: [...prev!.messages, message],
-        }));
-      }
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+  const sendMessageMutation = useMutation({
+    mutationFn: (message: any) => sendMessage(message),
+    onSuccess: () => {
+      refetch();
+    },
+  });
 
-    socket.on("connect", () => {
-      if (activeConversation) {
-        const roomId = activeConversation.id;
-        socket.emit("joinRoom", roomId);
-      }
-    });
-
-    socket.on("receiveMessage", handleReceiveMessage);
-
-    return () => {
-      socket.off("receiveMessage", handleReceiveMessage);
-      // Optionally keep socket connection alive, or manage disconnect based on your app's logic
-    };
-  }, [activeConversation]);
-
-  const sendMessage = () => {
+  const handleSendMessage = () => {
     if (inputMessage.trim() && activeConversation) {
       const message = {
         text: inputMessage,
+        user_id: user.id,
         receiver_id: activeConversation.participants?.participant.id,
+        conversation_id: activeConversation.id,
       };
 
-      socket.emit("sendMessage", {
-        user_id: user.id,
-        conversation_id: activeConversation.id,
-        message: message,
-      });
-
-      setActiveConversation((prev: Conversation) => ({
-        ...prev!,
-        messages: [...prev!.messages, message],
-      }));
-
+      sendMessageMutation.mutate(message);
       setInputMessage("");
-
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   };
@@ -122,35 +79,36 @@ export default function MessagesPage() {
     setFollowingModalIsOpen((o) => !o);
   };
 
-  const activeConversationMessages: Message[] =
-    activeConversationMessagesData?.length
-      ? activeConversationMessagesData
-      : !activeConversationMessagesData?.length &&
-        activeConversation.latest_message
-      ? [activeConversation.latest_message]
-      : [];
+  let activeConversationMessages = [];
+
+  if (activeConversationMessagesData?.data?.length > 0) {
+    activeConversationMessages = activeConversationMessagesData.data;
+  }
 
   return (
     <div className="min-h-screen w-full bg-white p-6">
       <div className="flex space-x-5">
         <div className="flex-1  flex flex-col space-y-4">
           <div className="flex min-h-screen border border-gray-300 rounded-lg ">
-            <div className="w-1/4 min-w-80 border-r border-gray-200 pr-3 p-2 pt-5">
+            <div className="w-[30%] min-w-80 border-r border-gray-200 pr-3 p-2 pt-5">
               <div className="sticky top-0 h-full overflow-y-auto max-h-[calc(100vh-100px)] px-3">
-                <h2 className="text font-semibold mb-4">Messages</h2>
-                <div className="mb-2 relative">
-                  <svg
-                    className="absolute left-3 top-3 w-5 h-5 text-gray-400"
-                    fill="currentColor"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
+                <div className="flex items-center space-x-1 mb-4">
+                  <h2 className="text-base font-app-medium">Messages</h2>
+                  <span
+                    className="flex bg-blue-600 text-white rounded-full text-xs items-center justify-center"
+                    style={{
+                      width: "17px",
+                      height: "17px",
+                    }}
                   >
-                    <path d="M10.5 2C5.81 2 2 5.81 2 10.5S5.81 19 10.5 19c2.45 0 4.66-.88 6.38-2.32l5.15 5.15 1.41-1.41-5.15-5.15C18.12 14.16 19 12.02 19 10.5 19 5.81 15.19 2 10.5 2zM10.5 17c-3.58 0-6.5-2.92-6.5-6.5S6.92 4 10.5 4 17 6.92 17 10.5 14.08 17 10.5 17z" />
-                  </svg>
+                    {conversations?.length}
+                  </span>
+                </div>
+                <div className="mb-2 relative">
                   <input
                     type="text"
                     placeholder="Search conversations..."
-                    className="w-full pl-10 pr-3 py-2 border rounded-lg placeholder:text-sm focus:outline-none focus:border-none focus:ring-1 focus:ring-blue-400"
+                    className="w-full pl-3 pr-3 font-app-light py-2 border rounded-lg placeholder:text-xs-sm focus:outline-none focus:border-none focus:ring-1 focus:ring-blue-400"
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
@@ -170,40 +128,72 @@ export default function MessagesPage() {
                     .map((conversation) => (
                       <div
                         key={conversation.id}
-                        className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer ${
+                        className={`flex flex-col space-y-2 p-3 rounded-lg cursor-pointer ${
                           activeConversation?.id === conversation.id
-                            ? "bg-blue-200"
-                            : "hover:bg-blue-100"
+                            ? "bg-blue-50"
+                            : "hover:bg-blue-50"
                         }`}
                         onClick={() => setActiveConversation(conversation)}
                       >
-                        <Image
-                          src={
-                            conversation.participants?.participant.profile
-                              .avatar as string
-                          }
-                          width={50}
-                          height={50}
-                          alt="avatar"
-                          className="rounded-full"
-                        />
-                        <div className="flex flex-col">
-                          <span className="font-medium text-sm">
-                            {conversation.participants?.participant.profile
-                              .first_name +
-                              " " +
-                              conversation.participants?.participant.profile
-                                .last_name}
-                          </span>
-                          <span className="text-xs text-custom-gray-paragraph">
-                            {conversation?.latest_message?.text}
-                          </span>
+                        <div className="flex items-center space-x-3 relative">
+                          <div className="relative">
+                            <Image
+                              src={
+                                conversation.participants?.participant.profile
+                                  .avatar as string
+                              }
+                              width={45}
+                              height={45}
+                              alt="avatar"
+                              className="rounded-full"
+                            />
+                            {isWithinLast10Minutes(
+                              conversation.participants?.participant
+                                .last_seen as Date
+                            ) && (
+                              <span
+                                className="absolute bottom-1 right-0 flex bg-green-600 text-white rounded-full text-xs items-center justify-center"
+                                style={{
+                                  width: "10px",
+                                  height: "10px",
+                                }}
+                              ></span>
+                            )}
+                          </div>
+                          <div className="flex flex-col space-y-1">
+                            <span className="font-app-medium text-sm">
+                              {conversation.participants?.participant.profile
+                                .first_name +
+                                " " +
+                                conversation.participants?.participant.profile
+                                  .last_name}
+                            </span>
+                            {conversation.messages?.length > 0 && (
+                              <span className="text-xs-sm text-gray-700">
+                                {conversation?.messages[0]?.text}
+                              </span>
+                            )}
+                          </div>
+                          {conversation?.messages &&
+                            conversation?.messages[0]?.created_at && (
+                              <div
+                                className="absolute top-1 text-gray-500 right-0"
+                                style={{
+                                  fontSize: "12px",
+                                }}
+                              >
+                                {getTime(
+                                  conversation?.messages[0]?.created_at as Date
+                                )}
+                              </div>
+                            )}
                         </div>
                       </div>
                     ))}
+
                   {!conversations?.length && (
                     <div className="bg-slate-50 mt-5 rounded-lg h-14 p-2 flex flex-col justify-center items-center space-y-3 text-custom-gray-paragraph">
-                      <span className="text-sm font-medium">
+                      <span className="text-xs-sm font-medium">
                         Hmmm, there is nothing here!
                       </span>
                     </div>
@@ -216,113 +206,83 @@ export default function MessagesPage() {
                 <div className="flex flex-col h-full bg-gray-50 rounded-lg p-2 relative">
                   <div className="sticky top-0 bg-gray-50 z-10 p-4">
                     <div className="flex items-center space-x-3">
-                      <Image
-                        src={
-                          activeConversation.participants?.participant.profile
-                            .avatar
-                        }
-                        width={50}
-                        height={50}
-                        alt="avatar"
-                        className="rounded-full"
-                      />
+                      <div className="border border-gray-300 p-1 rounded-full">
+                        <Image
+                          src={
+                            activeConversation.participants.participant.profile
+                              .avatar
+                          }
+                          width={50}
+                          height={50}
+                          alt="avatar"
+                          className="rounded-full"
+                        />
+                      </div>
                       <div className="flex flex-col">
-                        <span className="font-medium text-lg">
+                        <span className="font-app-medium">
                           {activeConversation.participants?.participant.profile
                             .first_name +
                             " " +
                             activeConversation.participants?.participant.profile
                               .last_name}
                         </span>
-                        <span className="text-xs text-custom-gray-paragraph">
-                          {(activeConversation.participants?.participant
-                            ?.last_seen &&
-                            timeAgo(
+                        <span className="text-xs-sm text-gray-600">
+                          {
+                            activeConversation.participants?.participant.profile
+                              .title
+                          }
+                        </span>
+                        {activeConversation.participants?.participant
+                          ?.last_seen && (
+                          <span className="text-xs text-gray-500 mt-2">
+                            {timeAgo(
                               activeConversation.participants?.participant
                                 .last_seen
-                            )) ||
-                            "Last seen recently"}
-                        </span>
+                            )}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                   <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-white rounded-lg shadow-sm">
-                    {!activeConversationMessages?.length &&
-                      activeConversation.length > 0 && (
-                        <div
-                          className={`flex space-x-3 ${
-                            activeConversation.latest_message.sender.id ===
-                            user.id
-                              ? "justify-end"
-                              : "justify-start"
-                          }`}
-                        >
-                          <Image
-                            src={
-                              activeConversation.latestMessage.participantId ===
-                              user.id
-                                ? activeConversation.participants?.filter(
-                                    (participant: User) =>
-                                      participant.id === user.id
-                                  )[0].profile.avatar
-                                : activeConversation.participants?.filter(
-                                    (participant: User) =>
-                                      participant.id !== user.id
-                                  )[0].profile.avatar
-                            }
-                            width={40}
-                            height={40}
-                            alt="avatar"
-                            className="rounded-full"
-                          />
-                          <div
-                            className={`p-3 rounded-lg ${
-                              activeConversation.latestMessage.participantId ===
-                              user.id
-                                ? "bg-blue-100"
-                                : "bg-green-100"
-                            }`}
-                          >
-                            <p className="text-sm text-gray-800">
-                              {activeConversation.latestMessage.text}
-                            </p>
-                          </div>
-                        </div>
-                      )}
                     {activeConversationMessages.length > 0 &&
                       activeConversationMessages.map((msg, index) => {
                         return (
                           <div
                             key={index}
                             className={`flex space-x-3 ${
-                              msg.sender.id === user.id
+                              msg.sender?.uuid === user.id
                                 ? "justify-end"
                                 : "justify-start"
                             }`}
                           >
-                            <Image
-                              src={
-                                msg.sender.id === user.id
-                                  ? activeConversation.participants?.user
-                                      .profile.avatar
-                                  : activeConversation.participants?.participant
-                                      .profile.avatar
-                              }
-                              width={40}
-                              height={40}
-                              alt="avatar"
-                              className="rounded-full"
-                            />
                             <div
-                              className={`p-3 rounded-lg ${
-                                msg.sender.id === user.id
-                                  ? "bg-blue-100"
-                                  : "bg-green-100"
+                              style={{
+                                width: "40px",
+                              }}
+                            >
+                              <Image
+                                src={
+                                  msg.sender?.uuid === user.id
+                                    ? activeConversation.participants?.user
+                                        .profile.avatar
+                                    : activeConversation.participants
+                                        ?.participant.profile.avatar
+                                }
+                                width={40}
+                                height={40}
+                                alt="avatar"
+                                className="rounded-full justify-self-end"
+                              />
+                            </div>
+                            <div
+                              className={`max-w-[66%] p-3 rounded-xl ${
+                                msg.sender.uuid === user.id
+                                  ? "bg-blue-500 text-white font-app-normal"
+                                  : "bg-slate-100 text-gray-800"
                               }`}
                             >
-                              <p className="text-sm text-gray-800">
-                                {msg.text}
-                              </p>
+                              <p className="text-sm">{msg.text}</p>
                             </div>
                           </div>
                         );
@@ -339,7 +299,7 @@ export default function MessagesPage() {
                     />
                     <button
                       className="bg-blue-700 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-600"
-                      onClick={sendMessage}
+                      onClick={handleSendMessage}
                     >
                       <svg
                         className="w-4 h-4"
@@ -360,27 +320,20 @@ export default function MessagesPage() {
                 </div>
               )}
               {!activeConversation && (
-                <div className="flex h-1/2 w-full justify-center ">
+                <div className="flex h-1/2 w-full justify-center font-light">
                   <div className="w-96 bg-slate-50 mt-10 rounded-xl h-64 px-4 py-8 text-center flex flex-col justify-center items-center space-y-6 text-custom-gray-paragraph">
                     <div>
-                      <p className="text-xl font-bold mb-3">Say hi!</p>
-                      <p
-                        className="text-sm leading-snug"
-                        style={{ fontSize: "15px" }}
-                      >
+                      <p className="text font-app-medium mb-3">
+                        Start a conversation
+                      </p>
+                      <p className="text-sm leading-snug">
                         Message your friends and colleagues to find out what is
                         new with them.
                       </p>
                     </div>
-                    {/* <Image
-                      src="/icons/no-message.svg"
-                      alt=""
-                      width={70}
-                      height={70}
-                    /> */}
                     <div
                       onClick={handleToggleFollowingModal}
-                      className="cursor-pointer flex space-x-2 items-center bg-blue-600 text-white text-sm px-3 py-2 rounded-lg"
+                      className="cursor-pointer flex space-x-2 items-center bg-blue-600 text-white text-xs-sm px-3 py-2 rounded-lg"
                     >
                       <span>Send a message</span>
                       <svg
@@ -419,10 +372,10 @@ export default function MessagesPage() {
             </div>
           </div>
         </div>
-        <aside className="w-1/4 space-y-5">
+        {/* <aside className="w-1/4 space-y-5">
           <div className="p-4 bg-white rounded-lg border border-gray-300">
-            <h3 className="font-semibold mb-3 text-gray-700 text-base">
-              Who to Follow
+            <h3 className="font-app-medium mb-3 text-gray-700 text-base">
+              Profiles for you
             </h3>
             <div className="space-y-4">
               {profilesRecommendations &&
@@ -430,9 +383,12 @@ export default function MessagesPage() {
                   let hasFollowed = false;
 
                   if (user)
-                    hasFollowed = user.profile
-                      .following!.map((following) => following.profile_id)
+                    hasFollowed = (user.profile.following || [])
+                      .map((following) => {
+                        return following.profile_id as string;
+                      })
                       .includes(profile.id);
+
                   return (
                     <div
                       key={profile.id}
@@ -444,6 +400,7 @@ export default function MessagesPage() {
                         title={profile.title}
                         profile_id={profile.id}
                         user_id={profile.user_id}
+                        avatar={profile.avatar || "/images/test-avatar-3.jpg"}
                         hasFollowed={hasFollowed}
                       />
                     </div>
@@ -451,7 +408,7 @@ export default function MessagesPage() {
                 })}
             </div>
           </div>
-        </aside>
+        </aside> */}
       </div>
       <AppModal
         title="Connections"
@@ -461,25 +418,26 @@ export default function MessagesPage() {
       >
         <div className="p-4">
           <div className="space-y-4">
-            {user.profile.following &&
-              user.profile.following.map((profile) => {
+            {user?.profile?.followers &&
+              user?.profile?.followers.map((profile) => {
                 let hasFollowed = false;
 
                 if (user)
-                  hasFollowed = user.profile
-                    .following!.map((following) => following.profile_id)
-                    .includes(profile.id);
+                  hasFollowed = (user.profile?.following || [])
+                    .map((following) => following.profile_id)
+                    .includes(profile.profile_id);
                 return (
                   <div
-                    key={profile.id}
+                    key={profile.profile_id}
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
                       currentUserProfileId={user?.profile?.id}
                       name={profile.first_name + " " + profile.last_name}
-                      title={profile.title}
-                      profile_id={profile.id}
+                      title={profile.title || ""}
+                      profile_id={profile.profile_id}
                       user_id={profile.user_id}
+                      avatar={profile.avatar || "/images/test-avatar-3.jpg"}
                       hasFollowed={hasFollowed}
                     />
                   </div>

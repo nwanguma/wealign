@@ -13,11 +13,13 @@ interface IProfilePreviewCardProps {
   avatar?: string;
   isPreview?: boolean;
   hasFollowed?: boolean;
+  email?: string;
 }
 
 export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
   currentUserProfileId,
   profile_id,
+  email,
   user_id,
   name,
   title,

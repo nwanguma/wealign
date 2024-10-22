@@ -36,6 +36,9 @@ const notificationsSlice = createSlice({
     resetNotifications: (state) => {
       state.data = [];
     },
+    markAsRead: (state, action) => {
+      state.data = state.data.filter((data) => data !== action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -53,5 +56,5 @@ const notificationsSlice = createSlice({
   },
 });
 
-export const { resetNotifications } = notificationsSlice.actions;
+export const { resetNotifications, markAsRead } = notificationsSlice.actions;
 export default notificationsSlice.reducer;

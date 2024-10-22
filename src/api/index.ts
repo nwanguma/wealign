@@ -11,8 +11,9 @@ import {
   ProjectsWithPagination,
   ProfilesWithPagination,
   IPagination,
-  IFilters,
   Comment,
+  IMessageFilters,
+  IFilters,
 } from "@/common/constants";
 
 export const fetchActivities = async (): Promise<Activity[]> => {
@@ -279,4 +280,24 @@ export const deleteComment = async (
   );
 
   return response.data.data;
+};
+
+export const fetchMessages = async (
+  conversationId: string,
+  params: IMessageFilters
+) => {
+  const result = await axiosInstance.get(
+    `/api/proxy/conversations/${conversationId}/messages`,
+    {
+      params,
+    }
+  );
+
+  return result.data.data;
+};
+
+export const sendMessage = async (message: any) => {
+  const result = await axiosInstance.post(`/api/proxy/messages`, message);
+
+  return result.data.data;
 };

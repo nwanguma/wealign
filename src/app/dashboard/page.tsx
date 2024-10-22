@@ -450,6 +450,7 @@ const MainFeed: React.FC = () => {
                     total={projectsTotal}
                     setPagination={setProjectsPagination}
                     limit={projectsPagination.limit}
+                    tag="projects"
                   />
                 </div>
               )}
@@ -469,6 +470,7 @@ const MainFeed: React.FC = () => {
                     total={eventsTotal}
                     setPagination={setEventsPagination}
                     limit={eventsPagination.limit}
+                    tag="events"
                   />
                 </div>
               )}
@@ -488,6 +490,7 @@ const MainFeed: React.FC = () => {
                     total={articlesTotal}
                     setPagination={setArticlesPagination}
                     limit={articlesPagination.limit}
+                    tag="articles"
                   />
                 </div>
               )}
@@ -534,6 +537,7 @@ const MainFeed: React.FC = () => {
                       className="border-b border-b-gray-200 pb-4 last:border-0"
                     >
                       <ProfilePreviewCard
+                        email={profile.email}
                         currentUserProfileId={currentUser?.profile?.id}
                         name={profile.first_name + " " + profile.last_name}
                         title={profile.title}
@@ -593,6 +597,7 @@ const MainFeed: React.FC = () => {
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
+                      email={profile.email}
                       currentUserProfileId={currentUser?.profile?.id}
                       name={profile.first_name + " " + profile.last_name}
                       title={profile.title || ""}
@@ -628,6 +633,7 @@ const MainFeed: React.FC = () => {
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
+                      email={profile.email}
                       currentUserProfileId={currentUser?.profile?.id}
                       name={profile.first_name + " " + profile.last_name}
                       title={profile.title || ""}

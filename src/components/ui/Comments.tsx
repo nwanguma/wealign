@@ -48,13 +48,10 @@ export const Comments: React.FC<ICommentsProps> = ({
       data: Partial<Comment>;
     }) => createComment(resource, resourceId, data),
     onSuccess: () => {
-      console.log("yes");
       triggerRefetch && triggerRefetch();
       setNewComment("");
     },
-    onError: (error: any) => {
-      console.log("litty", error);
-    },
+    onError: (error: any) => {},
     onSettled: () => {
       setIsLoading(false);
     },
@@ -296,6 +293,7 @@ export const Comments: React.FC<ICommentsProps> = ({
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
+                      email={reaction.owner.email}
                       currentUserProfileId={currentUserProfileId}
                       name={
                         reaction.owner.first_name +

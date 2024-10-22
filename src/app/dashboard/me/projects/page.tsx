@@ -167,6 +167,7 @@ export default function Projects() {
                 total={total}
                 setPagination={setPagination}
                 limit={pagination.limit}
+                tag="projects"
               />
             )}
           </div>

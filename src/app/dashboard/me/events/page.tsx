@@ -166,6 +166,7 @@ export default function Events() {
                 total={total}
                 setPagination={setPagination}
                 limit={pagination.limit}
+                tag="events"
               />
             )}
           </div>

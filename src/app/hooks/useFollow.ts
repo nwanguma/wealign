@@ -4,7 +4,10 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 
 import { AppDispatch, RootState } from "@/store";
-import { addToConversations } from "@/store/conversations";
+import {
+  addToConversations,
+  setLatestConversation,
+} from "@/store/conversations";
 import { initiateConversation, followUser, unfollowUser } from "@/api";
 import { fetchFollowing } from "@/store/user";
 
@@ -34,7 +37,6 @@ export const useFollow = () => {
   const unfollowMutation = useMutation({
     mutationFn: (profileId: string) => unfollowUser(profileId),
     onSuccess: (data, profileId) => {
-      console.log("yes");
       setJustFollowed((prevState) => ({
         ...prevState,
         [profileId]: false,
@@ -42,19 +44,17 @@ export const useFollow = () => {
 
       dispatch(fetchFollowing());
     },
-    onError: (error: any) => {
-      console.log(error);
-    },
+    onError: (error: any) => {},
   });
   const initiateConversationsMutation = useMutation({
     mutationFn: (recipientId: string) => initiateConversation(recipientId),
     onSuccess: (data) => {
-      const isExistingConversation = conversations.find(
-        (conversation) => conversation.id === data.id
-      );
+      const isExistingConversation = conversations.find((conversation) => {
+        return conversation.id === data.id;
+      });
 
       if (isExistingConversation) {
-        router.push(`/dashboard/messages/${data.id}`);
+        dispatch(setLatestConversation(data.id));
       } else {
         dispatch(addToConversations(data));
 
