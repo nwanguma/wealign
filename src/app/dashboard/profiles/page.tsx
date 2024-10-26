@@ -15,7 +15,10 @@ import {
 import { useSkills } from "@/app/hooks/useSkills";
 import PaginationComponent from "@/components/ui/PaginationComponent";
 import ContentWrapper from "@/components/ui/ContentWrapper";
-import { SkeletonLoaderGrid } from "@/components/ui/SkeletonLoader";
+import {
+  SkeletonLoaderGrid,
+  SkeletonLoader,
+} from "@/components/ui/SkeletonLoader";
 import { fetchProfiles } from "@/api";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -59,14 +62,14 @@ export default function Profiles() {
   });
 
   return (
-    <div className="min-h-screen w-full bg-white p-6">
-      <div className="min-h-screen px-5 md:px-10 lg:px-20">
+    <div className="min-h-screen w-full bg-white p-1 lg:p-6">
+      <div className="min-h-screen px-2 s:px-5 md:px-10 lg:px-20">
         <div className="flex-1">
           <DashboardPageHeader
             title="Explore Professional Profiles"
             description="Browse through profiles of skilled individuals across various fields. Discover potential collaborators, connect with experts, and expand your network to bring your projects to success. Whether you're looking for developers, designers, or strategists, find the right talent to meet your project needs and build lasting professional relationships."
           />
-          <div className="py-5 flex flex-col space-y-5 w-full">
+          <div className="py-5 flex flex-col space-y-3 lg:space-y-5 w-full">
             <FilterComponent
               filters={filters}
               setFilters={setFilters}
@@ -96,7 +99,7 @@ export default function Profiles() {
                     return (
                       <div
                         key={profile.id}
-                        className="w-full border border-gray-300 rounded-lg p-3"
+                        className="w-full border border-gray-300 rounded-lg p-2 lg:p-4"
                       >
                         <ProfileCard
                           currentUserProfileId={user?.profile?.id}
@@ -108,7 +111,16 @@ export default function Profiles() {
                   })}
               </ContentWrapper>
             )}
-            {isLoading && <SkeletonLoaderGrid />}
+            {isLoading && (
+              <>
+                <div className="hidden md:block">
+                  <SkeletonLoaderGrid />
+                </div>
+                <div className="block md:hidden">
+                  <SkeletonLoader />
+                </div>
+              </>
+            )}
             {profilesData && profiles && (
               <PaginationComponent
                 data={profiles as Profile[]}

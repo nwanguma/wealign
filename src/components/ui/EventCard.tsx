@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Event } from "@/common/constants";
 import { truncateString, formatDateShort } from "@/lib/helpers";
 import { FormatDateOptionsEnum } from "@/lib/helpers/constants";
+import CommentsReactionsUI from "./CommentsReactionsUI";
 
 interface IEventCardPreviewProps {
   event: Partial<Event>;
@@ -34,10 +35,10 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
   );
 
   return (
-    <div className="space-x-4 h-full relative">
+    <div className={`h-full ${!isPreview ? "pb-3" : "pb-0"} relative`}>
       <Link href={`/dashboard/events/${id}`}>
         <div className="h-full flex items-center space-x-5">
-          <div className="max-w-20">
+          <div className="max-w-28 sm:max-w-20">
             <div className="flex flex-col justify-center items-center">
               <span className="text-xs text-custom-gray-paragraph">
                 {dayOfWeek}
@@ -50,7 +51,7 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
               </span>
             </div>
           </div>
-          <div className="w-1/3 h-full min-h-20 relative rounded-lg">
+          <div className="hidden sm:block w-1/3 h-full min-h-20 relative rounded-lg">
             <Image
               src={banner || `/images/test-event-2.jpg`}
               alt="avatar"
@@ -72,22 +73,11 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
                 {truncateString(description as string, 70)}
               </span>
             </div>
-            {!isPreview && (
-              <div className="absolute bottom-0 right-0 flex items-center space-x-3 text-xs text-gray-600">
-                {!!comments?.length && (
-                  <span className="underline">
-                    <span>{comments?.length} Comments</span>
-                  </span>
-                )}
-                {!!reactions && (
-                  <span className="underline">
-                    <span>{reactions?.length} Likes</span>
-                  </span>
-                )}
-              </div>
-            )}
           </div>
         </div>
+        {!isPreview && (
+          <CommentsReactionsUI comments={comments!} reactions={reactions!} />
+        )}
       </Link>
     </div>
   );

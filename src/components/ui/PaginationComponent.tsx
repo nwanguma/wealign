@@ -10,36 +10,43 @@ import {
 } from "@/common/constants";
 
 interface IPaginationComponentProps {
+  count?: number;
   data: Project[] | Event[] | Profile[] | Job[] | Article[] | Notification[];
   total: number;
   setPagination: any;
   limit: number;
   tag?: string;
+  setPage?: boolean;
 }
 
 const PaginationComponent: React.FC<IPaginationComponentProps> = ({
+  count,
   data,
   total,
   setPagination,
   limit,
   tag,
+  setPage,
 }) => {
-  const paginationRef = useRef<number>(limit);
-  const fixedLimit = paginationRef.current;
+  const paginationRef = useRef<{ page: number; limit: number }>({
+    page: 1,
+    limit,
+  });
+  const fixedPagination = paginationRef.current;
 
   return (
     <div className="w-full flex items-center justify-center">
       <button
-        disabled={data.length === total}
+        disabled={count ? count === total : data.length === total}
         onClick={() =>
           setPagination((prev: IPagination) => ({
-            page: prev.page,
-            limit: prev.limit + fixedLimit,
+            page: setPage ? prev.page + fixedPagination.page : prev.page,
+            limit: !setPage ? prev.limit + fixedPagination.limit : prev.limit,
           }))
         }
         className="cursor-pointer p-2 text-xs-sm border text-gray-700 border-gray-300 bg-slate-50 rounded"
       >
-        {data.length < total
+        {(count ? count < total : data.length < total)
           ? "Load more" + " " + tag
           : "You have reached the end"}
       </button>

@@ -60,7 +60,11 @@ const TextArea: React.FC<TextAreaProps> = ({
           required
         />
       </div>
-      {error && <p className="text-red-500">{error}</p>}
+      {error && (
+        <p className="text-xs-sm text-red-500 first-letter:capitalize">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

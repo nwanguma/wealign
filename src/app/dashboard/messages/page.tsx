@@ -1,33 +1,35 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import { useDispatch, useSelector } from "react-redux";
 
 import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
-import { RootState } from "@/store";
+import { AppDispatch, RootState } from "@/store";
 import AppModal from "@/components/ui/Modal";
-import { Conversation, Message, User } from "@/common/constants";
+import { Conversation } from "@/common/constants";
 import { getTime, isWithinLast10Minutes, timeAgo } from "@/lib/helpers";
-import { IMessageFilters } from "@/common/constants";
 import { fetchMessages, sendMessage } from "@/api";
+import { fetchConversations } from "@/store/conversations";
+import PaginationComponent from "@/components/ui/PaginationComponent";
 
 export default function MessagesPage() {
-  const {
-    user,
-    profiles: profilesRecommendations,
-    conversations,
-    latestConversation,
-  } = useSelector((state: RootState) => ({
-    user: state.user,
-    profiles: state.recommendations?.profiles,
-    conversations: state.conversations.data,
-    latestConversation: state.conversations.latestConversation,
-  }));
-  const [messagesFilters, setMessagesFilters] = useState<IMessageFilters>({
-    limit: 20,
+  const newMessages = useSelector(
+    (state: RootState) => state.notifications.messages
+  );
+  const dispatch = useDispatch<AppDispatch>();
+  const { user, conversations, latestConversation } = useSelector(
+    (state: RootState) => ({
+      user: state.user,
+      profiles: state.recommendations?.profiles,
+      conversations: state.conversations.data,
+      latestConversation: state.conversations.latestConversation,
+    })
+  );
+  const [messagesPagination, setMessagesPagination] = useState({
     page: 1,
+    limit: 20,
   });
   const [activeConversation, setActiveConversation] = useState<
     Conversation | any
@@ -42,11 +44,13 @@ export default function MessagesPage() {
   );
   const { data: activeConversationMessagesData, refetch } = useQuery({
     queryKey: activeConversation?.id
-      ? ["messages", activeConversation?.id]
-      : ["messages"],
+      ? ["messages", activeConversation?.id, messagesPagination, newMessages]
+      : ["messages", messagesPagination, newMessages],
     queryFn: () =>
       activeConversation.id &&
-      fetchMessages(activeConversation.id, messagesFilters),
+      fetchMessages(activeConversation.id, messagesPagination),
+    refetchInterval: 30000,
+    placeholderData: keepPreviousData,
   });
   const [followingModalIsOpen, setFollowingModalIsOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState<string>("");
@@ -57,6 +61,10 @@ export default function MessagesPage() {
     mutationFn: (message: any) => sendMessage(message),
     onSuccess: () => {
       refetch();
+
+      console.log("did we get here");
+
+      dispatch(fetchConversations());
     },
   });
 
@@ -79,30 +87,48 @@ export default function MessagesPage() {
     setFollowingModalIsOpen((o) => !o);
   };
 
-  let activeConversationMessages = [];
+  let activeConversationMessages;
 
-  if (activeConversationMessagesData?.data?.length > 0) {
+  if (
+    activeConversationMessagesData?.data &&
+    Object.keys(activeConversationMessagesData?.data).length > 0
+  ) {
     activeConversationMessages = activeConversationMessagesData.data;
   }
 
+  console.log(conversations, "**conversations**");
+
   return (
-    <div className="min-h-screen w-full bg-white p-6">
+    <div className="min-h-screen w-full bg-white p-2 md:p-6">
       <div className="flex space-x-5">
         <div className="flex-1  flex flex-col space-y-4">
-          <div className="flex min-h-screen border border-gray-300 rounded-lg ">
-            <div className="w-[30%] min-w-80 border-r border-gray-200 pr-3 p-2 pt-5">
-              <div className="sticky top-0 h-full overflow-y-auto max-h-[calc(100vh-100px)] px-3">
-                <div className="flex items-center space-x-1 mb-4">
-                  <h2 className="text-base font-app-medium">Messages</h2>
-                  <span
-                    className="flex bg-blue-600 text-white rounded-full text-xs items-center justify-center"
-                    style={{
-                      width: "17px",
-                      height: "17px",
-                    }}
+          <div className="flex flex-col md:flex-row min-h-screen border border-gray-300 rounded-lg">
+            <div className="w-full md:w-[30%] md:min-w-80 md:border-r border-gray-200 md:pr-3 p-2 pt-2 md:pt-5">
+              <div className="sticky top-0 md:h-full overflow-y-auto max-h-56 md:max-h-[calc(100vh-100px)] px-1 md:px-3">
+                <div className="mb-4 flex justify-between items-center">
+                  <div className="flex items-center space-x-1">
+                    <h2 className="text-base font-app-medium">Messages</h2>
+                    <span
+                      className="flex bg-blue-600 text-white rounded-full text-xs items-center justify-center"
+                      style={{
+                        width: "17px",
+                        height: "17px",
+                      }}
+                    >
+                      {conversations?.length}
+                    </span>
+                  </div>
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => setFollowingModalIsOpen((o) => !o)}
                   >
-                    {conversations?.length}
-                  </span>
+                    <Image
+                      src="/icons/new-chat.svg"
+                      alt=""
+                      width={20}
+                      height={20}
+                    />
+                  </div>
                 </div>
                 <div className="mb-2 relative">
                   <input
@@ -112,7 +138,6 @@ export default function MessagesPage() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-
                 <div className="space-y-1">
                   {conversations
                     ?.filter((conversation) => {
@@ -168,25 +193,24 @@ export default function MessagesPage() {
                                 conversation.participants?.participant.profile
                                   .last_name}
                             </span>
-                            {conversation.messages?.length > 0 && (
+                            {conversation.latest_message?.text && (
                               <span className="text-xs-sm text-gray-700">
-                                {conversation?.messages[0]?.text}
+                                {conversation?.latest_message?.text}
                               </span>
                             )}
                           </div>
-                          {conversation?.messages &&
-                            conversation?.messages[0]?.created_at && (
-                              <div
-                                className="absolute top-1 text-gray-500 right-0"
-                                style={{
-                                  fontSize: "12px",
-                                }}
-                              >
-                                {getTime(
-                                  conversation?.messages[0]?.created_at as Date
-                                )}
-                              </div>
-                            )}
+                          {conversation?.latest_message?.created_at && (
+                            <div
+                              className="absolute top-1 text-gray-500 right-0"
+                              style={{
+                                fontSize: "12px",
+                              }}
+                            >
+                              {getTime(
+                                conversation?.latest_message?.created_at as Date
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -203,8 +227,8 @@ export default function MessagesPage() {
             </div>
             <div className="flex-1 flex flex-col">
               {activeConversation && (
-                <div className="flex flex-col h-full bg-gray-50 rounded-lg p-2 relative">
-                  <div className="sticky top-0 bg-gray-50 z-10 p-4">
+                <div className="flex flex-col h-full bg-gray-50 md:rounded-lg p-2 relative">
+                  <div className="sticky top-0 bg-gray-50 z-10 p-2 md:p-4">
                     <div className="flex items-center space-x-3">
                       <div className="border border-gray-300 p-1 rounded-full">
                         <Image
@@ -244,56 +268,106 @@ export default function MessagesPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-white rounded-lg shadow-sm">
-                    {activeConversationMessages.length > 0 &&
-                      activeConversationMessages.map((msg, index) => {
-                        return (
-                          <div
-                            key={index}
-                            className={`flex space-x-3 ${
-                              msg.sender?.uuid === user.id
-                                ? "justify-end"
-                                : "justify-start"
-                            }`}
-                          >
-                            <div
-                              style={{
-                                width: "40px",
-                              }}
-                            >
-                              <Image
-                                src={
-                                  msg.sender?.uuid === user.id
-                                    ? activeConversation.participants?.user
-                                        .profile.avatar
-                                    : activeConversation.participants
-                                        ?.participant.profile.avatar
-                                }
-                                width={40}
-                                height={40}
-                                alt="avatar"
-                                className="rounded-full justify-self-end"
-                              />
+                  <div className="flex-1 overflow-y-auto space-y-2 md:space-y-4 p-2 md:p-4 bg-white rounded-lg shadow-sm">
+                    {activeConversationMessages &&
+                      Object.keys(activeConversationMessages).length > 0 && (
+                        <PaginationComponent
+                          count={activeConversationMessagesData.batch}
+                          data={[]}
+                          total={activeConversationMessagesData.total}
+                          setPagination={setMessagesPagination}
+                          limit={messagesPagination.limit}
+                          tag="messages"
+                        />
+                      )}
+                    {activeConversationMessages &&
+                      Object.keys(activeConversationMessages).length > 0 &&
+                      Object.keys(activeConversationMessages).map(
+                        (key: string) => {
+                          const messages = activeConversationMessages[key];
+
+                          return (
+                            <div key={key} className="space-y-2">
+                              <div className="text-center text-gray-600 text-xs">
+                                {key}
+                              </div>
+                              {messages.map((msg) => {
+                                return (
+                                  <div
+                                    key={msg.id}
+                                    className={`flex space-x-3 ${
+                                      msg.sender?.uuid === user.id
+                                        ? "justify-end"
+                                        : "justify-start"
+                                    }`}
+                                  >
+                                    {msg.sender?.uuid !== user.id && (
+                                      <div
+                                        style={{
+                                          width: "40px",
+                                        }}
+                                      >
+                                        <Image
+                                          src={
+                                            msg.sender?.uuid === user.id
+                                              ? activeConversation.participants
+                                                  ?.user.profile.avatar
+                                              : activeConversation.participants
+                                                  ?.participant.profile.avatar
+                                          }
+                                          width={40}
+                                          height={40}
+                                          alt="avatar"
+                                          className="rounded-full"
+                                        />
+                                      </div>
+                                    )}
+                                    <div
+                                      className={`max-w-[80%] md:max-w-[66%] p-2 md:p-3 rounded-lg md:rounded-xl ${
+                                        msg.sender.uuid === user.id
+                                          ? "bg-[#1F69E0] text-white"
+                                          : "bg-[#F1F1F1] text-gray-700"
+                                      }`}
+                                    >
+                                      <p className="text-sm md:text-md font-landing">
+                                        {msg.text}
+                                      </p>
+                                    </div>
+                                    {msg.sender?.uuid === user.id && (
+                                      <div
+                                        style={{
+                                          width: "40px",
+                                        }}
+                                      >
+                                        <Image
+                                          src={
+                                            msg.sender?.uuid === user.id
+                                              ? activeConversation.participants
+                                                  ?.user.profile.avatar
+                                              : activeConversation.participants
+                                                  ?.participant.profile.avatar
+                                          }
+                                          width={40}
+                                          height={40}
+                                          alt="avatar"
+                                          className="rounded-full"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
-                            <div
-                              className={`max-w-[66%] p-3 rounded-xl ${
-                                msg.sender.uuid === user.id
-                                  ? "bg-blue-500 text-white font-app-normal"
-                                  : "bg-slate-100 text-gray-800"
-                              }`}
-                            >
-                              <p className="text-sm">{msg.text}</p>
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        }
+                      )}
                     <div ref={chatEndRef} />
                   </div>
-                  <div className="sticky bottom-0 left-0 right-0 bg-gray-100 px-4 py-3 flex items-center space-x-3">
+                  <div className="sticky bottom-0 left-0 right-0 bg-gray-100 px-2 md:px-4 py-2 md:py-3 flex items-center space-x-3">
                     <input
                       type="text"
                       placeholder="Type a message..."
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg placeholder:text-sm"
+                      className="flex-1 px-2 md:px-4 py-2 font-app-light text-sm border border-gray-300 rounded-lg placeholder:text-sm placeholder:font-app-light focus:border-0 focus:outline-none focus:ring-1 focus:ring-blue-700"
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
                     />
@@ -372,43 +446,6 @@ export default function MessagesPage() {
             </div>
           </div>
         </div>
-        {/* <aside className="w-1/4 space-y-5">
-          <div className="p-4 bg-white rounded-lg border border-gray-300">
-            <h3 className="font-app-medium mb-3 text-gray-700 text-base">
-              Profiles for you
-            </h3>
-            <div className="space-y-4">
-              {profilesRecommendations &&
-                profilesRecommendations.map((profile) => {
-                  let hasFollowed = false;
-
-                  if (user)
-                    hasFollowed = (user.profile.following || [])
-                      .map((following) => {
-                        return following.profile_id as string;
-                      })
-                      .includes(profile.id);
-
-                  return (
-                    <div
-                      key={profile.id}
-                      className="border-b border-b-gray-200 pb-4 last:border-0"
-                    >
-                      <ProfilePreviewCard
-                        currentUserProfileId={user?.profile?.id}
-                        name={profile.first_name + " " + profile.last_name}
-                        title={profile.title}
-                        profile_id={profile.id}
-                        user_id={profile.user_id}
-                        avatar={profile.avatar || "/images/test-avatar-3.jpg"}
-                        hasFollowed={hasFollowed}
-                      />
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-        </aside> */}
       </div>
       <AppModal
         title="Connections"
@@ -418,8 +455,8 @@ export default function MessagesPage() {
       >
         <div className="p-4">
           <div className="space-y-4">
-            {user?.profile?.followers &&
-              user?.profile?.followers.map((profile) => {
+            {user?.profile?.following &&
+              user?.profile?.following.map((profile) => {
                 let hasFollowed = false;
 
                 if (user)
@@ -432,6 +469,7 @@ export default function MessagesPage() {
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
+                      handleCloseModal={() => handleToggleFollowingModal()}
                       currentUserProfileId={user?.profile?.id}
                       name={profile.first_name + " " + profile.last_name}
                       title={profile.title || ""}

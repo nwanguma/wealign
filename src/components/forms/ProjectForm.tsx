@@ -17,7 +17,11 @@ import { Project, Profile, Option } from "@/common/constants";
 import AddItemInput from "./AddItemInput";
 import { useSkills } from "@/app/hooks/useSkills";
 import { WithTooltip } from "../ui/WithTooltip";
-import { getFilenameAndExtension } from "@/lib/helpers";
+import {
+  getFilenameAndExtension,
+  sanitizeFile,
+  serializeData,
+} from "@/lib/helpers";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "../../app/globals.css";
@@ -33,8 +37,10 @@ const schema = yup.object().shape({
     .string()
     .required("Description is required")
     .min(30, "Must be at least 30 characters"),
-  location: yup.string().required("Location is required"),
-  status: yup.string().required("Status is required"),
+  location: yup.string(),
+  // required("Location is required"),
+  status: yup.string(),
+  // required("Status is required"),
   website: yup.string().url("Must be a valid URL"),
   github_url: yup.string().url("Must be a valid URL"),
   skills: yup.array(),
@@ -56,13 +62,13 @@ const updateProject = async (data: Partial<Project>, id: string) => {
   return response.data.data;
 };
 
-interface ICreateProjectForm {
+interface IProjectFormProps {
   data?: Partial<Project>;
   handleModalClose?: () => void;
   triggerRefetch?: () => void;
 }
 
-const CreateProjectForm: React.FC<ICreateProjectForm> = ({
+const ProjectForm: React.FC<IProjectFormProps> = ({
   data,
   handleModalClose,
   triggerRefetch,
@@ -109,7 +115,7 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
   const [attachment, setAttachment] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const updateProfileMutation = useMutation({
+  const projectMutation = useMutation({
     mutationFn: (projectData: Partial<Project>) =>
       data
         ? updateProject(projectData, data?.id as string)
@@ -130,11 +136,14 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
 
   const handleAttachmentDrop = (acceptedFiles: File[]) => {
     setFileUploadLoading(true);
-    setAttachment(acceptedFiles[0]);
+    const sanitizedFile = sanitizeFile(acceptedFiles[0]);
+
+    // setAttachment(acceptedFiles[0]);
+    setAttachment(sanitizedFile);
 
     (async function () {
       const formData = new FormData();
-      formData.append("file", acceptedFiles[0]);
+      formData.append("file", sanitizedFile);
 
       const result = await axiosInstance.post(
         "/api/proxy/files/upload/documents",
@@ -167,10 +176,11 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
 
   const onSubmit = (data: any) => {
     setLoading(true);
+    const formattedData = serializeData(data);
 
     (async function () {
-      await updateProfileMutation.mutate({
-        ...data,
+      await projectMutation.mutate({
+        ...formattedData,
         skills: data?.skills.map((s: any) => ({ title: s.label })),
         requires_feedback: data?.requires_feeback === "yes",
       });
@@ -191,6 +201,7 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
             onChange={(e) => setValue("title", e.target.value)}
             error={errors.title?.message}
             otherClasses={methods.register("title")}
+            required
           />
         </div>
 
@@ -310,6 +321,7 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
           onChange={(e: any) => setValue("description", e.target.value)}
           error={errors.description?.message as string}
           otherClasses={methods.register("description")}
+          required
         />
         <AddItemInput
           label="Collaborators (if users are on the platform, they will be added)"
@@ -412,4 +424,4 @@ const CreateProjectForm: React.FC<ICreateProjectForm> = ({
   );
 };
 
-export default CreateProjectForm;
+export default ProjectForm;

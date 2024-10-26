@@ -37,7 +37,7 @@ export default function AppModal({
           <div className="fixed inset-0 bg-black bg-opacity-50" />
         </TransitionChild>
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-center justify-center p-2 lg:p-4 text-center">
             <TransitionChild
               as={Fragment}
               enter="ease-out duration-300"
@@ -48,7 +48,7 @@ export default function AppModal({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                className={`${width} transform overflow-hidden rounded-2xl bg-white p-4 text-left align-middle shadow-xl transition-all`}
+                className={`w-full sm:w-[70%] md:w-[50%] lg:w-[40%] xl:w-[35%] xxl:w-[25%] transform overflow-hidden rounded-2xl bg-white p-2 lg:p-4 text-left align-middle shadow-xl transition-all`}
               >
                 <div
                   className={`flex ${

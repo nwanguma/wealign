@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import NotificationIcon from "@/components/ui/NotificationIcon";
 import ProfileIcon from "@/components/ui/ProfileIcon";
 import { RootState } from "@/store";
+import MessagesIcon from "../ui/MessagesIcon";
 
 export default function DashboardNav() {
   /** User here to get user profile's avatar on sign up
@@ -28,26 +29,35 @@ export default function DashboardNav() {
   ];
 
   return (
-    <nav className="flex justify-between items-center px-6 h-14 bg-white">
-      <ul className="flex space-x-4 items-center">
+    <nav className="flex flex-wrap justify-end xxs:flex-nowrap xs:justify-between items-center lg:space-x-0 px-2 py-2 xs:py-0 xs:px-6 xs:h-14 bg-white">
+      <ul>
         <li className="hover:scale-110 transform transition duration-300">
-          <Link href="/home">
+          <Link href="/home" className="hidden md:block">
             <Image
               src="/icons/collabhub-logo.svg"
               alt="home"
-              width={140}
-              height={50}
-              className="hover:opacity-80 transition duration-300"
+              className="w-24 h-14 hover:opacity-80 transition duration-300"
+              width={0}
+              height={0}
+            />
+          </Link>
+          <Link href="/home" className="block md:hidden">
+            <Image
+              src="/icons/test-logo-min.svg"
+              alt="home"
+              className="w-5 h-5 hover:opacity-80 transition duration-300"
+              width={0}
+              height={0}
             />
           </Link>
         </li>
       </ul>
-      <ul className="flex text-sm text-gray-700">
+      <ul className="flex flex-wrap xxs:flex-nowrap justify-between items-center text-sm text-gray-700">
         {links.map((link) => (
           <li key={link.href} className="relative group">
             <Link
               href={link.href}
-              className={`px-8 py-2 border-b ${
+              className={`hidden md:block px-3 md:px-5 lg:px-8 py-2 border-b ${
                 pathname === link.href
                   ? "border-violet-700 text-violet-700 font-semibold"
                   : "border-transparent group-hover:border-b-violet-700 group-hover:text-violet-700 group-hover:font-normal"
@@ -55,24 +65,31 @@ export default function DashboardNav() {
             >
               {link.name}
             </Link>
+            <Link
+              href={link.href}
+              className={`block md:hidden px-3 sm:px-5 lg:px-8 py-2 border-b ${
+                pathname === link.href
+                  ? "border-violet-700 text-violet-700 font-semibold"
+                  : "border-transparent group-hover:border-b-violet-700 group-hover:text-violet-700 group-hover:font-normal"
+              } transition-all duration-300 ease-in-out delay-150`}
+            >
+              <Image
+                src={`/icons/${link.name.toLowerCase()}.svg`}
+                alt=""
+                className="w-5 h-5"
+                width={0}
+                height={0}
+              />
+            </Link>
           </li>
         ))}
       </ul>
-
-      <ul className="flex space-x-6 items-center">
+      <ul className="flex justify-between space-x-3 lg:space-x-6 items-center">
         <li>
           <NotificationIcon />
         </li>
         <li>
-          <Link href="/dashboard/messages">
-            <Image
-              src="/icons/messages.svg"
-              alt="messages"
-              width={24}
-              height={24}
-              className="cursor-pointer"
-            />
-          </Link>
+          <MessagesIcon />
         </li>
         <li>
           <ProfileIcon avatar={user?.profile?.avatar} />

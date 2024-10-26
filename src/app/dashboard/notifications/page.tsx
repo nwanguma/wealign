@@ -24,9 +24,10 @@ const fetchNotifications = async (
 };
 
 export default function Notifications() {
-  const newNotifications = useSelector(
+  const newNotificationsData = useSelector(
     (state: RootState) => state.notifications
   );
+  const newNotifications = newNotificationsData.data;
   const dispatch = useDispatch<AppDispatch>();
 
   const [pagination, setPagination] = useState({ page: 1, limit: 10 });
@@ -48,13 +49,13 @@ export default function Notifications() {
 
   return (
     <div className="min-h-screen w-full bg-white pb-5">
-      <div className="min-h-screen w-8/12 mx-auto">
+      <div className="min-h-screen w-full sm:w-10/12 lg:w-8/12 mx-auto">
         <div className="flex flex-col">
           {!isLoading && (
             <>
-              <div className="w-full px-10 flex space-x-1 items-center py-5 border-b border-b-gray-200 font-app-medium">
+              <div className="w-full px-4 lg:px-10 flex space-x-1 items-center py-2 lg:py-5 border-b border-b-gray-200 font-app-medium">
                 <h3 className="text-lg">Notifications</h3>
-                {newNotifications.data?.length > 0 && (
+                {newNotifications?.length > 0 && (
                   <div className="bg-blue-600 rounded-full h-5 w-5 flex items-center justify-center">
                     <span
                       className="inline-block text-white"
@@ -62,7 +63,7 @@ export default function Notifications() {
                         fontSize: "11px",
                       }}
                     >
-                      {newNotifications.data?.length}
+                      {newNotifications?.length}
                     </span>
                   </div>
                 )}
@@ -73,7 +74,7 @@ export default function Notifications() {
                     <NotificationsCard
                       key={notification.id}
                       notification={notification}
-                      newNotifications={newNotifications.data}
+                      newNotifications={newNotifications}
                       dispatch={dispatch}
                     />
                   ))}

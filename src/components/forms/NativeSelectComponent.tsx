@@ -50,7 +50,7 @@ const NativeSelect: React.FC<NativeSelectProps> = ({
             onChange={onChange}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(value !== "")}
-            className="block py-3 rounded-xl pl-4 pr-10 w-full text-sm text-gray-900 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400 capitalize"
+            className="block py-2 md:py-3 rounded-lg md:rounded-xl pl-2 md:pl-4 pr-6 md:pr-10 w-full text-sm text-gray-900 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400 capitalize"
             placeholder={placeholder}
             required={required}
           >
@@ -61,7 +61,7 @@ const NativeSelect: React.FC<NativeSelectProps> = ({
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1 md:pr-3">
             <svg
               className="w-4 h-4 text-gray-400"
               xmlns="http://www.w3.org/2000/svg"

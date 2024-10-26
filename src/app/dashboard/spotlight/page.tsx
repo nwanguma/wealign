@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import FilterComponent from "@/components/ui/Filter";
 import AddItemButton from "@/components/ui/AddItemButton";
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
-import AddEventForm from "@/components/forms/CreateEventForm";
+import AddEventForm from "@/components/forms/EventForm";
 import { EventCardPreview } from "@/components/ui/EventCard";
 import { Event } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";

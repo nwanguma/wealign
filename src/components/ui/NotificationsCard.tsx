@@ -16,7 +16,7 @@ const FollowNotification = ({
   const isNewNotification = newNotifications.includes(notification.id);
 
   return (
-    <div className="border-b border-gray-200 px-10 py-4 relative hover:bg-slate-50">
+    <div className="border-b border-gray-200 px-2 sm:px-4 lg:px-10 py-2 lg:py-4 relative hover:bg-slate-50">
       <div className="flex items-center space-x-3">
         <div className="border border-gray-200 p-1 rounded-full">
           <Image
@@ -62,7 +62,7 @@ const CommentNotification = ({
   const isNewNotification = newNotifications.includes(notification.id);
 
   return (
-    <div className="border-b border-gray-200 px-10 py-4 relative hover:bg-slate-50">
+    <div className="border-b border-gray-200 px-2 sm:px-4 lg:px-10 py-2 lg:py-4 relative hover:bg-slate-50">
       <div className="flex items-start space-x-3">
         <div className="border border-gray-200 p-1 rounded-full">
           <Image
@@ -125,7 +125,7 @@ const ReactionNotification = ({
   const isNewNotification = newNotifications.includes(notification.id);
 
   return (
-    <div className="border-b border-gray-200 px-10 py-4 relative hover:bg-slate-50">
+    <div className="border-b border-gray-200 px-2 sm:px-4 lg:px-10 py-2 lg:py-4 relative hover:bg-slate-50">
       <div className="flex items-start space-x-3">
         <div className="border border-gray-200 p-1 rounded-full">
           <Image

@@ -6,7 +6,7 @@ import { useState } from "react";
 import ContentWrapper from "@/components/ui/ContentWrapper";
 import AppModal from "@/components/ui/Modal";
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
-import CreateProjectForm from "@/components/forms/CreateProjectForm";
+import CreateProjectForm from "@/components/forms/ProjectForm";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import AddItemButton from "@/components/ui/AddItemButton";
 import FilterComponent from "@/components/ui/Filter";
@@ -14,7 +14,10 @@ import { ProjectsWithPagination, Project, Skill } from "@/common/constants";
 import { useSkills } from "@/app/hooks/useSkills";
 import PaginationComponent from "@/components/ui/PaginationComponent";
 import { WithTooltip } from "@/components/ui/WithTooltip";
-import { SkeletonLoaderGrid } from "@/components/ui/SkeletonLoader";
+import {
+  SkeletonLoaderGrid,
+  SkeletonLoader,
+} from "@/components/ui/SkeletonLoader";
 import { fetchProjects } from "@/api";
 
 export default function Projects() {
@@ -59,9 +62,9 @@ export default function Projects() {
   });
 
   return (
-    <div className="min-h-screen w-full bg-white p-6">
-      <div className="flex space-x-5">
-        <div className="min-h-screen px-5 md:px-10 lg:px-20">
+    <div className="min-h-screen w-full bg-white p-1 lg:p-6">
+      <div className="flex w-full space-x-0 md:space-x-5">
+        <div className="w-full min-h-screen px-2 s:px-5 md:px-10 lg:px-20">
           <div className="relative">
             <DashboardPageHeader
               title="Discover Projects and Collaborators"
@@ -128,7 +131,16 @@ export default function Projects() {
                   projects?.map((project) => <ProjectCard project={project} />)}
               </ContentWrapper>
             )}
-            {isLoading && <SkeletonLoaderGrid />}
+            {isLoading && (
+              <>
+                <div className="hidden md:block">
+                  <SkeletonLoaderGrid />
+                </div>
+                <div className="block md:hidden">
+                  <SkeletonLoader />
+                </div>
+              </>
+            )}
             {projectsData && projects && (
               <PaginationComponent
                 data={projects}

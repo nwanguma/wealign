@@ -8,7 +8,7 @@ import AppModal from "@/components/ui/Modal";
 import FilterComponent from "@/components/ui/Filter";
 import AddItemButton from "@/components/ui/AddItemButton";
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
-import AddArticleForm from "@/components/forms/CreateArticleForm";
+import AddArticleForm from "@/components/forms/ArticleForm";
 import { ArticleCardPreview } from "@/components/ui/ArticleCard";
 import { Article } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";
@@ -21,7 +21,10 @@ import {
 import PaginationComponent from "@/components/ui/PaginationComponent";
 import { WithTooltip } from "@/components/ui/WithTooltip";
 import { RootState } from "@/store";
-import { SkeletonLoaderGrid } from "@/components/ui/SkeletonLoader";
+import {
+  SkeletonLoaderGrid,
+  SkeletonLoader,
+} from "@/components/ui/SkeletonLoader";
 
 const fetchArticles = async (
   pagination: IPagination,
@@ -80,9 +83,9 @@ export default function Articles() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-white p-6">
-      <div className="flex space-x-5">
-        <div className="min-h-screen px-5 md:px-10 lg:px-20">
+    <div className="min-h-screen w-full bg-white p-1 lg:p-6">
+      <div className="flex w-full space-x-0 md:space-x-5">
+        <div className="w-full min-h-screen px-2 s:px-5 md:px-10 lg:px-20">
           <div className="relative">
             <DashboardPageHeader
               title="Discover Articles to Connect and Collaborate with Top Talent"
@@ -137,14 +140,23 @@ export default function Articles() {
                   articles?.map((article: Article) => (
                     <div
                       key={article.id}
-                      className="w-full border border-gray-300 rounded-lg p-4 h-48"
+                      className="w-full border border-gray-300 rounded-lg p-4 h-auto md:h-48"
                     >
                       <ArticleCardPreview article={article} />
                     </div>
                   ))}
               </ContentWrapper>
             )}
-            {isLoading && <SkeletonLoaderGrid />}
+            {isLoading && (
+              <>
+                <div className="hidden md:block">
+                  <SkeletonLoaderGrid />
+                </div>
+                <div className="block md:hidden">
+                  <SkeletonLoader />
+                </div>
+              </>
+            )}
             {articlesData && articles && (
               <PaginationComponent
                 data={articles}

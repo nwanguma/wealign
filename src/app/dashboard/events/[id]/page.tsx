@@ -10,7 +10,7 @@ import { EventCardPreview } from "@/components/ui/EventCard";
 import { RootState } from "@/store";
 import { useState } from "react";
 import AppModal from "@/components/ui/Modal";
-import AddEventForm from "@/components/forms/CreateEventForm";
+import AddEventForm from "@/components/forms/EventForm";
 import {
   SkeletonCard,
   SkeletonLoaderPage,
@@ -82,7 +82,7 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        <aside className="w-1/3 space-y-5">
+        <aside className="hidden lg:block w-1/3 space-y-5">
           {isRecommendationsLoading && <SkeletonCard />}
           {!isRecommendationsLoading && (
             <div className="p-4 bg-white rounded-lg border border-gray-300">

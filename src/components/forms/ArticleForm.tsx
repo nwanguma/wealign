@@ -13,7 +13,13 @@ import { WithTooltip } from "../ui/WithTooltip";
 import { Article } from "@/common/constants";
 import Input from "./Input";
 import axiosInstance from "@/lib/axiosInstance";
-import { getFilenameAndExtension, stripHtml } from "@/lib/helpers";
+import {
+  getFilenameAndExtension,
+  sanitizeFile,
+  serializeData,
+  stripHtml,
+} from "@/lib/helpers";
+import { createArticle, updateArticle } from "@/api";
 
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
@@ -39,19 +45,13 @@ const schema = yup.object().shape({
     .min(400, "Content must be at least 400 characters"),
 });
 
-const createArticle = async (data: Partial<Article>) => {
-  const result = await axiosInstance.post("/api/proxy/articles", data);
-
-  return result?.data?.data;
-};
-
-interface ICreateArticleForm {
+interface IArticleFormProps {
   data?: Partial<Article>;
   triggerRefetch?: () => void;
   handleModalClose?: () => void;
 }
 
-const CreateArticleForm: React.FC<ICreateArticleForm> = ({
+const ArticleForm: React.FC<IArticleFormProps> = ({
   data: articlesData,
   handleModalClose,
   triggerRefetch,
@@ -74,8 +74,11 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
     formState: { errors },
   } = methods;
 
-  const createArticleMutation = useMutation({
-    mutationFn: (data: Partial<Article>) => createArticle(data),
+  const articleMutation = useMutation({
+    mutationFn: (data: Partial<Article>) =>
+      articlesData
+        ? updateArticle(data, articlesData?.id as string)
+        : createArticle(data),
     onSuccess: () => {
       handleModalClose && handleModalClose();
       triggerRefetch && triggerRefetch();
@@ -93,12 +96,15 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
   const [fileUploadLoading, setFileUploadLoading] = useState(false);
 
   const handleBannerDrop = (acceptedFiles: File[]) => {
-    setBanner(acceptedFiles[0]);
     setFileUploadLoading(true);
+    const sanitizedFile = sanitizeFile(acceptedFiles[0] as File);
+
+    setBanner(sanitizedFile);
+    // setBanner(acceptedFiles[0]);
 
     (async function () {
       const formData = new FormData();
-      formData.append("file", acceptedFiles[0]);
+      formData.append("file", sanitizedFile);
 
       const result = await axiosInstance.post(
         "/api/proxy/files/upload/images",
@@ -123,9 +129,10 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
 
   const onSubmit = (data: any) => {
     setLoading(true);
+    const formattedData = serializeData(data);
 
     (async function () {
-      await createArticleMutation.mutate(data);
+      await articleMutation.mutate(formattedData);
     })();
   };
 
@@ -143,6 +150,7 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
             onChange={(e) => setValue("title", e.target.value)}
             error={errors.title?.message as string}
             otherClasses={methods.register("title")}
+            required
           />
         </div>
         <div className="py-3">
@@ -267,4 +275,4 @@ const CreateArticleForm: React.FC<ICreateArticleForm> = ({
   );
 };
 
-export default CreateArticleForm;
+export default ArticleForm;

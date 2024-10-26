@@ -105,10 +105,17 @@ async function handler(req: Request) {
       }ms: ${error.message}`
     );
 
+    console.log(error.response.data?.message[0]);
+
     return NextResponse.json(
       {
         error:
-          "An error occurred while processing your request. Please try again later.",
+          status == 500 || !error.response.data?.message
+            ? "An error occurred while processing your request. Please try again later."
+            : error.response.data?.message &&
+              typeof error.response.data?.message === "object"
+            ? error.response.data?.message[0]
+            : error.response.data?.message,
         details:
           process.env.NODE_ENV === "development" ? error.message : undefined,
       },

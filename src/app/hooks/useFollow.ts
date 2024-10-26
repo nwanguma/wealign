@@ -15,7 +15,7 @@ interface JustFollowed {
   [key: string]: boolean;
 }
 
-export const useFollow = () => {
+export const useFollow = (handleCloseModal?: () => void) => {
   const router = useRouter();
   const { conversations } = useSelector((state: RootState) => ({
     conversations: state.conversations.data,
@@ -64,6 +64,9 @@ export const useFollow = () => {
       }
     },
     onError: () => {},
+    onSettled: () => {
+      handleCloseModal && handleCloseModal();
+    },
   });
 
   const handleFollow = (profileId: string) => {

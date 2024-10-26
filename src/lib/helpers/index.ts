@@ -147,3 +147,29 @@ export function getTime(date: Date) {
 
   return formattedTime;
 }
+
+export function sanitizeFile(file: File) {
+  const sanitizedFile = new File([file], file.name.replace(/\s+/g, "_"), {
+    type: file.type,
+  });
+
+  return sanitizedFile;
+}
+
+export function serializeData<T extends Record<string, any>>(data: T): T {
+  const serializedData = { ...data };
+
+  Object.keys(serializedData).forEach((key) => {
+    const value = serializedData[key];
+
+    if (value === null || value === undefined || value === "") {
+      delete serializedData[key];
+    }
+  });
+
+  return serializedData;
+}
+
+export function formatErrorResponse(e: any) {
+  return e.response.data.error;
+}

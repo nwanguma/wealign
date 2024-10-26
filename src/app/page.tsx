@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import {
   useQueries,
@@ -14,8 +14,8 @@ import { fetchCurrentUser } from "@/store/user";
 import { Event } from "@/common/constants";
 import AppModal from "@/components/ui/Modal";
 import { AppDispatch, RootState } from "@/store";
-import CreateProjectForm from "@/components/forms/CreateProjectForm";
-import AddEventForm from "@/components/forms/CreateEventForm";
+import CreateProjectForm from "@/components/forms/ProjectForm";
+import AddEventForm from "@/components/forms/EventForm";
 import { EventCardPreview } from "@/components/ui/EventCard";
 import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
 import { ActivityComponent } from "@/components/ui/Activity";

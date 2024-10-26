@@ -11,7 +11,7 @@ import { fetchJob, deleteJob } from "@/api";
 import { JobCardMain } from "@/components/ui/JobCardMain";
 import { SkeletonLoaderPage } from "@/components/ui/SkeletonLoader";
 import AppModal from "@/components/ui/Modal";
-import CreateJobForm from "@/components/forms/CreateJobForm";
+import CreateJobForm from "@/components/forms/JobForm";
 import { SkeletonCard } from "@/components/ui/SkeletonLoader";
 import { JobCard } from "@/components/ui/JobCard";
 
@@ -55,7 +55,6 @@ export default function JobPage() {
           {!isLoading && job && (
             <div className="w-full">
               <JobCardMain
-                currentUserProfileId={user?.profile?.id}
                 job={job}
                 isOwner={isOwner}
                 toggleModal={handleToggleAddJobModal}
@@ -74,7 +73,7 @@ export default function JobPage() {
             </div>
           )}
         </div>
-        <aside className="w-1/3 space-y-5">
+        <aside className="hidden lg:block w-1/3 space-y-5">
           {isRecommendationsLoading && <SkeletonCard />}
           {!isRecommendationsLoading && jobsRecommendations?.length > 0 && (
             <div className="p-4 bg-white rounded-lg border border-gray-300">

@@ -11,7 +11,7 @@ const DashboardPageHeader: React.FC<IDashboardPageHeaderProps> = ({
   description,
 }) => {
   return (
-    <div className="w-full flex flex-col justify-center space-y-5 min-h-28 bg-gradient-to-r from-blue-100 via-purple-100 to-white p-6 rounded-lg shadow-md">
+    <div className="hidden md:flex w-full flex-col justify-center space-y-5 min-h-28 bg-gradient-to-r from-blue-100 via-purple-100 to-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-app-medium text-gray-800">{title}</h2>
       <p className="text-gray-600 mt-2 text-sm w-2/3">{description}</p>
     </div>
@@ -29,7 +29,7 @@ export const DashboardPageSecondaryHeader: React.FC<
   IDashboardPageSecondaryHeaderProps
 > = ({ title, description }) => {
   return (
-    <div className="w-full flex flex-col justify-center space-y-5 bg-gradient-to-r from-blue-100 via-purple-100 to-white px-3 py-3 rounded-lg shadow-md">
+    <div className="hidden w-full md:flex flex-col justify-center space-y-5 bg-gradient-to-r from-blue-100 via-purple-100 to-white px-3 py-3 rounded-lg shadow-md">
       <div className="flex items-center space-x-4">
         <span className="text-sm">Go back</span>
         <h2 className="text-2xl font-semibold text-gray-800">Event</h2>

@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { Article } from "@/common/constants";
 import { ArticleCardPreview } from "@/components/ui/ArticleCard";
 import { RootState } from "@/store";
-import AddArticleForm from "@/components/forms/CreateArticleForm";
+import AddArticleForm from "@/components/forms/ArticleForm";
 import AppModal from "@/components/ui/Modal";
 import {
   SkeletonCard,
@@ -60,7 +60,6 @@ export default function ArticlePage() {
           {!isLoading && article && (
             <div className="w-full">
               <ArticleCardMain
-                currentUserProfileId={user?.profile?.id}
                 article={article}
                 isOwner={isOwner}
                 toggleModal={handleToggleUpdateArticleModal}
@@ -79,7 +78,7 @@ export default function ArticlePage() {
             </div>
           )}
         </div>
-        <aside className="w-1/3 space-y-5">
+        <aside className="hidden lg:block w-1/3 space-y-5">
           {isRecommendationsLoading && <SkeletonCard />}
           {!isRecommendationsLoading && (
             <div className="p-4 bg-white rounded-lg border border-gray-300">

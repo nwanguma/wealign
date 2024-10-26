@@ -26,8 +26,15 @@ const config: Config = {
         "custom-gray-paragraph": "#6A6A6A",
         "custom-gray-small-text": "#6B7280",
       },
+      screens: {
+        xxs: "250px",
+        xs: "400px",
+        s: "600px",
+        xxl: "1500px",
+      },
     },
   },
   plugins: [],
 };
+
 export default config;

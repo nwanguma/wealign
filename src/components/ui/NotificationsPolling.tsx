@@ -12,7 +12,7 @@ const NotificationsPollingComponent = () => {
     if (intervalRef.current) return;
     intervalRef.current = setInterval(() => {
       dispatch(fetchNotifications());
-    }, 50000);
+    }, 10000);
   };
 
   const stopPolling = () => {

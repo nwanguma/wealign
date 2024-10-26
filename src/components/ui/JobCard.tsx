@@ -1,11 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { Job } from "@/common/constants";
 
 import { timeAgo } from "@/lib/helpers";
-import { Skill, Profile } from "@/common/constants";
-import { formatDateLong, truncateString } from "@/lib/helpers";
+import { truncateString } from "@/lib/helpers";
+import CommentsReactionsUI from "./CommentsReactionsUI";
 
 interface IJobCardProps {
   job: Partial<Job>;
@@ -28,7 +27,7 @@ export const JobCard: React.FC<IJobCardProps> = ({ job }) => {
   return (
     <Link href={`/dashboard/jobs/${id}`} className="block">
       <div className="border border-gray-300 p-3 rounded-lg flex flex-col space-y-4">
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-col xs:flex-row items-center space-x-3">
           <div className="border border-gray-300 p-2 rounded-lg">
             <Image src="/icons/google.svg" width={40} height={40} alt="logo" />
           </div>
@@ -52,7 +51,7 @@ export const JobCard: React.FC<IJobCardProps> = ({ job }) => {
                   href={website as string}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-blue-800"
+                  className="text-xs text-blue-800 break-all"
                 >
                   {website}
                 </Link>
@@ -65,7 +64,7 @@ export const JobCard: React.FC<IJobCardProps> = ({ job }) => {
                     href={application_url as string}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-800"
+                    className="text-xs text-blue-800 break-all"
                   >
                     {application_url}
                   </Link>
@@ -90,19 +89,14 @@ export const JobCard: React.FC<IJobCardProps> = ({ job }) => {
               </div>
             ))}
         </div>
-        <div className="flex justify-between text-xs text-gray-600 ">
-          <div className="flex items-center space-x-3">
-            {comments?.length > 0 && (
-              <span className="underline">
-                <span>{comments?.length} Comments</span>
-              </span>
-            )}
-            {reactions?.length > 0 && (
-              <span className="underline spac">
-                <span>{reactions?.length} Likes</span>
-              </span>
-            )}
-          </div>
+        <div
+          className={`flex ${
+            comments!?.length > 0 || reactions!?.length > 0
+              ? "justify-between"
+              : "justify-end"
+          } text-xs text-gray-600`}
+        >
+          <CommentsReactionsUI comments={comments!} reactions={reactions!} />
           <span>{timeAgo(created_at as string)}</span>
         </div>
       </div>

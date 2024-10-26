@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { timeAgo } from "@/lib/helpers";
 import { Project } from "@/common/constants";
+import CommentsReactionsUI from "./CommentsReactionsUI";
 
 interface IProjectCardProps {
   project: Partial<Project>;
@@ -20,18 +21,23 @@ export const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
     created_at,
     skills,
     status,
-    collaborators,
+    // collaborators,
   } = project;
   return (
-    <Link href={`/dashboard/projects/${id}`} className="block">
+    <div className="block h-auto">
       <div className="border border-gray-300 p-3 rounded-lg flex flex-col space-y-4">
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-col justify-center xs:justify-normal text-center xs:text-left xs:flex-row items-center xs:items-start space-x-3">
           <div className="border border-gray-300 p-2 rounded-lg">
             <Image src="/icons/google.svg" width={40} height={40} alt="logo" />
           </div>
           <div className="flex flex-col space-y-2">
             <div>
-              <span className="font-app-medium">{title}</span>
+              <Link
+                href={`/dashboard/projects/${id}`}
+                className="font-app-medium"
+              >
+                {title}
+              </Link>
               {status && (
                 <div className="space-y-2">
                   <span className="capitalize text-xs font-medium rounded text-gray-700 bg-green-200 py-1 px-1">
@@ -47,7 +53,7 @@ export const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
                   href={website as string}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-blue-800"
+                  className="text-xs text-blue-800 break-all"
                 >
                   {website}
                 </Link>
@@ -60,7 +66,7 @@ export const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
                     href={github_url as string}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-800"
+                    className="text-xs text-blue-800 break-all"
                   >
                     {github_url}
                   </Link>
@@ -81,22 +87,17 @@ export const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
               </div>
             ))}
         </div>
-        <div className="flex justify-between text-xs text-gray-600 ">
-          <div className="flex items-center space-x-3">
-            {comments?.length > 0 && (
-              <span className="underline">
-                <span>{comments?.length} Comments</span>
-              </span>
-            )}
-            {reactions?.length > 0 && (
-              <span className="underline spac">
-                <span>{reactions?.length} Likes</span>
-              </span>
-            )}
-          </div>
+        <div
+          className={`flex ${
+            comments!?.length > 0 || reactions!?.length > 0
+              ? "justify-between"
+              : "justify-end"
+          } text-xs text-gray-600`}
+        >
+          <CommentsReactionsUI comments={comments!} reactions={reactions!} />
           <span>{timeAgo(created_at as string)}</span>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };

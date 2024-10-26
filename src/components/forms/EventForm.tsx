@@ -14,12 +14,19 @@ import NativeSelect from "./NativeSelectComponent";
 import Input from "./Input";
 import TextArea from "./TextArea";
 import axiosInstance from "@/lib/axiosInstance";
-import { getFilenameAndExtension } from "@/lib/helpers";
+import {
+  getFilenameAndExtension,
+  sanitizeFile,
+  serializeData,
+} from "@/lib/helpers";
 import { WithTooltip } from "../ui/WithTooltip";
+import { createEvent, updateEvent } from "@/api";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
+import { errorToast, successToast } from "@/lib/helpers/toast";
+import { formatErrorResponse } from "@/lib/helpers";
 
 const schema = yup.object().shape({
   title: yup
@@ -52,25 +59,13 @@ const schema = yup.object().shape({
   end_date: yup.mixed(),
 });
 
-const createEvent = async (data: Partial<Event>) => {
-  const result = await axiosInstance.post("/api/proxy/events", data);
-
-  return result?.data?.data;
-};
-
-const updateEvent = async (data: Partial<Event>, id: string) => {
-  const result = await axiosInstance.put(`/api/proxy/events/${id}`, data);
-
-  return result?.data?.data;
-};
-
-interface ICreateEventForm {
+interface IEventFormProps {
   data?: Partial<Event>;
   handleModalClose?: () => void;
   triggerRefetch?: () => void;
 }
 
-const CreateEventForm: React.FC<ICreateEventForm> = ({
+const EventForm: React.FC<IEventFormProps> = ({
   data: eventsData,
   handleModalClose,
   triggerRefetch,
@@ -106,7 +101,7 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
     formState: { errors },
   } = methods;
 
-  const createEventMutation = useMutation({
+  const eventMutation = useMutation({
     mutationFn: (data: Partial<Event>) =>
       eventsData
         ? updateEvent(data, eventsData?.id as string)
@@ -114,8 +109,17 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
     onSuccess: () => {
       handleModalClose && handleModalClose();
       triggerRefetch && triggerRefetch();
+
+      successToast("Success! Your event is all set up!");
     },
-    onError: () => {},
+    onError: (e) => {
+      const errorMessage = formatErrorResponse(e);
+
+      errorToast(`Error! ${errorMessage}`);
+    },
+    onSettled: () => {
+      setLoading(false);
+    },
   });
 
   const [banner, setBanner] = useState<File | null>(null);
@@ -126,12 +130,16 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
   const [loading, setLoading] = useState(false);
 
   const handleBannerDrop = (acceptedFiles: File[]) => {
-    setBanner(acceptedFiles[0]);
     setFileUploadLoading(true);
+    // const sanitizedFile = sanitizeFile(acceptedFiles[0]);
+    const sanitizedFile = acceptedFiles[0];
+
+    setBanner(sanitizedFile);
+    // setBanner(acceptedFiles[0]);
 
     (async function () {
       const formData = new FormData();
-      formData.append("file", acceptedFiles[0]);
+      formData.append("file", sanitizedFile);
 
       const result = await axiosInstance.post(
         "/api/proxy/files/upload/images",
@@ -149,12 +157,15 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
   };
 
   const handleAttachmentDrop = (acceptedFiles: File[]) => {
-    setAttachment(acceptedFiles[0]);
     setFileUploadLoading(true);
+    const sanitizedFile = sanitizeFile(acceptedFiles[0]);
+
+    setAttachment(sanitizedFile);
+    // setAttachment(acceptedFiles[0]);
 
     (async function () {
       const formData = new FormData();
-      formData.append("file", acceptedFiles[0]);
+      formData.append("file", sanitizedFile);
 
       const result = await axiosInstance.post(
         "/api/proxy/files/upload/documents",
@@ -196,11 +207,10 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
 
   const onSubmit = (data: any) => {
     setLoading(true);
+    const formattedData = serializeData(data);
 
     (async function () {
-      await createEventMutation.mutate({
-        ...data,
-      });
+      await eventMutation.mutate(formattedData);
     })();
   };
 
@@ -218,6 +228,7 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
             onChange={(e) => setValue("title", e.target.value)}
             error={errors.title?.message as string}
             otherClasses={methods.register("title")}
+            required
           />
         </div>
         <div className="py-3">
@@ -381,6 +392,7 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
             },
           ]}
           otherClasses={methods.register("type")}
+          required
         />
         {["hybrid", "virtual"].includes(watch("type")) && (
           <div>
@@ -404,7 +416,6 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
               onChange={(e) => setValue("location", e.target.value)}
               error={errors.location?.message as string}
               otherClasses={methods.register("location")}
-              required
             />
           </div>
         )}
@@ -510,4 +521,4 @@ const CreateEventForm: React.FC<ICreateEventForm> = ({
   );
 };
 
-export default CreateEventForm;
+export default EventForm;

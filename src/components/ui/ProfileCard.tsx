@@ -4,6 +4,9 @@ import Link from "next/link";
 import { Profile } from "@/common/constants";
 import { useFollow } from "@/app/hooks/useFollow";
 import MoreActionsComponent from "./MoreActions";
+import { truncateString } from "@/lib/helpers";
+import TopIconBar from "./TopIconBar";
+import CommentsReactionsUI from "./CommentsReactionsUI";
 
 interface IProfileCardProps {
   profile: Partial<Profile>;
@@ -38,65 +41,8 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
   const isCurrentUser = currentUserProfileId === id;
 
   return (
-    <div className="flex w-full items-center justify-between relative">
-      <div className="flex flex-col space-y-6 pt-2 w-full">
-        <div className="flex-1 flex items-center space-x-2">
-          <div className="border border-gray-300 p-1 rounded-full">
-            <Image
-              src={avatar || "/images/test-avatar-3.jpg"}
-              width={75}
-              height={75}
-              alt="avatar"
-              className="rounded-full"
-            />
-          </div>
-          <div className="flex-1 space-y-3">
-            <div className="flex flex-col space-y-1">
-              <Link
-                href={`/dashboard/profiles/${id}`}
-                className="font-app-medium text-sm"
-              >
-                {first_name + " " + last_name}
-              </Link>
-              <span className="text-xs text-gray-700 font-normal">{title}</span>
-              <span className="text-xs text-custom-gray-paragraph">
-                {heading}
-              </span>
-            </div>
-            <div className="w-3/4 leading-4 text-gray-700">
-              <span className="text-sm leading-tight text-custom-gray-paragraph font-light">
-                {bio}{" "}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          {skills &&
-            skills.map((skill, index) => (
-              <div
-                key={skill.title}
-                className="capitalize text-xs border border-violet-500 text-violet-500 py-1 px-2 rounded"
-              >
-                {skill.title}
-              </div>
-            ))}
-        </div>
-        <div className="flex items-center w-full justify-end">
-          <div className="text-xs text-gray-600 space-x-2">
-            {!!comments && comments.length > 0 && (
-              <span className="underline">
-                <span>{comments.length} Comments</span>
-              </span>
-            )}
-            {!!reactions && reactions.length > 0 && (
-              <span className="underline">
-                <span>{reactions.length} Likes</span>
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="absolute top-2 right-0">
+    <>
+      <TopIconBar>
         <div className="flex items-center space-x-2">
           {!hasFollowed && !justFollowed[id as string] && !isCurrentUser && (
             <button
@@ -109,7 +55,7 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
                 version="1.1"
                 id="Capa_1"
                 viewBox="0 0 45.902 45.902"
-                className="w-4 h-4"
+                className="w-3 h-3"
               >
                 <g>
                   <g>
@@ -140,7 +86,7 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
               className="flex items-center p-2 bg-white border border-gray-300 text-blue-700 text-sm hover:bg-gray-100 rounded-full"
             >
               <svg
-                className="w-4 h-4"
+                className="w-3 h-3"
                 viewBox="0 0 24 24"
                 fill="#FFFFFF"
                 xmlns="http://www.w3.org/2000/svg"
@@ -171,7 +117,55 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
             />
           )}
         </div>
+      </TopIconBar>
+      <div className="flex w-full items-center justify-between relative">
+        <div className="flex flex-col space-y-6 pt-2 w-full">
+          <div className="flex-1 flex flex-col sm:flex-row items-center space-x-2">
+            <div className="border border-gray-300 p-1 rounded-full">
+              <Image
+                src={avatar || "/images/test-avatar-3.jpg"}
+                width={75}
+                height={75}
+                alt="avatar"
+                className="rounded-full"
+              />
+            </div>
+            <div className="flex-1 space-y-3 text-center sm:text-left">
+              <div className="flex flex-col space-y-1">
+                <Link
+                  href={`/dashboard/profiles/${id}`}
+                  className="font-app-medium text-sm"
+                >
+                  {first_name + " " + last_name}
+                </Link>
+                <span className="text-xs text-gray-700 font-normal">
+                  {title}
+                </span>
+                <span className="text-xs text-custom-gray-paragraph">
+                  {heading}
+                </span>
+              </div>
+              <div className="w-full sm:w-3/4 text-left leading-4 text-gray-700">
+                <span className="text-sm text-custom-gray-paragraph font-light">
+                  {truncateString(bio!, 180)}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {skills &&
+              skills.map((skill, index) => (
+                <div
+                  key={skill.title}
+                  className="capitalize text-xs border border-violet-500 text-violet-500 py-1 px-2 rounded break-all"
+                >
+                  {skill.title}
+                </div>
+              ))}
+          </div>
+          <CommentsReactionsUI comments={comments!} reactions={reactions!} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };

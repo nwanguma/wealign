@@ -17,7 +17,11 @@ import { AppDispatch } from "@/store";
 import { updateProfile } from "@/store/user";
 import TextArea from "./TextArea";
 import { WithTooltip } from "../ui/WithTooltip";
-import { getFilenameAndExtension } from "@/lib/helpers";
+import {
+  getFilenameAndExtension,
+  sanitizeFile,
+  serializeData,
+} from "@/lib/helpers";
 import NativeSelect from "./NativeSelectComponent";
 import { useSkills } from "@/app/hooks/useSkills";
 
@@ -37,13 +41,14 @@ const schema = yup.object().shape({
     .min(10, "Title must be at least 10 characters"),
   heading: yup
     .string()
-    .required("Heading is required")
+    // .required("Heading is required")
     .min(10, "Heading must be at least 10 characters"),
   bio: yup
     .string()
-    .required("Bio is required")
+    // .required("Bio is required")
     .min(10, "Bio must be at least 10 characters"),
-  location: yup.string().required("Location is required"),
+  location: yup.string(),
+  // .required("Location is required"),
   status: yup.string(),
   phone: yup
     .string()
@@ -81,12 +86,12 @@ const handleUpdateProfile = async (
   return response.data.data;
 };
 
-interface IUpdateProfileForm {
+interface IUpdateProfileFormProps {
   handleModalClose: () => void;
   triggerRefetch: () => void;
 }
 
-const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
+const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
   handleModalClose,
   triggerRefetch,
 }) => {
@@ -150,6 +155,9 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
       handleModalClose();
     },
     onError: (error: any) => {},
+    onSettled: () => {
+      setLoading(false);
+    },
   });
 
   const languagesOptions = [
@@ -171,8 +179,12 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
   });
 
   const handleAvatarDrop = (acceptedFiles: File[]) => {
-    setAvatar(acceptedFiles[0]);
     setFileUploadLoading(true);
+
+    const sanitizedFile = sanitizeFile(acceptedFiles[0]);
+
+    setAvatar(sanitizedFile);
+    // setAvatar(acceptedFiles[0]);
 
     (async function () {
       const formData = new FormData();
@@ -194,12 +206,15 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
   };
 
   const handleResumeDrop = (acceptedFiles: File[]) => {
-    setResume(acceptedFiles[0]);
     setFileUploadLoading(true);
+    const sanitizedFile = sanitizeFile(acceptedFiles[0]);
+
+    setResume(sanitizedFile);
+    // setResume(acceptedFiles[0]);
 
     (async function () {
       const formData = new FormData();
-      formData.append("file", acceptedFiles[0]);
+      formData.append("file", sanitizedFile);
 
       const result = await axiosInstance.post(
         "/api/proxy/files/upload/documents",
@@ -241,9 +256,10 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
 
   const onSubmit = (data: any) => {
     setLoading(true);
+    const formattedData = serializeData(data);
 
     const profileData = {
-      ...data,
+      ...formattedData,
       languages: data?.languages.map((l: Option) => l.value),
       skills: data?.skills.map((s: Option) => ({ title: s.label })),
     };
@@ -341,6 +357,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
           onChange={(e) => setValue("title", e.target.value)}
           error={errors.title?.message as string}
           otherClasses={methods.register("title")}
+          required
         />
         <Input
           id="heading"
@@ -353,7 +370,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileForm> = ({
         <TextArea
           id="bio"
           label="Bio"
-          value={watch("bio")}
+          value={watch("bio") as string}
           onChange={(e) => setValue("bio", e.target.value)}
           error={errors.bio?.message as string}
           otherClasses={methods.register("bio")}

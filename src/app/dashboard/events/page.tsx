@@ -8,7 +8,7 @@ import ContentWrapper from "@/components/ui/ContentWrapper";
 import FilterComponent from "@/components/ui/Filter";
 import AddItemButton from "@/components/ui/AddItemButton";
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
-import AddEventForm from "@/components/forms/CreateEventForm";
+import AddEventForm from "@/components/forms/EventForm";
 import { EventCardPreview } from "@/components/ui/EventCard";
 import {
   Event,
@@ -19,7 +19,10 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import PaginationComponent from "@/components/ui/PaginationComponent";
 import { WithTooltip } from "@/components/ui/WithTooltip";
-import { SkeletonLoaderGrid } from "@/components/ui/SkeletonLoader";
+import {
+  SkeletonLoader,
+  SkeletonLoaderGrid,
+} from "@/components/ui/SkeletonLoader";
 
 const fetchEvents = async (
   pagination: IPagination,
@@ -82,9 +85,9 @@ export default function Events() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-white p-6">
-      <div className="flex space-x-5">
-        <div className="min-h-screen px-5 md:px-10 lg:px-20">
+    <div className="min-h-screen w-full bg-white p-1 lg:p-6">
+      <div className="flex w-full space-x-0 md:space-x-5">
+        <div className="w-full min-h-screen px-2 s:px-5 md:px-10 lg:px-20">
           <div className="relative">
             <DashboardPageHeader
               title="Discover Events to Connect and Collaborate with Top Talent"
@@ -151,12 +154,21 @@ export default function Events() {
                       key={event.id}
                       className="w-full border border-gray-300 rounded-lg p-4 h-48"
                     >
-                      <EventCardPreview event={event} isPreview />
+                      <EventCardPreview event={event} />
                     </div>
                   ))}
               </ContentWrapper>
             )}
-            {isLoading && <SkeletonLoaderGrid />}
+            {isLoading && (
+              <>
+                <div className="hidden md:block">
+                  <SkeletonLoaderGrid />
+                </div>
+                <div className="block md:hidden">
+                  <SkeletonLoader />
+                </div>
+              </>
+            )}
             {eventsData && events && (
               <PaginationComponent
                 data={events}

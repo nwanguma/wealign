@@ -3,12 +3,13 @@
 import { ReactNode } from "react";
 import { Provider } from "react-redux";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
 
 import { store, persistor } from "@/store";
 import queryClient from "../../lib/react-query-client";
 import { PersistGate } from "redux-persist/integration/react";
 import DashboadHeader from "@/components/layout/DashboardHeader";
-import DashboardFooter from "@/components/layout/DashboardFooter";
+// import DashboardFooter from "@/components/layout/DashboardFooter";
 import DashboardNav from "@/components/layout/DashboardNav";
 import NotificationsPollingComponent from "@/components/ui/NotificationsPolling";
 import PageLoadingComponent from "@/components/ui/PageLoading";
@@ -33,6 +34,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </main>
           {/* <DashboardFooter /> */}
         </div>
+        <Toaster />
       </PersistGate>
     </Provider>
   );

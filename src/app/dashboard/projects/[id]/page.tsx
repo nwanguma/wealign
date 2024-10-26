@@ -11,7 +11,7 @@ import { ProjectCardMain } from "@/components/ui/ProjectCardMain";
 import { RootState } from "@/store";
 import { WithTooltip } from "@/components/ui/WithTooltip";
 import AppModal from "@/components/ui/Modal";
-import CreateProjectForm from "@/components/forms/CreateProjectForm";
+import CreateProjectForm from "@/components/forms/ProjectForm";
 import { SkeletonLoaderPage } from "@/components/ui/SkeletonLoader";
 import { SkeletonCard } from "@/components/ui/SkeletonLoader";
 import { fetchProject, deleteProject } from "@/api";
@@ -68,7 +68,6 @@ export default function ProjectPage() {
                 <div className="w-full">
                   <ProjectCardMain
                     isOwner={isOwner}
-                    currentUserProfileId={user?.profile?.id}
                     project={project}
                     toggleModal={handleToggleAddProjectModal}
                     triggerRefetch={refetch}
@@ -87,7 +86,7 @@ export default function ProjectPage() {
               </div>
             )}
           </div>
-          <aside className="w-1/3 space-y-5">
+          <aside className="hidden lg:block w-1/3 space-y-5">
             {isRecommendationsLoading && <SkeletonCard />}
             {!isRecommendationsLoading && (
               <div className="p-4 bg-white rounded-lg border border-gray-300">

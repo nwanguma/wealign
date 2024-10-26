@@ -14,6 +14,7 @@ interface IProfilePreviewCardProps {
   isPreview?: boolean;
   hasFollowed?: boolean;
   email?: string;
+  handleCloseModal?: () => void;
 }
 
 export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
@@ -25,13 +26,14 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
   title,
   avatar,
   hasFollowed,
+  handleCloseModal,
 }) => {
   const {
     handleInitiateConversations,
     handleFollow,
     handleUnfollow,
     justFollowed,
-  } = useFollow();
+  } = useFollow(handleCloseModal);
   const isCurrentUser = currentUserProfileId === profile_id;
 
   return (

@@ -30,10 +30,10 @@ export default function ProfileIcon({ avatar }: { avatar?: string | null }) {
       <div className="border border-gray-300 p-1 rounded-full">
         <Image
           src={avatar || "/images/test-avatar-3.jpg"}
-          width={30}
-          height={30}
+          width={0}
+          height={0}
           alt="user avatar"
-          className="cursor-pointer rounded-full"
+          className="cursor-pointer w-4 h-4 lg:w-6 lg:h-6 rounded-full"
           onClick={() => setIsProfileOpen(!isProfileOpen)}
         />
       </div>

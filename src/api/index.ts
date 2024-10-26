@@ -284,12 +284,32 @@ export const deleteComment = async (
 
 export const fetchMessages = async (
   conversationId: string,
-  params: IMessageFilters
+  pagination: IPagination
 ) => {
   const result = await axiosInstance.get(
     `/api/proxy/conversations/${conversationId}/messages`,
     {
-      params,
+      params: {
+        limit: pagination.limit,
+        page: pagination.page,
+      },
+    }
+  );
+
+  return result.data.data;
+};
+
+export const fetchMessagesLong = async (
+  conversationId: string,
+  pagination: IPagination
+) => {
+  const result = await axiosInstance.get(
+    `/api/proxy/conversations/${conversationId}/messages/long-poll`,
+    {
+      params: {
+        limit: pagination.limit,
+        page: pagination.page,
+      },
     }
   );
 
@@ -300,4 +320,40 @@ export const sendMessage = async (message: any) => {
   const result = await axiosInstance.post(`/api/proxy/messages`, message);
 
   return result.data.data;
+};
+
+export const createEvent = async (data: Partial<Event>) => {
+  const result = await axiosInstance.post("/api/proxy/events", data);
+
+  return result?.data?.data;
+};
+
+export const updateEvent = async (data: Partial<Event>, id: string) => {
+  const result = await axiosInstance.put(`/api/proxy/events/${id}`, data);
+
+  return result?.data?.data;
+};
+
+export const createArticle = async (data: Partial<Article>) => {
+  const result = await axiosInstance.post("/api/proxy/articles", data);
+
+  return result?.data?.data;
+};
+
+export const updateArticle = async (data: Partial<Article>, id: string) => {
+  const result = await axiosInstance.put(`/api/proxy/articles/${id}`, data);
+
+  return result?.data?.data;
+};
+
+export const createJob = async (data: Partial<Job>) => {
+  const result = await axiosInstance.post("/api/proxy/jobs", data);
+
+  return result?.data?.data;
+};
+
+export const updateJob = async (data: Partial<Job>, id: string) => {
+  const result = await axiosInstance.put(`/api/proxy/jobs/${id}`, data);
+
+  return result?.data?.data;
 };

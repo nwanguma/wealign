@@ -8,10 +8,8 @@ import { AppDispatch } from "@/store";
 import { resetNotifications } from "@/store/notifications";
 import { useRouter } from "next/navigation";
 
-export default function NotificationIcon() {
-  const { data: notifications } = useSelector(
-    (state: RootState) => state.notifications
-  );
+export default function MessagesIcon() {
+  const notifications = useSelector((state: RootState) => state.notifications);
 
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
@@ -22,18 +20,18 @@ export default function NotificationIcon() {
       onClick={() => {
         dispatch(resetNotifications());
 
-        router.push("/dashboard/notifications");
+        router.push("/dashboard/messages");
       }}
     >
       <Image
-        src="/icons/notifications.svg"
-        alt="notifications"
+        src="/icons/messages.svg"
+        alt="messages"
         width={0}
         height={0}
-        className="cursor-pointer w-5 h-5"
+        className="w-5 h-5 cursor-pointer"
       />
-      {notifications.length > 0 && (
-        <span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-600 absolute -top-1 right-0"></span>
+      {notifications?.messages?.length > 0 && (
+        <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-600 absolute -top-1 -right-1"></span>
       )}
     </div>
   );

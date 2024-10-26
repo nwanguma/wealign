@@ -9,11 +9,11 @@ import DashboardProfileCard from "@/components/ui/DashboardProfileCard";
 import DashboardEventCard from "@/components/ui/DashboardEventCard";
 import DashboardProjectCard from "@/components/ui/DashboardProjectCard";
 
-import AddEventForm from "@/components/forms/CreateEventForm";
-import CreateProjectForm from "@/components/forms/CreateProjectForm";
+import AddEventForm from "@/components/forms/EventForm";
+import CreateProjectForm from "@/components/forms/ProjectForm";
 import UpdateProfileForm from "@/components/forms/UpdateProfileForm";
 import AccountSettings from "@/components/forms/AccountsSettings";
-import CreateEventForm from "@/components/forms/CreateEventForm";
+import CreateEventForm from "@/components/forms/EventForm";
 
 import { ProfileCard } from "../page";
 

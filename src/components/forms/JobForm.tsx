@@ -12,8 +12,9 @@ import NativeSelect from "./NativeSelectComponent";
 import ReactSelectComponent from "./ReactSelectComponent";
 import Input from "./Input";
 import TextArea from "./TextArea";
-import axiosInstance from "@/lib/axiosInstance";
 import { useSkills } from "@/app/hooks/useSkills";
+import { serializeData } from "@/lib/helpers";
+import { createJob, updateJob } from "@/api";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "../../app/globals.css";
@@ -29,25 +30,19 @@ const schema = yup.object().shape({
     .min(10, "Description must be at least 10 characters"),
   status: yup.string().required("Status is required"),
   website: yup.string().url("Must be a valid URL"),
-  application_url: yup.string().url("Must be a valid URL"),
-  location: yup.string().required("Location is required"),
+  application_url: yup.string().url("Must be a valid URL").required(),
+  location: yup.string(),
   skills: yup.array(),
   deadline: yup.mixed(),
 });
 
-const createJob = async (data: Partial<Job>) => {
-  const result = await axiosInstance.post("/api/proxy/jobs", data);
-
-  return result?.data?.data;
-};
-
-interface ICreateJobForm {
+interface IJobFormProps {
   data?: Partial<Job>;
   triggerRefetch?: () => void;
   handleModalClose?: () => void;
 }
 
-const CreateJobForm: React.FC<ICreateJobForm> = ({
+const JobForm: React.FC<IJobFormProps> = ({
   data: jobsData,
   handleModalClose,
   triggerRefetch,
@@ -81,13 +76,17 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
     setValue,
     formState: { errors },
   } = methods;
-  const createJobMutation = useMutation({
-    mutationFn: (data: Partial<Job>) => createJob(data),
+  const jobMutation = useMutation({
+    mutationFn: (data: Partial<Job>) =>
+      jobsData ? updateJob(data, jobsData?.id as string) : createJob(data),
     onSuccess: () => {
       handleModalClose && handleModalClose();
       triggerRefetch && triggerRefetch();
     },
     onError: (error: any) => {},
+    onSettled: () => {
+      setLoading(false);
+    },
   });
 
   const skillsOptions = (skills || [])?.map((skill) => {
@@ -96,11 +95,12 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
 
   const onSubmit = (data: any) => {
     setLoading(true);
+    const formattedData = serializeData(data);
 
     (async function () {
-      await createJobMutation.mutate({
-        ...data,
-        skills: data.map((s: Option) => ({ title: s.value })),
+      await jobMutation.mutate({
+        ...formattedData,
+        skills: data?.skills.map((s: Option) => ({ title: s.value })),
       });
     })();
   };
@@ -119,6 +119,7 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
             onChange={(e) => setValue("title", e.target.value)}
             error={errors.title?.message as string}
             otherClasses={methods.register("title")}
+            required
           />
         </div>
         <div className="w-full">
@@ -202,6 +203,7 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
             error={errors.application_url?.message as string}
             otherClasses={methods.register("application_url")}
             placeholder="https://"
+            required
           />
         </div>
         <TextArea
@@ -233,4 +235,4 @@ const CreateJobForm: React.FC<ICreateJobForm> = ({
   );
 };
 
-export default CreateJobForm;
+export default JobForm;

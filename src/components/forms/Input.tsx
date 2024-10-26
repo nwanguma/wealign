@@ -53,7 +53,7 @@ const Input: React.FC<InputProps> = ({
           onChange={onChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(value !== "")}
-          className="block py-3 rounded-xl pl-4 w-full text-sm text-gray-900 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
+          className="block py-2 md:py-3 rounded-lg md:rounded-xl pl-2 md:pl-4 w-full text-sm text-gray-900 border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border focus:border-blue-600 peer hover:border-gray-400"
           placeholder={placeholder}
           required={required}
         />

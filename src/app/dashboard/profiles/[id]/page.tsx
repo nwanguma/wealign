@@ -40,7 +40,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen w-full bg-white">
-      <div className="flex space-x-5 p-6 w-9/12 mx-auto">
+      <div className="flex space-x-5 p-3 lg:p-6 lg:w-11/12 xl:w-9/12 mx-auto">
         <div className="flex-1 p-4 flex flex-col space-y-5 w-full rounded-lg">
           {isLoading && <SkeletonLoaderPage />}
           {!isLoading && profile && (

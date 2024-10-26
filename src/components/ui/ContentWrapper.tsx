@@ -10,12 +10,8 @@ const ContentWrapper: React.FC<IContentWrapperProps> = ({ data, children }) => {
   return (
     <div
       className={`w-full grid ${
-        data?.length === 1
-          ? "!grid-cols-1"
-          : data?.length === 2
-          ? "!grid-cols-2"
-          : ""
-      } grid-cols-2 md:grid-cols-2 2xl:grid-cols-3 gap-5`}
+        data?.length === 1 ? "!grid-cols-1" : ""
+      } grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3 md:gap-5`}
     >
       {children}
     </div>

@@ -7,7 +7,7 @@ import { keepPreviousData } from "@tanstack/react-query";
 
 import AppModal from "@/components/ui/Modal";
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
-import CreateJobForm from "@/components/forms/CreateJobForm";
+import CreateJobForm from "@/components/forms/JobForm";
 import { JobCard } from "@/components/ui/JobCard";
 import {
   Job,
@@ -24,7 +24,10 @@ import ContentWrapper from "@/components/ui/ContentWrapper";
 import { WithTooltip } from "@/components/ui/WithTooltip";
 import AddItemButton from "@/components/ui/AddItemButton";
 import { RootState } from "@/store";
-import { SkeletonLoaderGrid } from "@/components/ui/SkeletonLoader";
+import {
+  SkeletonLoaderGrid,
+  SkeletonLoader,
+} from "@/components/ui/SkeletonLoader";
 
 const fetchJobs = async (
   pagination: IPagination,
@@ -88,9 +91,9 @@ export default function Jobs() {
   });
 
   return (
-    <div className="min-h-screen w-full bg-white p-6">
-      <div className="flex space-x-5">
-        <div className="min-h-screen px-5 md:px-10 lg:px-20">
+    <div className="min-h-screen w-full bg-white p-1 lg:p-6">
+      <div className="flex w-full space-x-0 md:space-x-5">
+        <div className="w-full min-h-screen px-2 s:px-5 md:px-10 lg:px-20">
           <div className="relative">
             <DashboardPageHeader
               title="Find Opportunities and Jobs to Accelerate Your Career"
@@ -164,7 +167,16 @@ export default function Jobs() {
                   jobs?.map((job) => <JobCard key={job.id} job={job} />)}
               </ContentWrapper>
             )}
-            {isLoading && <SkeletonLoaderGrid />}
+            {isLoading && (
+              <>
+                <div className="hidden md:block">
+                  <SkeletonLoaderGrid />
+                </div>
+                <div className="block md:hidden">
+                  <SkeletonLoader />
+                </div>
+              </>
+            )}
             {jobsData && jobs && (
               <PaginationComponent
                 data={jobs}
