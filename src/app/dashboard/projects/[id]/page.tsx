@@ -1,23 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import Image from "next/image";
 
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { ProjectCardMain } from "@/components/ui/ProjectCardMain";
 import { RootState } from "@/store";
-import { WithTooltip } from "@/components/ui/WithTooltip";
 import AppModal from "@/components/ui/Modal";
-import CreateProjectForm from "@/components/forms/ProjectForm";
-import { SkeletonLoaderPage } from "@/components/ui/SkeletonLoader";
-import { SkeletonCard } from "@/components/ui/SkeletonLoader";
-import { fetchProject, deleteProject } from "@/api";
+import ProjectForm from "@/components/forms/ProjectForm";
+import { fetchProject, deleteProject, deleteProjectFeedback } from "@/api";
 import { Project } from "@/common/constants";
+import PageWrapperWithError from "@/components/ui/PageWrapper";
+import PageMainContent from "@/components/ui/MainContentWrapper";
+import RecommendationsComponent from "@/components/ui/RecommendationsComponent";
+import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
+import { CustomError } from "@/lib/helpers/class";
+import { feedbackTextMapper } from "@/lib/helpers/constants";
+import FeedbackForm from "@/components/forms/FeedbackForm";
 
 export default function ProjectPage() {
+  const router = useRouter();
   const { recommendations, user } = useSelector((state: RootState) => ({
     recommendations: state.recommendations,
     user: state.user,
@@ -26,6 +30,10 @@ export default function ProjectPage() {
   const id = params?.id;
   const [addProjectModalIsOpen, setAddProjectModalIsOpen] =
     useState<boolean>(false);
+  const [addFeedbackModalIsOpen, setAddFeedbackModalIsOpen] =
+    useState<boolean>(false);
+  const [editFeedbackModalIsOpen, setEditFeedbackModalIsOpen] =
+    useState<string>("");
   const {
     isLoading: isRecommendationsLoading,
     projects: projectRecommendations,
@@ -38,90 +46,133 @@ export default function ProjectPage() {
     isLoading,
   } = useQuery<Project, Error>({
     queryKey: ["projects", id],
-    queryFn: () => fetchProject(id as string),
+    queryFn: () => (id ? fetchProject(id as string) : Promise.reject("No ID")),
+    enabled: !!id,
   });
 
   const isOwner = user?.profile?.id === project?.owner?.id;
-
   const deleteMutation = useMutation({
     mutationFn: (projectId: string) => deleteProject(projectId),
-    onSuccess: () => {},
-    onError: (error: any) => {},
+    onSuccess: () => {
+      successToast(feedbackTextMapper.delete("Project"));
+      router.push("/dashboard/jobs");
+    },
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
+  });
+  const deleteFeedbackMutation = useMutation({
+    mutationFn: ({
+      projectId,
+      feedbackId,
+    }: {
+      projectId: string;
+      feedbackId: string;
+    }) => deleteProjectFeedback(projectId, feedbackId),
+    onSuccess: () => {
+      successToast(feedbackTextMapper.delete("Feedback"));
+      refetch();
+    },
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
   });
 
-  const handleDelete = (projectId: string) => {
-    deleteMutation.mutate(projectId);
-  };
-
-  const handleToggleAddProjectModal = () => {
-    setAddProjectModalIsOpen(!addProjectModalIsOpen);
-  };
+  const handleDelete = useCallback(
+    (projectId: string) => {
+      deleteMutation.mutate(projectId);
+    },
+    [deleteMutation]
+  );
+  const handleDeleteFeedback = useCallback(
+    (projectId: string, feedbackId: string) => {
+      deleteFeedbackMutation.mutate({ projectId, feedbackId });
+    },
+    [deleteFeedbackMutation]
+  );
+  const handleToggleAddProjectModal = useCallback(() => {
+    setAddProjectModalIsOpen((prevState) => !prevState);
+  }, []);
+  const handleToggleAddFeedbackModal = useCallback(() => {
+    setAddFeedbackModalIsOpen((prevState) => !prevState);
+  }, []);
+  const handleToggleEditFeedbackModal = useCallback((id?: string) => {
+    setEditFeedbackModalIsOpen(id || "");
+  }, []);
+  const MemoizedRecommendations = useMemo(
+    () => (
+      <RecommendationsComponent
+        recommendations={projectRecommendations}
+        isLoading={isRecommendationsLoading}
+        render={(project) => <ProjectCard project={project as Project} />}
+      />
+    ),
+    [projectRecommendations, isRecommendationsLoading]
+  );
 
   return (
-    <div>
-      <div className="min-h-screen w-full bg-white relative">
-        <div className="flex space-x-5 p-6">
-          <div className="flex-1 p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg relative">
-            {isLoading && <SkeletonLoaderPage />}
-            {!isLoading && project && (
-              <div className="w-full">
-                <div className="w-full">
-                  <ProjectCardMain
-                    isOwner={isOwner}
-                    project={project}
-                    toggleModal={handleToggleAddProjectModal}
-                    triggerRefetch={refetch}
-                  />
-                </div>
-                {isOwner && project && (
-                  <div
-                    className="w-full text-center cursor-pointer"
-                    onClick={() => handleDelete(project.id)}
-                  >
-                    <span className="inline-block rounded text-xs text-red-500 bg-red-50 px-3 py-2">
-                      Delete this project
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          <aside className="hidden lg:block w-1/3 space-y-5">
-            {isRecommendationsLoading && <SkeletonCard />}
-            {!isRecommendationsLoading && (
-              <div className="p-4 bg-white rounded-lg border border-gray-300">
-                <h3 className="font-app-medium mb-3 text-gray-700 text-base">
-                  More Projects
-                </h3>
-                <div className="space-y-4">
-                  {projectRecommendations &&
-                    [...projectRecommendations]?.splice(0, 3).map((project) => {
-                      return (
-                        <div
-                          key={project.id}
-                          className="border-b border-b-gray-200 pb-4 last:border-0"
-                        >
-                          <ProjectCard project={project} />
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
-            )}
-          </aside>
-        </div>
-      </div>
+    <PageWrapperWithError error={error}>
+      <PageMainContent
+        isLoading={isLoading}
+        contentData={project!}
+        handleDelete={handleDelete}
+        isOwner={isOwner}
+        mainContent={(project, isOwner) => (
+          <ProjectCardMain
+            currentUserProfileId={user.profile?.id}
+            isOwner={isOwner}
+            project={project as Project}
+            toggleModal={handleToggleAddProjectModal}
+            toggleFeedbackModal={handleToggleAddFeedbackModal}
+            toggleEditFeedbackModal={handleToggleEditFeedbackModal}
+            handleDeleteFeedback={handleDeleteFeedback}
+            triggerRefetch={refetch}
+          />
+        )}
+        asideContent={() => MemoizedRecommendations}
+      />
       <AppModal
         title="Update Project"
         isOpen={addProjectModalIsOpen}
-        onClose={() => handleToggleAddProjectModal()}
+        onClose={() => {
+          handleToggleAddProjectModal();
+        }}
       >
-        <CreateProjectForm
+        <ProjectForm
           data={project as Project}
           handleModalClose={handleToggleAddProjectModal}
           triggerRefetch={refetch}
         />
       </AppModal>
-    </div>
+      <AppModal
+        title="Share feedback"
+        isOpen={addFeedbackModalIsOpen}
+        onClose={() => {
+          handleToggleAddFeedbackModal();
+        }}
+      >
+        <FeedbackForm
+          projectData={project as Project}
+          handleModalClose={handleToggleAddFeedbackModal}
+          triggerRefetch={refetch}
+        />
+      </AppModal>
+      <AppModal
+        title="Edit feedback"
+        isOpen={!!editFeedbackModalIsOpen}
+        onClose={() => {
+          handleToggleEditFeedbackModal();
+        }}
+      >
+        <FeedbackForm
+          projectData={project as Project}
+          feedbackData={project?.feedbacks?.find(
+            (f) => f.id === editFeedbackModalIsOpen
+          )}
+          handleModalClose={handleToggleEditFeedbackModal}
+          triggerRefetch={refetch}
+        />
+      </AppModal>
+    </PageWrapperWithError>
   );
 }

@@ -24,6 +24,9 @@ import {
 } from "@/lib/helpers";
 import NativeSelect from "./NativeSelectComponent";
 import { useSkills } from "@/app/hooks/useSkills";
+import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
+import { feedbackTextMapper } from "@/lib/helpers/constants";
+import { CustomError } from "@/lib/helpers/class";
 
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
@@ -71,7 +74,11 @@ const schema = yup.object().shape({
     .min(1, "At least one skill is required")
     .required("Skills are required"),
   is_mentor: yup.boolean(),
-  mentor_note: yup.string().min(10, "Note must be at least 10 characters"),
+  mentor_note: yup.string().when("is_mentor", {
+    is: true,
+    then: (schema) => schema.required("Mentor note is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 const handleUpdateProfile = async (
@@ -150,11 +157,15 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
       data: Partial<Profile>;
     }) => handleUpdateProfile(profileId, data),
     onSuccess: (data: Profile) => {
+      successToast(feedbackTextMapper.update("Profile"));
+
       dispatch(updateProfile(data));
       triggerRefetch();
       handleModalClose();
     },
-    onError: (error: any) => {},
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
     onSettled: () => {
       setLoading(false);
     },
@@ -182,13 +193,11 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
     setFileUploadLoading(true);
 
     const sanitizedFile = sanitizeFile(acceptedFiles[0]);
-
     setAvatar(sanitizedFile);
-    // setAvatar(acceptedFiles[0]);
 
     (async function () {
       const formData = new FormData();
-      formData.append("file", acceptedFiles[0]);
+      formData.append("file", sanitizedFile);
 
       const result = await axiosInstance.post(
         "/api/proxy/files/upload/images",
@@ -210,7 +219,6 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
     const sanitizedFile = sanitizeFile(acceptedFiles[0]);
 
     setResume(sanitizedFile);
-    // setResume(acceptedFiles[0]);
 
     (async function () {
       const formData = new FormData();

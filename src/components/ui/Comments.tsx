@@ -9,17 +9,19 @@ import { useMutation } from "@tanstack/react-query";
 import { createComment, deleteComment, createReaction } from "@/api";
 import { ProfilePreviewCard } from "./ProfileCardPreview";
 import AppModal from "./Modal";
-
-import "../../app/globals.css";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+
+import "../../app/globals.css";
+import { CustomError } from "@/lib/helpers/class";
+import { errorToastWithCustomError } from "@/lib/helpers/toast";
 
 interface ICommentsProps {
   isOwner: boolean;
   resource: string;
   resourceId: string;
   comments: Comment[];
-  reactions: any;
+  reactions: Reaction[];
   triggerRefetch?: () => void;
 }
 
@@ -51,7 +53,9 @@ export const Comments: React.FC<ICommentsProps> = ({
       triggerRefetch && triggerRefetch();
       setNewComment("");
     },
-    onError: (error: any) => {},
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
     onSettled: () => {
       setIsLoading(false);
     },
@@ -69,7 +73,9 @@ export const Comments: React.FC<ICommentsProps> = ({
       triggerRefetch && triggerRefetch();
       setNewComment("");
     },
-    onError: (error: any) => {},
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
     onSettled: () => {
       setIsLoading(false);
     },
@@ -88,7 +94,9 @@ export const Comments: React.FC<ICommentsProps> = ({
     onSuccess: () => {
       triggerRefetch && triggerRefetch();
     },
-    onError: (error: any) => {},
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
   });
 
   const handleAddComment = () => {
@@ -138,7 +146,7 @@ export const Comments: React.FC<ICommentsProps> = ({
               viewBox="0 0 32 32"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <g fill="none" fill-rule="evenodd">
+              <g fill="none" fillRule="evenodd">
                 <path d="m0 0h32v32h-32z" />
                 <path
                   d="m24 2c4.418278 0 8 3.581722 8 8v9c0 4.418278-3.581722 8-8 8h-14.65568992c-.8644422 0-1.70562318.280039-2.39757043.7981793l-3.74795444 2.8065233c-.88415838.6620708-2.13762479.4820332-2.79969558-.4021251-.25907013-.3459737-.39908963-.7665641-.39908963-1.1987852v-19.0037923c0-4.418278 3.581722-8 8-8zm-2.571997 10.0964585c-.4991419-.2363809-1.0954008-.023371-1.3317816.4757709-.6771647 1.4299014-2.3250027 2.4280053-4.099688 2.4280053-1.7734204 0-3.4129473-.9905459-4.0942267-2.416524-.2380843-.4983315-.8350673-.7093035-1.3333988-.4712192-.4983316.2380843-.70930361.8350673-.4712193 1.3333988 1.0200199 2.1349917 3.3692971 3.5543444 5.8988448 3.5543444 2.5328429 0 4.8924921-1.4292516 5.9072405-3.5719947.2363808-.4991418.0233709-1.0954007-.4757709-1.3317815z"
@@ -160,7 +168,7 @@ export const Comments: React.FC<ICommentsProps> = ({
                 xmlnsXlink="http://www.w3.org/1999/xlink"
                 className="w-5 h-5"
                 viewBox="0 0 64 64"
-                enable-background="new 0 0 64 64"
+                enableBackground="new 0 0 64 64"
                 xmlSpace="preserve"
               >
                 <path
@@ -186,7 +194,7 @@ export const Comments: React.FC<ICommentsProps> = ({
         </div>
       </div>
       <div className="sticky self-start">
-        <div className="space-y-2 border border-gray-300 rounded-lg p-1 py-2.5 overflow-y-auto max-h-72 main-feed">
+        <div className="space-y-2 border border-gray-300 rounded-lg p-1 py-2.5 overflow-y-auto max-h-72 hide-scroll">
           {comments.map((comment) => {
             return (
               <div
@@ -239,7 +247,7 @@ export const Comments: React.FC<ICommentsProps> = ({
                       viewBox="0 0 32 32"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <g fill="none" fill-rule="evenodd">
+                      <g fill="none" fillRule="evenodd">
                         <path d="m0 0h32v32h-32z" />
                         <path
                           d="m19 0c3.3137085 0 6 2.6862915 6 6h6c.5522847 0 1 .44771525 1 1s-.4477153 1-1 1l-3-.001v18.001c0 3.3137085-2.6862915 6-6 6h-12c-3.3137085 0-6-2.6862915-6-6v-18h-3c-.55228475 0-1-.44771525-1-1s.44771525-1 1-1h6c0-3.3137085 2.6862915-6 6-6zm7 8h-20v18c0 2.1421954 1.68396847 3.8910789 3.80035966 3.9951047l.19964034.0048953h12c2.1421954 0 3.8910789-1.6839685 3.9951047-3.8003597l.0048953-.1996403zm-13 6c.5522847 0 1 .4477153 1 1v7c0 .5522847-.4477153 1-1 1s-1-.4477153-1-1v-7c0-.5522847.4477153-1 1-1zm6 0c.5522847 0 1 .4477153 1 1v7c0 .5522847-.4477153 1-1 1s-1-.4477153-1-1v-7c0-.5522847.4477153-1 1-1zm0-12h-6c-2.1421954 0-3.89107888 1.68396847-3.99510469 3.80035966l-.00489531.19964034h7 7c0-2.14219539-1.6839685-3.89107888-3.8003597-3.99510469z"

@@ -190,7 +190,10 @@ export default function Jobs() {
         isOpen={addJobModalIsOpen}
         onClose={() => handleToggleAddJobModal()}
       >
-        <CreateJobForm />
+        <CreateJobForm
+          triggerRefetch={refetch}
+          handleModalClose={handleToggleAddJobModal}
+        />
       </AppModal>
     </div>
   );

@@ -20,6 +20,9 @@ import {
   stripHtml,
 } from "@/lib/helpers";
 import { createArticle, updateArticle } from "@/api";
+import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
+import { CustomError } from "@/lib/helpers/class";
+import { feedbackTextMapper } from "@/lib/helpers/constants";
 
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
@@ -80,10 +83,17 @@ const ArticleForm: React.FC<IArticleFormProps> = ({
         ? updateArticle(data, articlesData?.id as string)
         : createArticle(data),
     onSuccess: () => {
+      const feedbackMessage = articlesData?.id
+        ? feedbackTextMapper.update("Article")
+        : feedbackTextMapper.create("Article");
+
+      successToast(feedbackMessage);
       handleModalClose && handleModalClose();
       triggerRefetch && triggerRefetch();
     },
-    onError: () => {},
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
     onSettled: () => {
       setLoading(false);
     },
@@ -98,9 +108,7 @@ const ArticleForm: React.FC<IArticleFormProps> = ({
   const handleBannerDrop = (acceptedFiles: File[]) => {
     setFileUploadLoading(true);
     const sanitizedFile = sanitizeFile(acceptedFiles[0] as File);
-
     setBanner(sanitizedFile);
-    // setBanner(acceptedFiles[0]);
 
     (async function () {
       const formData = new FormData();

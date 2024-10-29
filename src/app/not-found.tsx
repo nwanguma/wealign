@@ -22,7 +22,7 @@ const NotFoundPage: React.FC = ({ searchParams, params }: any) => {
       </nav>
       <div className="flex-grow w-full flex flex-col justify-center relative">
         <div className="w-11/12 sm:w-10/12 lg:w-7/12 mx-auto space-y-2 sm:space-y-3">
-          <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-blue-700">
+          <div className="text-3xl sm:text-4xl lg:text-5xl font-app-semibold text-blue-700">
             Page Not Found!
           </div>
           <div className="text-gray-500 text-base sm:text-lg-xl break-all">

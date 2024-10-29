@@ -247,7 +247,7 @@ const MainFeed: React.FC = () => {
                     className="text-custom-gray-paragraph"
                     style={{ fontSize: "13.5px" }}
                   >
-                    There are no upcoming events.
+                    Events will show here.
                   </div>
                 )}
               </div>
@@ -446,7 +446,7 @@ const MainFeed: React.FC = () => {
               <SkeletonLoader />
             )}
             {!(projectsIsLoading || eventsIsLoading || articlesIsLoading) && (
-              <div className="overflow-y-auto main-feed h-screen">
+              <div className="overflow-y-auto hide-scroll h-screen">
                 {mainFeedSettings.contentType === "projects" && (
                   <div className="space-y-3">
                     {projects &&

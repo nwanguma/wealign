@@ -13,6 +13,8 @@ import { getTime, isWithinLast10Minutes, timeAgo } from "@/lib/helpers";
 import { fetchMessages, sendMessage } from "@/api";
 import { fetchConversations } from "@/store/conversations";
 import PaginationComponent from "@/components/ui/PaginationComponent";
+import { CustomError } from "@/lib/helpers/class";
+import { errorToastWithCustomError } from "@/lib/helpers/toast";
 
 export default function MessagesPage() {
   const newMessages = useSelector(
@@ -61,10 +63,10 @@ export default function MessagesPage() {
     mutationFn: (message: any) => sendMessage(message),
     onSuccess: () => {
       refetch();
-
-      console.log("did we get here");
-
       dispatch(fetchConversations());
+    },
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
     },
   });
 
@@ -95,8 +97,6 @@ export default function MessagesPage() {
   ) {
     activeConversationMessages = activeConversationMessagesData.data;
   }
-
-  console.log(conversations, "**conversations**");
 
   return (
     <div className="min-h-screen w-full bg-white p-2 md:p-6">

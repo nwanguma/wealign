@@ -114,9 +114,12 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
             <div className="space-y-1">
               <h3 className="text-sm text-gray-600 font-bold">Contact</h3>
               <div className="flex space-x-2 items-center">
-                <span className="text-sm text-gray-400 font-bold">
+                <Link
+                  href={`/dashboard/profiles/${owner?.id}`}
+                  className="text-sm text-gray-400 font-bold"
+                >
                   {owner?.first_name} {owner?.last_name}
-                </span>
+                </Link>
               </div>
             </div>
             <div className="space-y-1">

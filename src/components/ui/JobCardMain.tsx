@@ -44,7 +44,7 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
           <ViewsComponent views={views as number} />
           {isOwner &&
             WithTooltip(
-              "Edit event",
+              "Edit job",
               <div onClick={() => toggleModal && toggleModal()}>
                 <Image src="/icons/edit.svg" alt="" width={20} height={20} />
               </div>

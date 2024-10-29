@@ -8,6 +8,8 @@ import * as yup from "yup";
 import { RootState } from "@/store";
 import axiosInstance from "@/lib/axiosInstance";
 import Input from "./Input";
+import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
+import { CustomError } from "@/lib/helpers/class";
 
 const schema = yup.object().shape({
   old_password: yup.string().required("Old password is required"),
@@ -42,8 +44,12 @@ const AccountSettingsForm: React.FC<IAccountSettingsFormProps> = ({
   const passwordChangeMutation = useMutation({
     mutationFn: (data: { old_password: string; new_password: string }) =>
       handleChangePassword(data),
-    onSuccess: (data: any) => {},
-    onError: (error: any) => {},
+    onSuccess: (data: any) => {
+      successToast("Account settings updated successfully");
+    },
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
     onSettled(data, error, variables, context) {
       setLoading(false);
     },

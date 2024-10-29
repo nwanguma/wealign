@@ -249,12 +249,109 @@ body {
 }
 
 /* Hide main feed overflow scrollbar */
-.main-feed {
+.hide-scroll {
   overflow: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.main-feed::-webkit-scrollbar {
+.hide-scroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Article */
+.article-content {
+  font-family: "CH_Custom_W_Bk", "TTCommons_Custom", "sans-serif" !important;
+  font-weight: 400;
+  color: #333333;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.65rem;
+}
+
+.article-content p {
+  color: #4a4a4a;
+  font-size: 15px;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4 {
+  font-weight: bold !important;
+  font-family: "CH_Custom_W_Bd", "TTCommons_Custom", "sans-serif" !important;
+}
+
+.article-content strong {
+  font-family: "CH_Custom_W_Bd", "TTCommons_Custom", "sans-serif" !important;
+}
+
+.article-content h1 {
+  font-size: 2rem;
+  color: #2d3748;
+}
+
+.article-content h2 {
+  font-size: 1.75rem;
+  color: #2d3748;
+}
+
+.article-content h3 {
+  font-size: 1.5rem;
+  color: #4a5568;
+}
+
+.article-content ul,
+.article-content ol {
+  padding-left: 2em !important;
+}
+
+.article-content ul > li {
+  list-style: disc;
+}
+
+.article-content ol > li {
+  list-style: decimal;
+}
+
+.article-content ul li,
+.article-content ol li {
+  line-height: 1.6;
+}
+
+.article-content blockquote {
+  font-style: italic;
+  background-color: #f7fafc;
+  border-left: 4px solid #cbd5e0;
+  color: #4a5568;
+}
+
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em 0;
+  border-radius: 4px;
+}
+
+.article-content a {
+  color: #3182ce;
+  text-decoration: underline;
+}
+
+.article-content a:hover {
+  color: #2b6cb0;
+}
+
+.article-content code {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.95rem;
+  background-color: #f1f5f9;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}
+
+.article-content hr {
+  border: 0;
+  border-top: 1px solid #e2e8f0;
 }

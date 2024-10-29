@@ -85,7 +85,11 @@ const CommentNotification = ({
                   notification.initiator.profile.last_name}{" "}
               </Link>
               {"  "}
-              <span>commented in</span>
+              <span>
+                {notification.category.includes("feedback")
+                  ? "left a feedback"
+                  : "commented in"}
+              </span>
               {"  "}
               <Link
                 className="text-gray-600 font-app-medium"
@@ -186,12 +190,13 @@ const NotificationsCard = ({
       }
       className="cursor-pointer"
     >
-      {notification.category.includes("comment") && (
-        <CommentNotification
-          notification={notification}
-          newNotifications={newNotifications}
-        />
-      )}
+      {notification.category.includes("comment") ||
+        (notification.category.includes("feedback") && (
+          <CommentNotification
+            notification={notification}
+            newNotifications={newNotifications}
+          />
+        ))}
       {notification.category.includes("follow") && (
         <FollowNotification
           notification={notification}

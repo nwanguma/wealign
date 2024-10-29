@@ -1,6 +1,7 @@
 import CryptoJS from "crypto-js";
 import { Profile } from "@/common/constants";
 import { DateInfo, FormatDateOptions } from "./constants";
+import { CustomError } from "./class";
 
 export const formatDateShort = (
   dateString: string,
@@ -157,19 +158,32 @@ export function sanitizeFile(file: File) {
 }
 
 export function serializeData<T extends Record<string, any>>(data: T): T {
-  const serializedData = { ...data };
+  const serializedData: Record<string, any> = { ...data };
 
   Object.keys(serializedData).forEach((key) => {
     const value = serializedData[key];
 
     if (value === null || value === undefined || value === "") {
-      delete serializedData[key];
+      serializedData[key] = null;
     }
   });
 
-  return serializedData;
+  return serializedData as T;
 }
 
-export function formatErrorResponse(e: any) {
-  return e.response.data.error;
+export function formatErrorResponse(error: CustomError): string {
+  const errorResponse = error.response?.data?.error;
+
+  if (Array.isArray(errorResponse)) {
+    return errorResponse[0];
+  }
+
+  if (typeof errorResponse === "string") {
+    return errorResponse;
+  }
+
+  return "An error occurred while processing your request. Please try again later.";
 }
+
+export const capitalizeFirstLetter = (text: string): string =>
+  text.charAt(0).toUpperCase() + text.slice(1);

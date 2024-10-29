@@ -25,8 +25,14 @@ import { createEvent, updateEvent } from "@/api";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
-import { errorToast, successToast } from "@/lib/helpers/toast";
+import {
+  errorToast,
+  errorToastWithCustomError,
+  successToast,
+} from "@/lib/helpers/toast";
 import { formatErrorResponse } from "@/lib/helpers";
+import { feedbackTextMapper } from "@/lib/helpers/constants";
+import { CustomError } from "@/lib/helpers/class";
 
 const schema = yup.object().shape({
   title: yup
@@ -107,15 +113,19 @@ const EventForm: React.FC<IEventFormProps> = ({
         ? updateEvent(data, eventsData?.id as string)
         : createEvent(data),
     onSuccess: () => {
+      const feedbackMessage = eventsData?.id
+        ? feedbackTextMapper.update("Event")
+        : feedbackTextMapper.create("Event");
+
+      successToast(feedbackMessage);
+
       handleModalClose && handleModalClose();
       triggerRefetch && triggerRefetch();
 
       successToast("Success! Your event is all set up!");
     },
-    onError: (e) => {
-      const errorMessage = formatErrorResponse(e);
-
-      errorToast(`Error! ${errorMessage}`);
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
     },
     onSettled: () => {
       setLoading(false);
@@ -131,11 +141,9 @@ const EventForm: React.FC<IEventFormProps> = ({
 
   const handleBannerDrop = (acceptedFiles: File[]) => {
     setFileUploadLoading(true);
-    // const sanitizedFile = sanitizeFile(acceptedFiles[0]);
-    const sanitizedFile = acceptedFiles[0];
+    const sanitizedFile = sanitizeFile(acceptedFiles[0]);
 
     setBanner(sanitizedFile);
-    // setBanner(acceptedFiles[0]);
 
     (async function () {
       const formData = new FormData();

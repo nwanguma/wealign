@@ -71,7 +71,9 @@ export interface Project {
   views?: number | null;
   updated_at: string;
   attachment?: string;
-  requires_feeback?: string;
+  requires_feedback?: string;
+  feedback_guide?: string;
+  feedbacks?: Feedback[];
 }
 
 export interface Job {
@@ -139,6 +141,13 @@ export interface Follower {
   avatar?: string;
   title?: string;
   user_id?: string;
+}
+
+export interface Feedback {
+  id: string;
+  guide: string;
+  text: string;
+  owner: Profile;
 }
 
 export enum ActivityTypes {

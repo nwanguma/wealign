@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import DOMPurify from "dompurify";
 
 import { Article, Profile } from "@/common/constants";
@@ -7,6 +8,8 @@ import { ViewsComponent } from "./ViewsComponent";
 import { WithTooltip } from "./WithTooltip";
 import { Comments } from "./Comments";
 import TopIconBar from "./TopIconBar";
+
+import "../../app/globals.css";
 
 interface IArticleCardMainProps {
   article: Article;
@@ -40,7 +43,7 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
           <ViewsComponent views={views as number} />
           {isOwner &&
             WithTooltip(
-              "Edit event",
+              "Edit article",
               <div onClick={() => toggleModal && toggleModal()}>
                 <Image src="/icons/edit.svg" alt="" width={20} height={20} />
               </div>
@@ -61,9 +64,12 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
             <div className="space-y-1">
               <h3 className="text-sm text-gray-400">Author</h3>
               <div className="flex space-x-2 items-center">
-                <span className="text-sm text-gray-600">
+                <Link
+                  href={`/dashboard/profiles/${owner.id}`}
+                  className="text-sm text-gray-600"
+                >
                   {(owner as Profile).first_name} {(owner as Profile).last_name}
-                </span>
+                </Link>
               </div>
             </div>
             <div className="space-y-1">
@@ -97,10 +103,9 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
             {title}
           </p>
         </div>
-        <div className="space-y-2">
-          <h3 className="text-sm font-semibold">Content</h3>
+        <div>
           <p
-            className="text-gray-600 text-sm leading-relaxed"
+            className="text-gray-600 text-sm leading-relaxed article-content"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(body) }}
           />
         </div>

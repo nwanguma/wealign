@@ -117,6 +117,17 @@ export const deleteProject = async (projectId: string) => {
   return response.data.data;
 };
 
+export const deleteProjectFeedback = async (
+  projectId: string,
+  feedbackId: string
+) => {
+  const response = await axiosInstance.delete(
+    `/api/proxy/projects/${projectId}/${feedbackId}/feedbacks`
+  );
+
+  return response.data.data;
+};
+
 export const fetchProjects = async (
   pagination: IPagination,
   filters: IFilters

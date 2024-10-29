@@ -4,27 +4,6 @@ import crypto from "crypto";
 import CryptoJS from "crypto-js";
 import { NextResponse } from "next/server";
 
-interface EncryptedData {
-  iv: string;
-  encryptedData: string;
-}
-
-function encryptData(data: Record<string, any>): EncryptedData {
-  const key = CryptoJS.enc.Hex.parse(process.env.ENCRYPTION_KEY!);
-  const iv = CryptoJS.enc.Hex.parse(process.env.ENCRYPTION_IV!);
-
-  const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key, {
-    iv: iv,
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
-  });
-
-  return {
-    iv: iv.toString(CryptoJS.enc.Hex),
-    encryptedData: encrypted.ciphertext.toString(CryptoJS.enc.Hex),
-  };
-}
-
 async function parseRequestBody(req: Request) {
   const contentType = req.headers.get("content-type") || "";
 
@@ -87,8 +66,6 @@ async function handler(req: Request) {
       }ms`
     );
 
-    // const encryptedData = encryptData(response.data);
-
     const responseHeaders = new Headers(response.headers as any);
     const nextResponse = NextResponse.json(response.data, {
       status: response.status,
@@ -105,16 +82,11 @@ async function handler(req: Request) {
       }ms: ${error.message}`
     );
 
-    console.log(error.response.data?.message[0]);
-
     return NextResponse.json(
       {
         error:
           status == 500 || !error.response.data?.message
             ? "An error occurred while processing your request. Please try again later."
-            : error.response.data?.message &&
-              typeof error.response.data?.message === "object"
-            ? error.response.data?.message[0]
             : error.response.data?.message,
         details:
           process.env.NODE_ENV === "development" ? error.message : undefined,

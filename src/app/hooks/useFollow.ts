@@ -10,6 +10,8 @@ import {
 } from "@/store/conversations";
 import { initiateConversation, followUser, unfollowUser } from "@/api";
 import { fetchFollowing } from "@/store/user";
+import { CustomError } from "@/lib/helpers/class";
+import { errorToastWithCustomError } from "@/lib/helpers/toast";
 
 interface JustFollowed {
   [key: string]: boolean;
@@ -32,7 +34,9 @@ export const useFollow = (handleCloseModal?: () => void) => {
 
       dispatch(fetchFollowing());
     },
-    onError: (error: any) => {},
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
   });
   const unfollowMutation = useMutation({
     mutationFn: (profileId: string) => unfollowUser(profileId),
@@ -44,7 +48,9 @@ export const useFollow = (handleCloseModal?: () => void) => {
 
       dispatch(fetchFollowing());
     },
-    onError: (error: any) => {},
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
   });
   const initiateConversationsMutation = useMutation({
     mutationFn: (recipientId: string) => initiateConversation(recipientId),
@@ -63,7 +69,9 @@ export const useFollow = (handleCloseModal?: () => void) => {
         }, 2000);
       }
     },
-    onError: () => {},
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
     onSettled: () => {
       handleCloseModal && handleCloseModal();
     },

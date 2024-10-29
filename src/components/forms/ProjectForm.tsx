@@ -7,6 +7,7 @@ import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
+import { useSelector } from "react-redux";
 
 import NativeSelect from "./NativeSelectComponent";
 import ReactSelectComponent from "./ReactSelectComponent";
@@ -22,11 +23,24 @@ import {
   sanitizeFile,
   serializeData,
 } from "@/lib/helpers";
+import { RootState } from "@/store";
+import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
+import { feedbackTextMapper } from "@/lib/helpers/constants";
+import { CustomError } from "@/lib/helpers/class";
 
 import "react-datepicker/dist/react-datepicker.css";
+import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import dynamic from "next/dynamic";
+
+const Loading = () => (
+  <div className="w-full h-96 block border border-gray-300 rounded-lg"></div>
+);
+
+const ReactQuill = dynamic(() => import("react-quill"), {
+  ssr: false,
+  loading: () => <Loading />,
+});
 
 const schema = yup.object().shape({
   title: yup
@@ -48,6 +62,11 @@ const schema = yup.object().shape({
   collaborators: yup.array(),
   start_date: yup.mixed(),
   requires_feedback: yup.string(),
+  feedback_guide: yup.string().when("requires_feedback", {
+    is: true,
+    then: (schema) => schema.required("Feedback guide is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 const createProject = async (data: Partial<Project>) => {
@@ -94,7 +113,8 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
     start_date: data?.start_date
       ? new Date(data?.start_date as string)
       : new Date(),
-    requires_feedback: data?.requires_feeback ? "yes" : "no",
+    requires_feedback: data?.requires_feedback ? "yes" : "no",
+    feedback_guide: data?.feedback_guide || "",
   };
 
   const methods = useForm({
@@ -117,14 +137,21 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
 
   const projectMutation = useMutation({
     mutationFn: (projectData: Partial<Project>) =>
-      data
+      data?.id
         ? updateProject(projectData, data?.id as string)
         : createProject(projectData),
     onSuccess: () => {
+      const feedbackMessage = data?.id
+        ? feedbackTextMapper.update("Project")
+        : feedbackTextMapper.create("Project");
+
+      successToast(feedbackMessage);
       handleModalClose && handleModalClose();
       triggerRefetch && triggerRefetch();
     },
-    onError: () => {},
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
     onSettled: () => {
       setLoading(false);
     },
@@ -138,7 +165,6 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
     setFileUploadLoading(true);
     const sanitizedFile = sanitizeFile(acceptedFiles[0]);
 
-    // setAttachment(acceptedFiles[0]);
     setAttachment(sanitizedFile);
 
     (async function () {
@@ -257,31 +283,6 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
           error={errors.location?.message as string}
           otherClasses={methods.register("location")}
         />
-        <div className="space-y-2">
-          <label className="block text-sm text-gray-600">Need feedback?</label>
-          <div className="flex items-center space-x-4 mt-1 text-sm">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="yes"
-                checked={watch("requires_feedback") === "no"}
-                onChange={() => setValue("requires_feedback", "no")}
-                className="form-radio"
-              />
-              <span className="ml-2">Yes</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="no"
-                checked={watch("requires_feedback") === "yes"}
-                onChange={() => setValue("requires_feedback", "yes")}
-                className="form-radio"
-              />
-              <span className="ml-2">No</span>
-            </label>
-          </div>
-        </div>
         <NativeSelect
           id="status"
           label="Status"
@@ -403,6 +404,41 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
             </div>
           )}
         </div>
+        <div className="space-y-2">
+          <label className="block text-sm text-gray-600">Need feedback?</label>
+          <div className="flex items-center space-x-4 mt-1 text-sm">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="yes"
+                checked={watch("requires_feedback") === "yes"}
+                onChange={() => setValue("requires_feedback", "yes")}
+                className="form-radio"
+              />
+              <span className="ml-2">Yes</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="no"
+                checked={watch("requires_feedback") === "no"}
+                onChange={() => setValue("requires_feedback", "no")}
+                className="form-radio"
+              />
+              <span className="ml-2">No</span>
+            </label>
+          </div>
+        </div>
+        {watch("requires_feedback") === "yes" && (
+          <TextArea
+            id="feedback_guide"
+            label="Feedback guide (ask specific questions or guide feedback response)"
+            value={watch("feedback_guide") as string}
+            onChange={(e: any) => setValue("feedback_guide", e.target.value)}
+            error={errors.feedback_guide?.message as string}
+            otherClasses={methods.register("feedback_guide")}
+          />
+        )}
         <div className="flex items-center space-x-2 justify-end">
           <button
             onClick={() => handleModalClose && handleModalClose()}

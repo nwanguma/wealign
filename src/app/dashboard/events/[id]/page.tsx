@@ -1,23 +1,26 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 
 import { Event } from "@/common/constants";
 import { EventCardMain } from "@/components/ui/EventCardMain";
 import { EventCardPreview } from "@/components/ui/EventCard";
 import { RootState } from "@/store";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import AppModal from "@/components/ui/Modal";
 import AddEventForm from "@/components/forms/EventForm";
-import {
-  SkeletonCard,
-  SkeletonLoaderPage,
-} from "@/components/ui/SkeletonLoader";
 import { fetchEvent, deleteEvent } from "@/api";
+import PageWrapperWithError from "@/components/ui/PageWrapper";
+import PageMainContent from "@/components/ui/MainContentWrapper";
+import RecommendationsComponent from "@/components/ui/RecommendationsComponent";
+import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
+import { feedbackTextMapper } from "@/lib/helpers/constants";
+import { CustomError } from "@/lib/helpers/class";
 
-export default function Dashboard() {
+export default function EventPage() {
+  const router = useRouter();
   const { recommendations, user } = useSelector((state: RootState) => ({
     recommendations: state.recommendations,
     user: state.user,
@@ -34,78 +37,66 @@ export default function Dashboard() {
     isLoading,
   } = useQuery<Event, Error>({
     queryKey: ["events", id],
-    queryFn: () => fetchEvent(id as string),
+    queryFn: () => (id ? fetchEvent(id as string) : Promise.reject("No ID")),
+    enabled: !!id,
   });
 
   const isOwner = user?.profile?.id === event?.owner?.id;
   const deleteMutation = useMutation({
     mutationFn: (eventId: string) => deleteEvent(eventId),
-    onSuccess: () => {},
-    onError: (error: any) => {},
+    onSuccess: () => {
+      successToast(feedbackTextMapper.delete("Event"));
+      router.push("/dashboard/events");
+    },
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
   });
 
   const [addEventModalIsOpen, setAddEventModalIsOpen] =
     useState<boolean>(false);
 
-  const handleToggleAddEventModal = () => {
-    setAddEventModalIsOpen(!addEventModalIsOpen);
-  };
+  const handleToggleAddEventModal = useCallback(() => {
+    setAddEventModalIsOpen((prevState) => !prevState);
+  }, []);
+  const handleDelete = useCallback(
+    (eventId: string) => {
+      deleteMutation.mutate(eventId);
+    },
+    [deleteMutation]
+  );
 
-  const handleDelete = (eventId: string) => {
-    deleteMutation.mutate(eventId);
-  };
+  const MemoizedRecommendations = useMemo(
+    () => (
+      <RecommendationsComponent
+        recommendations={eventRecommendations}
+        isLoading={isRecommendationsLoading}
+        render={(event) => (
+          <EventCardPreview event={event as Event} isPreview />
+        )}
+      />
+    ),
+    [eventRecommendations, isRecommendationsLoading]
+  );
 
   return (
-    <div className="min-h-screen w-full bg-white">
-      <div className="flex space-x-5 p-6">
-        <div className="flex-1 p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg relative">
-          {isLoading && <SkeletonLoaderPage />}
-          {!isLoading && event && (
-            <div className="w-full">
-              <EventCardMain
-                currentUserProfileId={user?.profile?.id}
-                event={event}
-                isOwner={isOwner}
-                toggleModal={handleToggleAddEventModal}
-                triggerRefetch={refetch}
-              />
-              {event && isOwner && (
-                <div
-                  className="w-full text-center cursor-pointer"
-                  onClick={() => handleDelete(event.id)}
-                >
-                  <span className="inline-block rounded text-xs text-red-500 bg-red-50 px-3 py-2">
-                    Delete this event
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        <aside className="hidden lg:block w-1/3 space-y-5">
-          {isRecommendationsLoading && <SkeletonCard />}
-          {!isRecommendationsLoading && (
-            <div className="p-4 bg-white rounded-lg border border-gray-300">
-              <h3 className="font-app-medium mb-3 text-gray-700">
-                Upcoming events
-              </h3>
-              <div className="space-y-4">
-                {eventRecommendations &&
-                  eventRecommendations.slice(0, 4).map((event) => {
-                    return (
-                      <div
-                        key={event.id}
-                        className="border-b border-b-gray-200 py-3"
-                      >
-                        <EventCardPreview event={event} isPreview />
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          )}
-        </aside>
-      </div>
+    <PageWrapperWithError error={error}>
+      <PageMainContent
+        isLoading={isLoading}
+        contentData={event!}
+        handleDelete={handleDelete}
+        isOwner={isOwner}
+        mainContent={(event, isOwner) => (
+          <EventCardMain
+            currentUserProfileId={user?.profile?.id}
+            event={event as Event}
+            isOwner={isOwner}
+            toggleModal={handleToggleAddEventModal}
+            triggerRefetch={refetch}
+          />
+        )}
+        asideContent={() => MemoizedRecommendations}
+      />
       <AppModal
         title="Create event"
         isOpen={addEventModalIsOpen}
@@ -118,6 +109,6 @@ export default function Dashboard() {
           triggerRefetch={refetch}
         />
       </AppModal>
-    </div>
+    </PageWrapperWithError>
   );
 }

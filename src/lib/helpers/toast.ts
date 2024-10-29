@@ -1,28 +1,28 @@
 import toast from "react-hot-toast";
+import { capitalizeFirstLetter, formatErrorResponse } from ".";
+import { CustomError } from "./class";
 
 export const successToast = (message: string, id?: string) =>
-  toast.success(message, {
+  toast.success(capitalizeFirstLetter(message), {
     ...(id && { id }),
     position: "top-right",
     duration: 6000,
     style: {
-      textTransform: "capitalize",
-      backgroundColor: "#eff6ff",
+      backgroundColor: "#f0fdf4",
       fontSize: "15px",
     },
     iconTheme: {
       primary: "#f7f7f7",
-      secondary: "#1d4ed8",
+      secondary: "#16a34a",
     },
   });
 
 export const errorToast = (message: string, id?: string) =>
-  toast.error(message, {
+  toast.error(capitalizeFirstLetter(message), {
     ...(id && { id }),
     position: "top-right",
     duration: 6000,
     style: {
-      textTransform: "capitalize",
       backgroundColor: "#fff1f2",
       fontSize: "15px",
     },
@@ -32,13 +32,18 @@ export const errorToast = (message: string, id?: string) =>
     },
   });
 
+export const errorToastWithCustomError = (error: CustomError, id?: string) => {
+  const message = formatErrorResponse(error);
+
+  return errorToast(message, id);
+};
+
 export const infoToast = (message: string, id?: string) =>
-  toast(message, {
+  toast(capitalizeFirstLetter(message), {
     ...(id && { id }),
     position: "top-right",
     duration: 6000,
     style: {
-      textTransform: "capitalize",
       backgroundColor: "#ffffff",
       fontSize: "15px",
     },

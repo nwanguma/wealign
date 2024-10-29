@@ -8,7 +8,7 @@ import ContentWrapper from "@/components/ui/ContentWrapper";
 import FilterComponent from "@/components/ui/Filter";
 import AddItemButton from "@/components/ui/AddItemButton";
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
-import AddEventForm from "@/components/forms/EventForm";
+import EventForm from "@/components/forms/EventForm";
 import { EventCardPreview } from "@/components/ui/EventCard";
 import {
   Event,
@@ -187,7 +187,10 @@ export default function Events() {
         onClose={() => handleToggleAddEventModal()}
         width="w-5/12"
       >
-        <AddEventForm />
+        <EventForm
+          triggerRefetch={refetch}
+          handleModalClose={handleToggleAddEventModal}
+        />
       </AppModal>
     </div>
   );

@@ -6,7 +6,7 @@ import { useState } from "react";
 import ContentWrapper from "@/components/ui/ContentWrapper";
 import AppModal from "@/components/ui/Modal";
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
-import CreateProjectForm from "@/components/forms/ProjectForm";
+import ProjectForm from "@/components/forms/ProjectForm";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import AddItemButton from "@/components/ui/AddItemButton";
 import FilterComponent from "@/components/ui/Filter";
@@ -158,7 +158,10 @@ export default function Projects() {
         isOpen={addProjectModalIsOpen}
         onClose={() => handleToggleAddProjectModal()}
       >
-        <CreateProjectForm handleModalClose={handleToggleAddProjectModal} />
+        <ProjectForm
+          triggerRefetch={refetch}
+          handleModalClose={handleToggleAddProjectModal}
+        />
       </AppModal>
     </div>
   );

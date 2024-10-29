@@ -21,7 +21,8 @@ export const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
     created_at,
     skills,
     status,
-    // collaborators,
+    collaborators,
+    requires_feedback,
   } = project;
   return (
     <div className="block h-auto">
@@ -38,10 +39,17 @@ export const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
               >
                 {title}
               </Link>
-              {status && (
+              {!requires_feedback && status && (
                 <div className="space-y-2">
                   <span className="capitalize text-xs font-medium rounded text-gray-700 bg-green-200 py-1 px-1">
                     {status}
+                  </span>
+                </div>
+              )}
+              {requires_feedback && (
+                <div className="space-y-2">
+                  <span className="capitalize text-xs font-medium rounded text-gray-700 bg-rose-200 py-1 px-1">
+                    Requires feedback
                   </span>
                 </div>
               )}
@@ -70,6 +78,23 @@ export const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
                   >
                     {github_url}
                   </Link>
+                </span>
+              )}
+              {collaborators!?.length > 0 && (
+                <span className="flex items-center space-x-2">
+                  {/* Todo: Icon with text */}
+                  <Image
+                    src="/icons/person.svg"
+                    alt=""
+                    width={15}
+                    height={15}
+                  />
+                  <span className="text-xs break-all">
+                    {collaborators?.length}{" "}
+                    {collaborators?.length == 1
+                      ? "collaborator"
+                      : "collaborators"}
+                  </span>
                 </span>
               )}
             </div>

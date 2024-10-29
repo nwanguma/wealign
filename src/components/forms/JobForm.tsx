@@ -15,6 +15,9 @@ import TextArea from "./TextArea";
 import { useSkills } from "@/app/hooks/useSkills";
 import { serializeData } from "@/lib/helpers";
 import { createJob, updateJob } from "@/api";
+import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
+import { CustomError } from "@/lib/helpers/class";
+import { feedbackTextMapper } from "@/lib/helpers/constants";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "../../app/globals.css";
@@ -80,10 +83,17 @@ const JobForm: React.FC<IJobFormProps> = ({
     mutationFn: (data: Partial<Job>) =>
       jobsData ? updateJob(data, jobsData?.id as string) : createJob(data),
     onSuccess: () => {
+      const feedbackMessage = jobsData?.id
+        ? feedbackTextMapper.update("Job")
+        : feedbackTextMapper.create("Job");
+
+      successToast(feedbackMessage);
       handleModalClose && handleModalClose();
       triggerRefetch && triggerRefetch();
     },
-    onError: (error: any) => {},
+    onError: (error: CustomError) => {
+      errorToastWithCustomError(error);
+    },
     onSettled: () => {
       setLoading(false);
     },

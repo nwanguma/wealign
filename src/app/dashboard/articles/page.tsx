@@ -7,7 +7,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import FilterComponent from "@/components/ui/Filter";
 import AddItemButton from "@/components/ui/AddItemButton";
 import DashboardPageHeader from "@/components/ui/DashboardPageHeader";
-import AddArticleForm from "@/components/forms/ArticleForm";
+import ArticleForm from "@/components/forms/ArticleForm";
 import { ArticleCardPreview } from "@/components/ui/ArticleCard";
 import { Article, ArticlesWithPagination } from "@/common/constants";
 import ContentWrapper from "@/components/ui/ContentWrapper";
@@ -148,7 +148,10 @@ export default function Articles() {
         onClose={() => handleToggleAddArticleModal()}
         width="w-5/12"
       >
-        <AddArticleForm />
+        <ArticleForm
+          triggerRefetch={refetch}
+          handleModalClose={handleToggleAddArticleModal}
+        />
       </AppModal>
     </div>
   );
