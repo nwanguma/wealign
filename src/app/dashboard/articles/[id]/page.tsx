@@ -102,7 +102,7 @@ export default function ArticlePage() {
         title="Update article"
         isOpen={updateArticleModalIsOpen}
         onClose={() => handleToggleUpdateArticleModal()}
-        width="w-5/12"
+        width="w-full sm:w-[75%] md:w-[65%] lg:w-[60%] xl:w-[55%] xxl:w-[35%]"
       >
         <AddArticleForm
           triggerRefetch={refetch}

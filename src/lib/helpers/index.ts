@@ -182,6 +182,8 @@ export function formatErrorResponse(error: CustomError): string {
     return errorResponse;
   }
 
+  if (error.message) return error.message;
+
   return "An error occurred while processing your request. Please try again later.";
 }
 

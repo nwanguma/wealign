@@ -278,6 +278,7 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
         <Input
           id="location"
           label="Location"
+          placeholder="e.g Lagos, Nigeria"
           value={watch("location")}
           onChange={(e) => setValue("location", e.target.value)}
           error={errors.location?.message as string}

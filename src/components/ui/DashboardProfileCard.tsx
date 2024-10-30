@@ -31,7 +31,7 @@ const DashboardProfileCard: React.FC<IDashboardProfileCardProps> = ({
       <div className="flex items-center space-x-3">
         <div className="border border-gray-300 p-2 rounded-full">
           <Image
-            src={avatar || "/images/test-avatar-2.jpg"}
+            src={avatar || "/images/profile-placeholder.png"}
             width={50}
             height={50}
             alt="logo"

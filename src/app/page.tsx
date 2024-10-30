@@ -1,85 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Image from "next/image";
-import {
-  useQueries,
-  UseQueryResult,
-  UseQueryOptions,
-  useMutation,
-} from "@tanstack/react-query";
-import axios from "axios";
 import Link from "next/link";
 
-import { ProjectCard } from "@/components/ui/ProjectCard";
-import { fetchCurrentUser } from "@/store/user";
-import { Event } from "@/common/constants";
-import AppModal from "@/components/ui/Modal";
-import { AppDispatch, RootState } from "@/store";
-import CreateProjectForm from "@/components/forms/ProjectForm";
-import AddEventForm from "@/components/forms/EventForm";
-import { EventCardPreview } from "@/components/ui/EventCard";
-import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
-import { ActivityComponent } from "@/components/ui/Activity";
-import { fetchRecommendations } from "@/store/recommendations";
-import { User } from "@/common/constants";
-import AddItemButton from "@/components/ui/AddItemButton";
-import { Activity } from "@/common/constants";
-import { fetchConversations } from "@/store/conversations";
-
-import { EventWithPagination } from "@/common/constants";
-import { ProjectsWithPagination } from "@/common/constants";
-import { ProfilesWithPagination } from "@/common/constants";
-import { Profile, Project } from "@/common/constants";
 import HomeAuthControls from "@/components/ui/HomeAuthControls";
-import { useSearchParams } from "next/navigation";
 import { Toaster } from "react-hot-toast";
-
-const fetchActivities = async (): Promise<Activity[]> => {
-  try {
-    const response = await axios.get("/api/proxy/activities");
-
-    return response.data.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
-
-const fetchEventsData = async (
-  pagination: any,
-  contentType: string
-): Promise<EventWithPagination> => {
-  try {
-    const response = await axios.get("/api/proxy/events", {
-      params: {
-        limit: pagination.limit,
-        page: pagination.page,
-        contentType,
-      },
-    });
-
-    return response.data.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
-
-const fetchProjectsData = async (
-  pagination: any,
-  contentType: string
-): Promise<ProjectsWithPagination[]> => {
-  try {
-    const response = await axios.get("/api/proxy/projects", {
-      params: {
-        limit: pagination.limit,
-        page: pagination.page,
-        contentType,
-      },
-    });
-
-    return response.data.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
 
 const riderText = [
   "Connecting you with the finest talent globally",
@@ -99,9 +23,6 @@ const Home: React.FC = ({ searchParams, params }: any) => {
   const actionParam = searchParams?.action;
 
   const { slug } = params;
-  const events: Event[] = [];
-  const projects: Project[] = [];
-  const profiles: Profile[] = [];
 
   const links: { href: string; name: string }[] = [];
 
@@ -110,20 +31,20 @@ const Home: React.FC = ({ searchParams, params }: any) => {
       <div className="w-full">
         <header className="w-full min-h-screen pt-6 bg-gradient-to-r from-blue-100 via-purple-100 to-white">
           <nav className="flex justify-between items-center px-6 h-10">
-            <ul className="flex space-x-4 items-center">
+            <ul className="flex space-x-2 lg:space-x-4 items-center">
               <li className="hover:scale-110 transform transition duration-300">
                 <Link href="/home">
                   <Image
                     src="/icons/collabhub-logo.svg"
                     alt="home"
-                    width={140}
+                    width={120}
                     height={50}
                     className="hover:opacity-80 transition duration-300"
                   />
                 </Link>
               </li>
             </ul>
-            <ul className="flex text-sm text-gray-700">
+            {/* <ul className="flex text-sm text-gray-700">
               {links.map((link) => (
                 <li key={link.href} className="relative group">
                   <Link
@@ -138,13 +59,13 @@ const Home: React.FC = ({ searchParams, params }: any) => {
                   </Link>
                 </li>
               ))}
-            </ul>
-            <ul className="space-x-5">
+            </ul> */}
+            <ul className="space-x-3 lg:space-x-5">
               <HomeAuthControls main action={actionParam} />
             </ul>
           </nav>
           <div className="w-full min-h-[calc(100vh-10%)] flex">
-            <div className="flex items-center flex-col w-9/12 mx-auto mt-[6%] 2xl:mt-[8%]">
+            <div className="flex items-center flex-col w-11/12 lg:w-8/12 xl:w-9/12 mx-auto mt-[15%] lg:mt-[6%] 2xl:mt-[8%]">
               <div className="bg-blue-100 text-blue-600 text-md px-2 rounded flex space-x-1 items-center">
                 <span>{riderText[riderTextDisplayIndex]}</span>
                 <Image
@@ -154,14 +75,14 @@ const Home: React.FC = ({ searchParams, params }: any) => {
                   alt="work"
                 />
               </div>
-              <div className="text-6xl font-bold text-center mt-2 mb-16 text-gray-800">
+              <div className="text-4xl lg:text-5xl xl:text-6xl font-bold text-center mt-2 mb-8 md:mb-10 lg:mb-16 text-gray-800">
                 Discover top <span className="text-blue-700">talent</span>{" "}
                 <br></br> collaborate on{" "}
                 <span className="text-blue-700">projects</span>
                 <br></br> and unlock new{" "}
                 <span className="text-blue-700">job opportunities</span>
               </div>
-              <div className="mb-5 text-gray-500 w-1/2 text-center text-lg-xl">
+              <div className="mb-5 text-gray-500 w-full md:w-2/3 lg:w-1/2 text-center text-lg-xl">
                 Connect with professionals, explore exciting projects, and find
                 your next career move in one dynamic platform
                 <Image
@@ -172,7 +93,7 @@ const Home: React.FC = ({ searchParams, params }: any) => {
                   className="ml-1 -mt-1 inline"
                 />
               </div>
-              <div className="w-1/2 text-center space-x-3 space-y-3 pb-3">
+              <div className="w-full md:w-2/3 lg:w-1/2 text-center space-x-3 space-y-3 pb-1 md:pb-3">
                 {[
                   { title: "JavaScript" },
                   { title: "TypeScript" },
@@ -187,42 +108,18 @@ const Home: React.FC = ({ searchParams, params }: any) => {
                 ].map((skill) => (
                   <span
                     key={skill.title}
-                    className="inline-block capitalize text-sm border border-violet-500 text-violet-500 py-2 px-3 rounded"
+                    className="inline-block capitalize text-sm border border-violet-500 text-violet-500 py-1 px-2 sm:py-2 sm:px-3 rounded"
                   >
                     {skill.title}
                   </span>
                 ))}
               </div>
-              <div className="mt-10">
+              <div className="mt-5 md:mt-10">
                 <HomeAuthControls />
               </div>
             </div>
           </div>
         </header>
-        {/* <div className="flex space-x-5">
-        <div className="w-1/4 space-y-5">
-          <div className="p-4 bg-white rounded-lg border border-gray-300">
-            <div className="space-y-4">
-              {projects &&
-                projects.map((project) => {
-                  return <div key={project.id}>This is the project</div>;
-                })}
-            </div>
-            <div className="space-y-4">
-              {events &&
-                events.map((event) => {
-                  return <div key={event.id}>This is the event</div>;
-                })}
-            </div>
-            <div className="space-y-4">
-              {profiles &&
-                profiles.map((profile) => {
-                  return <div key={profile.id}>This is the profile</div>;
-                })}
-            </div>
-          </div>
-        </div>
-      </div> */}
       </div>
       <Toaster />
     </>

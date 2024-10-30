@@ -20,7 +20,7 @@ export default function AppModal({
   onClose,
   title,
   children,
-  width = "w-5/12",
+  width = "w-full sm:w-[70%] md:w-[50%] lg:w-[45%] xl:w-[40%] xxl:w-[25%]",
 }: AppModalProps) {
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -48,7 +48,7 @@ export default function AppModal({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                className={`w-full sm:w-[70%] md:w-[50%] lg:w-[40%] xl:w-[35%] xxl:w-[25%] transform overflow-hidden rounded-2xl bg-white p-2 lg:p-4 text-left align-middle shadow-xl transition-all`}
+                className={`${width} transform overflow-hidden rounded-2xl bg-white p-2 lg:p-4 text-left align-middle shadow-xl transition-all`}
               >
                 <div
                   className={`flex ${

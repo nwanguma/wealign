@@ -87,7 +87,7 @@ const CommentNotification = ({
               {"  "}
               <span>
                 {notification.category.includes("feedback")
-                  ? "left a feedback"
+                  ? "left a feedback in"
                   : "commented in"}
               </span>
               {"  "}

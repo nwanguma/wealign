@@ -25,12 +25,7 @@ import { createEvent, updateEvent } from "@/api";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
-import {
-  errorToast,
-  errorToastWithCustomError,
-  successToast,
-} from "@/lib/helpers/toast";
-import { formatErrorResponse } from "@/lib/helpers";
+import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
 import { feedbackTextMapper } from "@/lib/helpers/constants";
 import { CustomError } from "@/lib/helpers/class";
 
@@ -420,6 +415,7 @@ const EventForm: React.FC<IEventFormProps> = ({
             <Input
               id="location"
               label="Location"
+              placeholder="e.g Lagos, Nigeria"
               value={watch("location") as string}
               onChange={(e) => setValue("location", e.target.value)}
               error={errors.location?.message as string}

@@ -22,7 +22,7 @@ const AuthButton = ({
     <button
       style={{ fontSize: "16px" }}
       onClick={onClick}
-      className={`${className} text-sm px-6 py-3 rounded ${
+      className={`${className} text-sm px-3 lg:px-6 py-2 lg:py-3 rounded ${
         variant !== "filled"
           ? "border border-blue-700 text-gray-700 hover:bg-slate-50"
           : "bg-blue-600 text-white hover:bg-blue-700"
@@ -49,7 +49,7 @@ const HomeAuthControls = ({
   return (
     <div>
       {main && (
-        <div className="space-x-5">
+        <div className="space-x-3 lg:space-x-5">
           <AuthButton
             text="Login"
             onClick={() => setLoginModalIsOpen((o) => !o)}
@@ -73,7 +73,6 @@ const HomeAuthControls = ({
         onClose={() => {
           setLoginModalIsOpen(false);
         }}
-        width="w-4/12 2xl:w-3/12"
       >
         <div>
           <LoginPage />
@@ -97,7 +96,6 @@ const HomeAuthControls = ({
         onClose={() => {
           setRegisterModalIsOpen(false);
         }}
-        width="w-4/12 2xl:w-3/12"
       >
         <div>
           <RegisterPage />

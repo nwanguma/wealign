@@ -54,7 +54,7 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
       <div className="relative space-y-4">
         <div className="flex flex-col space-y-6 border-b border-b-gray-200 pb-4">
           <div className="flex flex-col xs:flex-row items-center space-x-6">
-            <div className="border border-gray-300 p-1 rounded-lg">
+            {/* <div className="border border-gray-300 p-1 rounded-lg">
               <Image
                 src="/icons/google.svg"
                 width={70}
@@ -62,7 +62,7 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
                 alt="avatar"
                 className="rounded-lg"
               />
-            </div>
+            </div> */}
             <div className="flex flex-col space-y-2">
               <div className="flex flex-col space-y-1">
                 <span className="font-app-medium text-2xl text-gray-900">
@@ -170,7 +170,7 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
           resource="jobs"
           resourceId={id!}
           comments={comments!}
-          reactions={reactions}
+          reactions={reactions!}
           triggerRefetch={triggerRefetch}
         />
       </div>

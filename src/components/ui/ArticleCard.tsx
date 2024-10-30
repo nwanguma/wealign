@@ -23,13 +23,16 @@ export const ArticleCardPreview: React.FC<IArticleCardPreviewProps> = ({
       <Link href={`/dashboard/articles/${id}`}>
         <div className="h-full flex flex-col text-center sm:text-left sm:flex-row items-center space-x-0 sm:space-x-5">
           <div className="w-full sm:w-1/3 min-h-40 relative rounded-lg bg-orange-50">
-            <Image
-              src={banner || `/images/test-event-2.jpg`}
-              alt="avatar"
-              className="rounded-lg"
-              layout="fill"
-            />
+            {banner && (
+              <Image
+                src={banner!}
+                alt="avatar"
+                className="rounded-lg"
+                layout="fill"
+              />
+            )}
           </div>
+
           <div className="flex flex-col flex-1 space-y-4">
             <div className="flex flex-col space-y-2 py-2">
               <div className="flex flex-col space-y-1">

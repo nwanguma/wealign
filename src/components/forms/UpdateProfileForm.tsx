@@ -386,6 +386,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
         <Input
           id="location"
           label="Location"
+          placeholder="e.g Lagos, Nigeria"
           value={watch("location")}
           onChange={(e) => setValue("location", e.target.value)}
           error={errors.location?.message as string}

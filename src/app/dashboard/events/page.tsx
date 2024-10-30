@@ -185,7 +185,6 @@ export default function Events() {
         title="Create event"
         isOpen={addEventModalIsOpen}
         onClose={() => handleToggleAddEventModal()}
-        width="w-5/12"
       >
         <EventForm
           triggerRefetch={refetch}

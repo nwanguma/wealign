@@ -52,13 +52,15 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
       </TopIconBar>
       <div className="relative space-y-5">
         <div className="flex flex-col xs:flex-row items-center xs:space-x-5">
-          <div className="relative w-full md:w-2/3 h-40 md:h-80">
-            <Image
-              src={banner || `/images/test-event-5.png`}
-              alt="event banner"
-              className="rounded-lg"
-              layout="fill"
-            />
+          <div className="relative w-full md:w-2/3 h-40 md:h-80 bg-orange-50">
+            {banner && (
+              <Image
+                src={banner}
+                alt="event banner"
+                className="rounded-lg"
+                layout="fill"
+              />
+            )}
           </div>
           <div className="space-y-4">
             <div className="space-y-1">

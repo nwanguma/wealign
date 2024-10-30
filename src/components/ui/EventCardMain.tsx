@@ -58,13 +58,15 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
       </TopIconBar>
       <div className="relative space-y-5">
         <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row items-center sm:space-x-5">
-          <div className="relative w-full sm:w-2/3 h-36 sm:h-80">
-            <Image
-              src={banner || "/images/test-event-5.png"}
-              alt="event banner"
-              className="rounded-lg"
-              layout="fill"
-            />
+          <div className="relative w-full sm:w-2/3 h-36 sm:h-80 bg-orange-50">
+            {banner && (
+              <Image
+                src={banner!}
+                alt="event banner"
+                className="rounded-lg"
+                layout="fill"
+              />
+            )}
           </div>
           <div className="space-y-2 w-full sm:w-1/2">
             <div className="space-y-1">

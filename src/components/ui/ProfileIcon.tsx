@@ -29,7 +29,7 @@ export default function ProfileIcon({ avatar }: { avatar?: string | null }) {
     <div className="relative" ref={profileRef}>
       <div className="border border-gray-300 p-1 rounded-full">
         <Image
-          src={avatar || "/images/test-avatar-3.jpg"}
+          src={avatar || "/images/profile-placeholder.png"}
           width={0}
           height={0}
           alt="user avatar"

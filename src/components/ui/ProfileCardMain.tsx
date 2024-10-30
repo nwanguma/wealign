@@ -209,7 +209,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
           <div className="flex flex-col xs:flex-row items-center xs:space-x-6 justify-center xs:justify-normal">
             <div className="border border-gray-300 p-1 rounded-full">
               <Image
-                src={avatar || "/images/test-avatar.jpg"}
+                src={avatar || "/images/profile-placeholder.png"}
                 width={150}
                 height={150}
                 alt="avatar"

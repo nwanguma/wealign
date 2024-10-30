@@ -54,8 +54,8 @@ export const authOptions: NextAuthOptions = {
             return {
               ...result.user,
               accessToken: result.access_token,
-              refreshToken: result.refresh_token,
-              accessTokenExpires: Date.now() + result.expires_in * 1000,
+              // refreshToken: result.refresh_token,
+              // accessTokenExpires: Date.now() + result.expires_in * 1000,
             };
           }
         } catch (error) {
@@ -76,20 +76,22 @@ export const authOptions: NextAuthOptions = {
         if (isUserWithTokens(user)) {
           return {
             accessToken: user.accessToken,
-            refreshToken: user.refreshToken,
-            accessTokenExpires: user.accessTokenExpires,
+            // refreshToken: user.refreshToken,
+            // accessTokenExpires: user.accessTokenExpires,
           };
         }
       }
 
-      if (
-        (token as Token).accessToken &&
-        Date.now() < (token as Token).accessTokenExpires
-      ) {
-        return token;
-      }
+      // if (
+      //   (token as Token).accessToken &&
+      //   Date.now() < (token as Token).accessTokenExpires
+      // ) {
+      // return token;
+      // }
 
-      return refreshAccessToken(token as Token);
+      // return refreshAccessToken(token as Token);
+
+      return token;
     },
 
     async session({
@@ -140,8 +142,8 @@ async function refreshAccessToken(token: Token): Promise<Token> {
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
+      // accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+      // refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
     };
   } catch (error) {
     console.error("Error refreshing access token:", error);

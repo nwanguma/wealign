@@ -26,11 +26,11 @@ export const JobCard: React.FC<IJobCardProps> = ({ job }) => {
 
   return (
     <Link href={`/dashboard/jobs/${id}`} className="block">
-      <div className="border border-gray-300 p-3 rounded-lg flex flex-col space-y-4">
-        <div className="flex flex-col xs:flex-row items-center space-x-3">
-          <div className="border border-gray-300 p-2 rounded-lg">
+      <div className="border border-gray-300 p-3 md:p-5 rounded-lg flex flex-col space-y-4">
+        <div className="flex flex-col xs:flex-row items-start space-x-3">
+          {/* <div className="border border-gray-300 p-2 rounded-lg">
             <Image src="/icons/google.svg" width={40} height={40} alt="logo" />
-          </div>
+          </div> */}
           <div className="flex flex-col space-y-2">
             <div>
               <span className="font-app-medium">

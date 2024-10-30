@@ -123,7 +123,7 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
           <div className="flex-1 flex flex-col sm:flex-row items-center space-x-2">
             <div className="border border-gray-300 p-1 rounded-full">
               <Image
-                src={avatar || "/images/test-avatar-3.jpg"}
+                src={avatar || "/images/profile-placeholder.png"}
                 width={75}
                 height={75}
                 alt="avatar"

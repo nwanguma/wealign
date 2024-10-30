@@ -41,7 +41,7 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
       <div className="flex-1 flex items-center space-x-2">
         <div className="border border-gray-300 p-1 rounded-full">
           <Image
-            src={avatar || "/images/test-avatar-2"}
+            src={avatar || "/images/profile-placeholder.png"}
             width={40}
             height={40}
             alt="avatar"

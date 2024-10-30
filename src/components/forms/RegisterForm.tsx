@@ -99,24 +99,24 @@ const RegisterForm: React.FC = () => {
             explore new opportunities.
           </p>
         </div>
-        <div className="p-4 mt-3 space-y-4">
-          {/* <AuthSocialsButton
+        {/* <div className="p-4 mt-3 space-y-4"> */}
+        {/* <AuthSocialsButton
           text="Continue with Linkedin"
           logoUrl="/icons/linkedin.svg"
           onClick={() => handleSignIn("linkedin")}
         /> */}
-          <AuthSocialsButton
+        {/* <AuthSocialsButton
             text="Sign up with Google"
             logoUrl="/icons/google.svg"
             onClick={() => handleSignIn("google")}
-          />
-        </div>
-        {error && <p className="text-red-500">{error}</p>}
-        <div className="flex flex-row items-center justify-center space-x-3">
+          /> */}
+        {/* </div> */}
+        {/* {error && <p className="text-red-500">{error}</p>} */}
+        {/* <div className="flex flex-row items-center justify-center space-x-3">
           <span className="border-b border-b-3 border-gray-300 w-1/3"></span>
           <span className="-mt-1">or</span>
           <span className="border-b border-b-3 border-gray-300 w-1/3"></span>
-        </div>
+        </div> */}
         <div className="p-4">
           <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
@@ -166,7 +166,7 @@ const RegisterForm: React.FC = () => {
             </div>
             <div className="mt-10">
               <AuthButton
-                text="Log In"
+                text="Register"
                 style="bg-blue-600 text-white w-full hover:bg-blue-700"
                 type="submit"
                 loading={loading}

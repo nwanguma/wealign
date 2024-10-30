@@ -51,13 +51,15 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
               </span>
             </div>
           </div>
-          <div className="hidden sm:block w-1/3 h-full min-h-20 relative rounded-lg">
-            <Image
-              src={banner || `/images/test-event-2.jpg`}
-              alt="avatar"
-              className="rounded-lg"
-              layout="fill"
-            />
+          <div className="hidden sm:block w-1/3 h-full min-h-20 relative rounded-lg bg-orange-50">
+            {banner && (
+              <Image
+                src={banner!}
+                alt="avatar"
+                className="rounded-lg"
+                layout="fill"
+              />
+            )}
           </div>
           <div className="flex flex-col flex-1 space-y-4">
             <div className="flex flex-col space-y-2 py-2">

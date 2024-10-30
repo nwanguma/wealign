@@ -264,7 +264,10 @@ const MainFeed: React.FC = () => {
                   <div className="flex flex-col text-center s:text-left s:flex-row items-center space-x-2">
                     <div className="border border-gray-300 p-1 rounded-full">
                       <Image
-                        src={currentUser.profile.avatar || ""}
+                        src={
+                          currentUser.profile.avatar ||
+                          "/images/profile-placeholder.png"
+                        }
                         width={80}
                         height={80}
                         alt="avatar"
@@ -570,7 +573,6 @@ const MainFeed: React.FC = () => {
         title="Create event"
         isOpen={addEventModalIsOpen}
         onClose={() => handleToggleAddEventModal()}
-        width="w-5/12"
       >
         <AddEventForm handleModalClose={handleToggleAddEventModal} />
       </AppModal>
@@ -585,6 +587,7 @@ const MainFeed: React.FC = () => {
         title="Create Article"
         isOpen={addArticleModalIsOpen}
         onClose={() => handleToggleAddArticleModal()}
+        width="w-full sm:w-[75%] md:w-[65%] lg:w-[60%] xl:w-[55%] xxl:w-[35%]"
       >
         <CreateArticleForm handleModalClose={handleToggleAddArticleModal} />
       </AppModal>

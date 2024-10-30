@@ -1,6 +1,8 @@
 import axios from "axios";
 import { getSession, signOut } from "next-auth/react";
 import { store } from "@/store";
+import { CustomError } from "./helpers/class";
+import { NextResponse } from "next/server";
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -16,8 +18,9 @@ axiosInstance.interceptors.request.use(
     const profileRequiresUpdate =
       store.getState()?.user?.profile?.requires_update;
 
-    const isExcludedRoute = excludedRoutes.some((route) =>
-      config.url?.startsWith(route)
+    const isExcludedRoute = excludedRoutes.some(
+      (route) =>
+        config.url?.startsWith(route) && !config.url?.includes("follow")
     );
     if (
       profileRequiresUpdate &&
@@ -25,7 +28,7 @@ axiosInstance.interceptors.request.use(
       config.method.toLowerCase() !== "get" &&
       !isExcludedRoute
     ) {
-      return Promise.reject(new Error("Update your profile to proceed"));
+      throw new Error("Please update your profile to unlock full access!");
     }
 
     const session = await getSession();

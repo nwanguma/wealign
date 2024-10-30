@@ -101,7 +101,6 @@ export default function EventPage() {
         title="Create event"
         isOpen={addEventModalIsOpen}
         onClose={() => handleToggleAddEventModal()}
-        width="w-5/12"
       >
         <AddEventForm
           data={event as Event}

@@ -77,7 +77,7 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
       <div className="relative space-y-4">
         <div className="flex flex-col space-y-6 border-b border-b-gray-200 pb-4">
           <div className="flex flex-col xs:flex-row items-center xs:space-x-6">
-            <div className="border border-gray-300 p-1 rounded-lg">
+            {/* <div className="border border-gray-300 p-1 rounded-lg">
               <Image
                 src="/icons/google.svg"
                 width={70}
@@ -85,7 +85,7 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
                 alt="avatar"
                 className="rounded-lg"
               />
-            </div>
+            </div> */}
             <div className="flex flex-col space-y-2">
               <div className="flex flex-col space-y-1">
                 <span className="font-app-medium text-2xl text-gray-900">
@@ -187,12 +187,14 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
                 </span>
               </div>
             </div>
-            <div className="space-y-1">
-              <h3 className="text-sm text-gray-600 font-bold">Location</h3>
-              <div className="flex space-x-2 items-center">
-                <span className="text-xs">{location}</span>
+            {location && (
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Location</h3>
+                <div className="flex space-x-2 items-center">
+                  <span className="text-xs">{location}</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="space-y-2 border-b border-b-gray-200 pb-4">
