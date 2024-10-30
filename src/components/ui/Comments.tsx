@@ -204,7 +204,10 @@ export const Comments: React.FC<ICommentsProps> = ({
                 <div className="flex items-center space-x-4">
                   <div className="border border-gray-200 p-1 rounded-full">
                     <Image
-                      src={comment.owner.avatar || "/images/test-avatar-3"}
+                      src={
+                        comment.owner.avatar ||
+                        "/images/profile-placeholder.png"
+                      }
                       width={30}
                       height={30}
                       alt="avatar"
@@ -312,7 +315,8 @@ export const Comments: React.FC<ICommentsProps> = ({
                       profile_id={reaction.owner.id!}
                       user_id={reaction.owner.user_id}
                       avatar={
-                        reaction.owner.avatar || "/images/test-avatar-3.jpg"
+                        reaction.owner.avatar ||
+                        "/images/profile-placeholder.png"
                       }
                       hasFollowed={hasFollowed}
                     />

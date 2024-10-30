@@ -246,7 +246,7 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
                 <div className="flex items-center space-x-2">
                   <div className="border border-gray-200 p-1 rounded-full">
                     <Image
-                      src={c.avatar || "/images/test-avatar-3"}
+                      src={c.avatar || "/images/profile-placeholder.png"}
                       width={30}
                       height={30}
                       alt="avatar"
@@ -349,7 +349,10 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
                       <div className="w-full flex items-start space-x-2">
                         <div className="border border-gray-200 p-1 rounded-full">
                           <Image
-                            src={f.owner.avatar || "/images/test-avatar-3"}
+                            src={
+                              f.owner.avatar ||
+                              "/images/profile-placeholder.png"
+                            }
                             width={30}
                             height={30}
                             alt="avatar"

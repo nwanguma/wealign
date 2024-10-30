@@ -475,7 +475,9 @@ export default function MessagesPage() {
                       title={profile.title || ""}
                       profile_id={profile.profile_id}
                       user_id={profile.user_id}
-                      avatar={profile.avatar || "/images/test-avatar-3.jpg"}
+                      avatar={
+                        profile.avatar || "/images/profile-placeholder.png"
+                      }
                       hasFollowed={hasFollowed}
                     />
                   </div>

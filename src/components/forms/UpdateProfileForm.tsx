@@ -299,7 +299,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
                     src={
                       !deletedAvatar && user?.profile?.avatar
                         ? user?.profile?.avatar
-                        : "/images/test-avatar-3.jpg"
+                        : "/images/profile-placeholder.png"
                     }
                     width={80}
                     height={80}
