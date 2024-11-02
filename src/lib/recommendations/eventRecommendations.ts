@@ -12,17 +12,17 @@ const recommendEvents = ({
   const today = new Date();
 
   return events
-    .filter((event) => new Date(event.event_end_date) > today)
+    .filter((event) => new Date(event.event_end_date as any) > today)
     .map((event) => {
       let score = 0;
 
       const daysUntilEvent =
-        (new Date(event.event_start_date).getTime() - today.getTime()) /
+        (new Date(event.event_start_date as any).getTime() - today.getTime()) /
         (1000 * 3600 * 24);
       score += Math.max(0, 10 - daysUntilEvent);
 
       const skillMatches = userProfile.skills.some((skill: Skill) =>
-        event.description.includes(skill.title)
+        event.description?.includes(skill.title)
       );
       if (skillMatches) score += 5;
 

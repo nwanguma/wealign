@@ -207,7 +207,7 @@ export default function MessagesPage() {
                               }}
                             >
                               {getTime(
-                                conversation?.latest_message?.created_at as Date
+                                conversation?.latest_message?.created_at as any
                               )}
                             </div>
                           )}
@@ -291,7 +291,7 @@ export default function MessagesPage() {
                               <div className="text-center text-gray-600 text-xs">
                                 {key}
                               </div>
-                              {messages.map((msg) => {
+                              {messages.map((msg: any) => {
                                 return (
                                   <div
                                     key={msg.id}

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import LogoWithText from "./LogoWithText";
@@ -7,8 +9,8 @@ const HomeNav = ({
   actionParam,
   pathname,
 }: {
-  actionParam: string;
-  pathname: string;
+  actionParam?: string;
+  pathname?: string;
 }) => {
   const links: { href: string; name: string }[] = [
     {
@@ -42,7 +44,7 @@ const HomeNav = ({
           </ul>
         </ul>
         <ul className="space-x-1 sm:space-x-3 lg:space-x-5">
-          <HomeAuthControls main action={actionParam} />
+          <HomeAuthControls main action={actionParam || undefined} />
         </ul>
       </nav>
     </>

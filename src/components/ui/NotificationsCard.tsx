@@ -58,7 +58,7 @@ const CommentNotification = ({
   notification: Notification;
   newNotifications: string[];
 }) => {
-  const resource = notification[notification.resource_type];
+  const resource = (notification as any)[notification.resource_type];
   const isNewNotification = newNotifications.includes(notification.id);
 
   return (
@@ -125,7 +125,7 @@ const ReactionNotification = ({
   notification: Notification;
   newNotifications: string[];
 }) => {
-  const resource = notification[notification.resource_type];
+  const resource = (notification as any)[notification.resource_type];
   const isNewNotification = newNotifications.includes(notification.id);
 
   return (

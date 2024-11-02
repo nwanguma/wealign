@@ -90,7 +90,7 @@ const EventForm: React.FC<IEventFormProps> = ({
   };
 
   const methods = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
     defaultValues,
   });
 

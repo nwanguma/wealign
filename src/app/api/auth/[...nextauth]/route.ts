@@ -21,7 +21,7 @@ interface UserWithTokens extends User {
   accessTokenExpires: number;
 }
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",

@@ -5,7 +5,6 @@ import AppModal from "./Modal";
 
 import LoginPage from "../forms/LoginForm";
 import RegisterPage from "../forms/RegisterForm";
-import { useSearchParams } from "next/navigation";
 
 const AuthButton = ({
   text,
@@ -39,11 +38,8 @@ const HomeAuthControls = ({
   main?: boolean;
   action?: string;
 }) => {
-  const searchParams = useSearchParams();
-  const actionParam = searchParams.get("action");
-
   const [loginModalIsOpen, setLoginModalIsOpen] = useState(
-    action === "login" || actionParam === "login" || false
+    action === "login" || false
   );
   const [registerModalIsOpen, setRegisterModalIsOpen] = useState(false);
 
