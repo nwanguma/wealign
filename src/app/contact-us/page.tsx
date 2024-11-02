@@ -5,7 +5,7 @@ import HomeNav from "@/components/ui/HomeNav";
 
 const NotFoundPage: React.FC = ({ searchParams, params }: any) => {
   const actionParam = searchParams?.action;
-  const pathname = `/${params.slug?.join("/") || ""}`;
+  const pathname = `/${params?.slug?.join("/") || ""}`;
 
   return (
     <div className="flex flex-col w-full h-screen bg-white">

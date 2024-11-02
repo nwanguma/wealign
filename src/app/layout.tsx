@@ -18,6 +18,11 @@ export const metadata: Metadata = {
     "10x developers",
     "business for developers",
   ],
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/favicon-32x32.png",
+  },
 };
 
 export default function RootLayout({
@@ -27,6 +32,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" />
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/favicon-32x32.png" />
+      </head>
       <body>{children}</body>
     </html>
   );

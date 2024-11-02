@@ -26,7 +26,7 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ searchParams, params }) => {
   const riderTextDisplayIndex = Math.floor(Math.random() * 10);
   const actionParam = searchParams?.action;
-  const pathname = `/${params.slug?.join("/") || ""}`;
+  const pathname = `/${params?.slug?.join("/") || ""}`;
 
   return (
     <>
