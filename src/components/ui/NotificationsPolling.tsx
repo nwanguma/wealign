@@ -41,7 +41,7 @@ const NotificationsPollingComponent = () => {
       stopPolling();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [dispatch]);
+  });
 
   return null;
 };

@@ -8,6 +8,7 @@ import { ViewsComponent } from "./ViewsComponent";
 import { WithTooltip } from "./WithTooltip";
 import { Comments } from "./Comments";
 import TopIconBar from "./TopIconBar";
+import ShareComponent from "./ShareComponent";
 interface IJobCardMainProps {
   job: Partial<Job>;
   isOwner?: boolean;
@@ -121,21 +122,7 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
                 </div>
               </div>
             )}
-            <div className="space-y-1">
-              <h3 className="text-sm text-gray-600 font-bold">Share</h3>
-              <div className="flex space-x-3">
-                {["linkedin", "google", "facebook", "twitter"].map(
-                  (platform) => (
-                    <Image
-                      src={`/icons/${platform}-share.svg`}
-                      alt=""
-                      width={20}
-                      height={20}
-                    />
-                  )
-                )}
-              </div>
-            </div>
+            <ShareComponent text="This opportunity on WeAlign might interest you" />
             <div className="space-y-1">
               <h3 className="text-sm text-gray-600 font-bold">Posted</h3>
               <div className="flex space-x-2 items-center">

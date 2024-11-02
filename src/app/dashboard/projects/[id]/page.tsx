@@ -105,6 +105,7 @@ export default function ProjectPage() {
         recommendations={projectRecommendations}
         isLoading={isRecommendationsLoading}
         render={(project) => <ProjectCard project={project as Project} />}
+        title="Projects for you"
       />
     ),
     [projectRecommendations, isRecommendationsLoading]

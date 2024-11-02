@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -36,6 +36,7 @@ import {
 
 import "../../app/globals.css";
 import { successToast, errorToast, infoToast } from "@/lib/helpers/toast";
+import RecommendationsComponent from "@/components/ui/RecommendationsComponent";
 
 const MainFeed: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -46,6 +47,7 @@ const MainFeed: React.FC = () => {
     upcomingEvents: upcomingEventsRecommendations,
     liveEvents: liveEventsRecommendations,
     events: eventsRecommendations,
+    isLoading: isRecommendationsLoading,
     // jobs: jobsRecommendations,
     // projects: projectsRecommendations,
     // articles: articlesRecommendations,
@@ -205,7 +207,7 @@ const MainFeed: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [currentUser?.id, dispatch]);
 
   const eventsToDisplay =
     upcomingEventsRecommendations?.length > 0
@@ -213,6 +215,31 @@ const MainFeed: React.FC = () => {
       : liveEventsRecommendations?.length > 0
       ? liveEventsRecommendations
       : eventsRecommendations;
+
+  const MemoizedRecommendations = useMemo(
+    () => (
+      <RecommendationsComponent
+        recommendations={eventsToDisplay}
+        isLoading={isRecommendationsLoading}
+        title={
+          upcomingEventsRecommendations?.length > 0
+            ? "Upcoming events"
+            : liveEventsRecommendations?.length > 0
+            ? "Live events"
+            : "Events you may be interested in"
+        }
+        render={(event) => (
+          <EventCardPreview event={event as Event} isPreview />
+        )}
+      />
+    ),
+    [
+      eventsToDisplay,
+      upcomingEventsRecommendations,
+      liveEventsRecommendations,
+      isRecommendationsLoading,
+    ]
+  );
 
   useEffect(() => {
     dispatch(fetchFollowing());
@@ -223,35 +250,7 @@ const MainFeed: React.FC = () => {
       <div className="flex lg:space-x-5">
         <div className="hidden xl:block">
           <aside className="w-96 space-y-5 md:sticky top-0 self-start">
-            <div className="p-4 bg-white rounded-lg border border-gray-300">
-              <h3 className="font-app-medium mb-3">
-                {upcomingEventsRecommendations?.length > 0
-                  ? "Upcoming events"
-                  : liveEventsRecommendations?.length > 0
-                  ? "Live events"
-                  : "Events you may be interested in"}
-              </h3>
-              <div className="space-y-4">
-                {eventsToDisplay.slice(0, 4).map((event: Event) => {
-                  return (
-                    <div
-                      className="border-b border-b-gray-200 last:border-b-0 py-3"
-                      key={event.id}
-                    >
-                      <EventCardPreview event={event} isPreview />
-                    </div>
-                  );
-                })}
-                {!eventsRecommendations?.length && (
-                  <div
-                    className="text-custom-gray-paragraph"
-                    style={{ fontSize: "13.5px" }}
-                  >
-                    Events will show here.
-                  </div>
-                )}
-              </div>
-            </div>
+            {MemoizedRecommendations}
           </aside>
         </div>
         <div className="w-full md:flex-1">

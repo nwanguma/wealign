@@ -5,7 +5,7 @@ import AppModal from "./Modal";
 
 import LoginPage from "../forms/LoginForm";
 import RegisterPage from "../forms/RegisterForm";
-// import { useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 const AuthButton = ({
   text,
@@ -20,11 +20,10 @@ const AuthButton = ({
 }) => {
   return (
     <button
-      style={{ fontSize: "16px" }}
       onClick={onClick}
-      className={`${className} text-sm px-3 lg:px-6 py-2 lg:py-3 rounded ${
+      className={`${className} text-sm px-1 xs:px-2 lg:px-4 py-2 lg:py-3 text-md sm:text-base rounded ${
         variant !== "filled"
-          ? "border border-blue-700 text-gray-700 hover:bg-slate-50"
+          ? "text-gray-700 hover:bg-slate-50"
           : "bg-blue-600 text-white hover:bg-blue-700"
       }`}
     >
@@ -40,16 +39,18 @@ const HomeAuthControls = ({
   main?: boolean;
   action?: string;
 }) => {
-  // const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
+  const actionParam = searchParams.get("action");
+
   const [loginModalIsOpen, setLoginModalIsOpen] = useState(
-    action === "login" || false
+    action === "login" || actionParam === "login" || false
   );
   const [registerModalIsOpen, setRegisterModalIsOpen] = useState(false);
 
   return (
     <div>
       {main && (
-        <div className="space-x-3 lg:space-x-5">
+        <div className="space-x-1 sm:space-x-3 lg:space-x-5">
           <AuthButton
             text="Login"
             onClick={() => setLoginModalIsOpen((o) => !o)}
@@ -73,11 +74,12 @@ const HomeAuthControls = ({
         onClose={() => {
           setLoginModalIsOpen(false);
         }}
+        width="w-full sm:w-[70%] md:w-[50%] lg:w-[40%] xl:w-[35%] xxl:w-[25%]"
       >
         <div>
           <LoginPage />
           <div className="flex justify-center space-x-1 pb-5 font-light">
-            <span className="inline-block">Don't have an account?</span>
+            <span className="inline-block">Don&apos;t have an account?</span>
             <span className="inline-block text-blue-600 cursor-pointer font-normal">
               <span
                 onClick={() => {
@@ -96,6 +98,7 @@ const HomeAuthControls = ({
         onClose={() => {
           setRegisterModalIsOpen(false);
         }}
+        width="w-full sm:w-[70%] md:w-[50%] lg:w-[45%] xl:w-[40%] xxl:w-[25%]"
       >
         <div>
           <RegisterPage />

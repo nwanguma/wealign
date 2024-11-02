@@ -1,9 +1,9 @@
 import React from "react";
 import Image from "next/image";
-import Link from "next/link";
 
 import HomeAuthControls from "@/components/ui/HomeAuthControls";
 import { Toaster } from "react-hot-toast";
+import HomeNav from "@/components/ui/HomeNav";
 
 const riderText = [
   "Connecting you with the finest talent globally",
@@ -18,54 +18,23 @@ const riderText = [
   "Find the perfect team for your next big project",
 ];
 
-const Home: React.FC = ({ searchParams, params }: any) => {
+interface HomeProps {
+  searchParams: Record<string, string>;
+  params: { slug?: string[] };
+}
+
+const Home: React.FC<HomeProps> = ({ searchParams, params }) => {
   const riderTextDisplayIndex = Math.floor(Math.random() * 10);
   const actionParam = searchParams?.action;
-
-  const { slug } = params;
-
-  const links: { href: string; name: string }[] = [];
+  const pathname = `/${params.slug?.join("/") || ""}`;
 
   return (
     <>
       <div className="w-full">
-        <header className="w-full min-h-screen pt-6 bg-gradient-to-r from-blue-100 via-purple-100 to-white">
-          <nav className="flex justify-between items-center px-6 h-10">
-            <ul className="flex space-x-2 lg:space-x-4 items-center">
-              <li className="hover:scale-110 transform transition duration-300">
-                <Link href="/home">
-                  <Image
-                    src="/icons/collabhub-logo.svg"
-                    alt="home"
-                    width={120}
-                    height={50}
-                    className="hover:opacity-80 transition duration-300"
-                  />
-                </Link>
-              </li>
-            </ul>
-            {/* <ul className="flex text-sm text-gray-700">
-              {links.map((link) => (
-                <li key={link.href} className="relative group">
-                  <Link
-                    href={link.href}
-                    className={`px-8 py-2 border-b ${
-                      slug === link.href
-                        ? "border-violet-700 text-violet-700 font-semibold"
-                        : "border-transparent group-hover:border-b-violet-700 group-hover:text-violet-700 group-hover:font-normal"
-                    } transition-all duration-300 ease-in-out delay-150`}
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul> */}
-            <ul className="space-x-3 lg:space-x-5">
-              <HomeAuthControls main action={actionParam} />
-            </ul>
-          </nav>
+        <header className="w-full min-h-screen py-4 bg-gradient-to-r from-blue-100 via-purple-100 to-white">
+          <HomeNav actionParam={actionParam} pathname={pathname} />
           <div className="w-full min-h-[calc(100vh-10%)] flex">
-            <div className="flex items-center flex-col w-11/12 lg:w-8/12 xl:w-9/12 mx-auto mt-[15%] lg:mt-[6%] 2xl:mt-[8%]">
+            <div className="flex items-center flex-col w-11/12 lg:w-9/12 xl:w-10/12 mx-auto mt-[12%] lg:mt-[6%] 2xl:mt-[8%]">
               <div className="bg-blue-100 text-blue-600 text-md px-2 rounded flex space-x-1 items-center">
                 <span>{riderText[riderTextDisplayIndex]}</span>
                 <Image
@@ -75,14 +44,15 @@ const Home: React.FC = ({ searchParams, params }: any) => {
                   alt="work"
                 />
               </div>
-              <div className="text-4xl lg:text-5xl xl:text-6xl font-bold text-center mt-2 mb-8 md:mb-10 lg:mb-16 text-gray-800">
-                Discover top <span className="text-blue-700">talent</span>{" "}
+              <div className="text-4xl lg:text-5xl xl:text-6xl font-bold text-center mt-2 mb-8 md:mb-10 lg:mb-10 text-gray-800">
+                Join <span className="text-blue-700">WeAlign</span> to <br></br>
+                discover top <span className="text-blue-700">talent</span>{" "}
                 <br></br> collaborate on{" "}
                 <span className="text-blue-700">projects</span>
                 <br></br> and unlock new{" "}
                 <span className="text-blue-700">job opportunities</span>
               </div>
-              <div className="mb-5 text-gray-500 w-full md:w-2/3 lg:w-1/2 text-center text-lg-xl">
+              <div className="mb-4 text-gray-500 w-full md:w-2/3 lg:w-1/2 text-center text-lg-xl">
                 Connect with professionals, explore exciting projects, and find
                 your next career move in one dynamic platform
                 <Image
@@ -114,7 +84,7 @@ const Home: React.FC = ({ searchParams, params }: any) => {
                   </span>
                 ))}
               </div>
-              <div className="mt-5 md:mt-10">
+              <div className="mt-4 md:mt-6">
                 <HomeAuthControls />
               </div>
             </div>

@@ -74,6 +74,7 @@ export default function EventPage() {
         render={(event) => (
           <EventCardPreview event={event as Event} isPreview />
         )}
+        title="Events for you"
       />
     ),
     [eventRecommendations, isRecommendationsLoading]

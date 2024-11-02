@@ -68,6 +68,7 @@ export default function JobPage() {
         recommendations={jobsRecommendations}
         isLoading={isRecommendationsLoading}
         render={(job) => <JobCard job={job as Job} />}
+        title="Jobs you may be interested in"
       />
     ),
     [jobsRecommendations, isRecommendationsLoading]

@@ -10,12 +10,14 @@ import { Comments } from "./Comments";
 import TopIconBar from "./TopIconBar";
 
 import "../../app/globals.css";
+import ShareComponent from "./ShareComponent";
 
 interface IArticleCardMainProps {
   article: Article;
   isOwner?: boolean;
   toggleModal?: () => void;
   triggerRefetch?: () => void;
+  isPublic?: boolean;
 }
 
 export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
@@ -23,6 +25,7 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
   isOwner,
   toggleModal,
   triggerRefetch,
+  isPublic,
 }) => {
   const {
     id,
@@ -82,22 +85,7 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
                 </span>
               </div>
             </div>
-            <div className="space-y-1">
-              <h3 className="text-sm text-gray-400">Share</h3>
-              <div className="flex space-x-3">
-                {["linkedin", "google", "facebook", "twitter"].map(
-                  (platform) => (
-                    <Image
-                      key={platform}
-                      src={`/icons/${platform}-share.svg`}
-                      alt=""
-                      width={20}
-                      height={20}
-                    />
-                  )
-                )}
-              </div>
-            </div>
+            <ShareComponent text="This article on WeAlign is everything" />
           </div>
         </div>
         <div className="space-y-2">
@@ -111,14 +99,16 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(body) }}
           />
         </div>
-        <Comments
-          isOwner={isOwner!}
-          resource="articles"
-          resourceId={id}
-          triggerRefetch={triggerRefetch}
-          comments={comments}
-          reactions={reactions}
-        />
+        {!isPublic && (
+          <Comments
+            isOwner={isOwner!}
+            resource="articles"
+            resourceId={id}
+            triggerRefetch={triggerRefetch}
+            comments={comments}
+            reactions={reactions}
+          />
+        )}
       </div>
     </>
   );

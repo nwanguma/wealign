@@ -76,6 +76,7 @@ export default function ArticlePage() {
             descriptionLimit={40}
           />
         )}
+        title="Articles for you"
       />
     ),
     [articleRecommendations, isRecommendationsLoading]

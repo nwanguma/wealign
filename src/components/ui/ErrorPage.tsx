@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import LogoWithText from "./LogoWithText";
 
 interface IErrorPageProps {
   useLayout?: boolean;
@@ -20,15 +21,7 @@ const ErrorPage: React.FC<IErrorPageProps> = ({ useLayout, type }) => {
         <nav className="flex justify-between items-center px-2 lg:px-6 py-3">
           <ul>
             <li className="hover:scale-110 transform transition duration-300">
-              <Link href="/">
-                <Image
-                  src="/icons/collabhub-logo.svg"
-                  alt="home"
-                  width={140}
-                  height={50}
-                  className="hover:opacity-80 transition duration-300"
-                />
-              </Link>
+              <LogoWithText />
             </li>
           </ul>
         </nav>
@@ -48,7 +41,7 @@ const ErrorPage: React.FC<IErrorPageProps> = ({ useLayout, type }) => {
             </Link>{" "}
             If the issue persists, feel free to{" "}
             <Link
-              href="mailto:support@collabhub.io"
+              href="mailto:support@wealign.io"
               className="text-blue-700 font-medium"
             >
               contact

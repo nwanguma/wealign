@@ -128,7 +128,9 @@ export default function Projects() {
             {!isLoading && (
               <ContentWrapper data={projects}>
                 {projectsData &&
-                  projects?.map((project) => <ProjectCard project={project} />)}
+                  projects?.map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))}
               </ContentWrapper>
             )}
             {isLoading && (

@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import axiosInstance from "@/lib/axiosInstance";
 import {
   Event,
@@ -12,7 +14,6 @@ import {
   ProfilesWithPagination,
   IPagination,
   Comment,
-  IMessageFilters,
   IFilters,
 } from "@/common/constants";
 
@@ -168,9 +169,37 @@ export const fetchArticles = async (
   }
 };
 
+export const fetchPublicArticles = async (
+  pagination: IPagination,
+  filters: IFilters
+): Promise<ArticlesWithPagination> => {
+  try {
+    const response = await axios.get("/api/proxy/articles/public", {
+      params: {
+        ...pagination,
+        ...filters,
+      },
+    });
+
+    return response.data.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const fetchArticle = async (id: string): Promise<Article> => {
   try {
     const response = await axiosInstance.get(`/api/proxy/articles/${id}`);
+
+    return response.data.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const fetchPublicArticle = async (id: string): Promise<Article> => {
+  try {
+    const response = await axios.get(`/api/proxy/articles/${id}/public`);
 
     return response.data.data;
   } catch (error: any) {
@@ -365,6 +394,12 @@ export const createJob = async (data: Partial<Job>) => {
 
 export const updateJob = async (data: Partial<Job>, id: string) => {
   const result = await axiosInstance.put(`/api/proxy/jobs/${id}`, data);
+
+  return result?.data?.data;
+};
+
+export const fetchArticleRecommendations = async () => {
+  const result = await axios.get("/api/proxy/recommendations?type=article");
 
   return result?.data?.data;
 };

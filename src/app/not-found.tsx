@@ -1,25 +1,18 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import LogoWithText from "@/components/ui/LogoWithText";
+import HomeNav from "@/components/ui/HomeNav";
 
 const NotFoundPage: React.FC = ({ searchParams, params }: any) => {
+  const actionParam = searchParams?.action;
+  const pathname = `/${params.slug?.join("/") || ""}`;
+
   return (
     <div className="flex flex-col w-full h-screen bg-gradient-to-r from-blue-100 via-purple-100 to-white">
-      <nav className="flex justify-between items-center px-2 lg:px-6 py-3">
-        <ul>
-          <li className="hover:scale-110 transform transition duration-300">
-            <Link href="/">
-              <Image
-                src="/icons/collabhub-logo.svg"
-                alt="home"
-                width={140}
-                height={50}
-                className="hover:opacity-80 transition duration-300"
-              />
-            </Link>
-          </li>
-        </ul>
-      </nav>
+      <header className="py-4">
+        <HomeNav actionParam={actionParam} pathname={pathname} />
+      </header>
       <div className="flex-grow w-full flex flex-col justify-center relative">
         <div className="w-11/12 sm:w-10/12 lg:w-7/12 mx-auto space-y-2 sm:space-y-3">
           <div className="text-3xl sm:text-4xl lg:text-5xl font-app-semibold text-blue-700">
@@ -35,7 +28,7 @@ const NotFoundPage: React.FC = ({ searchParams, params }: any) => {
             </Link>{" "}
             or{" "}
             <Link
-              href="mailto:support@collabhub.io"
+              href="mailto:support@wealign.io"
               className="text-blue-700 font-medium"
             >
               contact us

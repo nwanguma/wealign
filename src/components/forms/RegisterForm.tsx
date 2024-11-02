@@ -92,7 +92,7 @@ const RegisterForm: React.FC = () => {
       <div className="w-full pt-4 px-2">
         <div className="space-y-2 text-center mx-auto">
           <div className="text-2xl font-bold text-gray-700">
-            Join <span className="text-blue-700">CollabHub</span> today!
+            Join <span className="text-blue-700">WeAlign</span> today!
           </div>
           <p className="text-gray-400 font-light">
             Sign up to connect with top talent, collaborate on projects, and

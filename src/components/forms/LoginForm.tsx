@@ -70,7 +70,7 @@ const LoginForm: React.FC = () => {
     <div className="w-full pt-4 px-2">
       <div className="space-y-2 text-center mx-auto">
         <div className="text-2xl font-bold text-gray-700">
-          Welcome back to <span className="text-blue-700">CollabHub!</span>
+          Welcome back to <span className="text-blue-700">WeAlign!</span>
         </div>
         <p className="text-gray-400 font-light">
           Log in to connect, collaborate, and discover new opportunities.

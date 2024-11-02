@@ -9,18 +9,20 @@ interface IArticleCardPreviewProps {
   article: Partial<Article>;
   isPreview?: boolean;
   descriptionLimit?: number;
+  isPublic?: boolean;
 }
 
 export const ArticleCardPreview: React.FC<IArticleCardPreviewProps> = ({
   article,
   isPreview,
   descriptionLimit,
+  isPublic,
 }) => {
   const { id, banner, title, body, comments, reactions, created_at, owner } =
     article;
   return (
     <div className="space-x-4 h-full relative">
-      <Link href={`/dashboard/articles/${id}`}>
+      <Link href={isPublic ? `articles/${id}` : `/dashboard/articles/${id}`}>
         <div className="h-full flex flex-col text-center sm:text-left sm:flex-row items-center space-x-0 sm:space-x-5">
           <div className="w-full sm:w-1/3 min-h-40 relative rounded-lg bg-orange-50">
             {banner && (

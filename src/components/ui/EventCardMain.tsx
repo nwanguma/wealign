@@ -8,6 +8,7 @@ import { Event } from "@/common/constants";
 import { ViewsComponent } from "./ViewsComponent";
 import { Comments } from "./Comments";
 import TopIconBar from "./TopIconBar";
+import ShareComponent from "./ShareComponent";
 
 interface IEventCardMainProps {
   currentUserProfileId: string;
@@ -124,22 +125,7 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
                 </Link>
               </div>
             </div>
-            <div className="space-y-1">
-              <h3 className="text-sm text-gray-600 font-bold">Share</h3>
-              <div className="flex space-x-3">
-                {["linkedin", "google", "facebook", "twitter"].map(
-                  (platform) => (
-                    <Image
-                      key={platform}
-                      src={`/icons/${platform}-share.svg`}
-                      alt=""
-                      width={20}
-                      height={20}
-                    />
-                  )
-                )}
-              </div>
-            </div>
+            <ShareComponent text="View this and more great events on WeAlign" />
           </div>
         </div>
         <div className="space-y-2 py-2 border-b border-gray-200">

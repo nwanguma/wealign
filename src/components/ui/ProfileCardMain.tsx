@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
 
 import MoreActionsComponent from "./MoreActions";
 import { getFilenameAndExtension } from "@/lib/helpers";
@@ -81,14 +80,6 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
     justFollowed,
     handleUnfollow,
   } = useFollow();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL}${pathname}${
-    searchParams
-      ? `${searchParams.toString() ? "?" : ""}${searchParams.toString()}`
-      : ""
-  }`;
 
   return (
     <>
@@ -330,10 +321,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                     ))}
                   </div>
                 </div>
-                <ShareComponent
-                  url={fullUrl}
-                  text="Collaborate with this professional on collabhub"
-                />
+                <ShareComponent text="Collaborate with this professional on WeAlign" />
               </div>
             </div>
             <div className="space-y-2 border-b border-b-gray-200 py-4">

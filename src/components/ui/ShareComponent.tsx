@@ -1,7 +1,18 @@
 import Image from "next/image";
+import { usePathname, useSearchParams } from "next/navigation";
+
 import { WithTooltip } from "./WithTooltip";
 
-const ShareComponent = ({ url, text }: { url: string; text?: string }) => {
+const ShareComponent = ({ text }: { text: string }) => {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const url = `${process.env.NEXT_PUBLIC_APP_URL}${pathname}${
+    searchParams
+      ? `${searchParams.toString() ? "?" : ""}${searchParams.toString()}`
+      : ""
+  }`;
+
   const shareUrls: { [key: string]: string } = {
     Linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
       url

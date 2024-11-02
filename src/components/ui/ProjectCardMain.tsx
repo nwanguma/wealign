@@ -8,6 +8,7 @@ import { Project, Reaction } from "@/common/constants";
 import { ViewsComponent } from "./ViewsComponent";
 import { Comments } from "./Comments";
 import TopIconBar from "./TopIconBar";
+import ShareComponent from "./ShareComponent";
 
 import "../../app/globals.css";
 
@@ -163,22 +164,7 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
                 </div>
               </div>
             )}
-            <div className="space-y-1">
-              <h3 className="text-sm text-gray-600 font-bold">Share</h3>
-              <div className="flex space-x-3">
-                {["linkedin", "google", "facebook", "twitter"].map(
-                  (platform) => (
-                    <Image
-                      key={platform}
-                      src={`/icons/${platform}-share.svg`}
-                      alt=""
-                      width={20}
-                      height={20}
-                    />
-                  )
-                )}
-              </div>
-            </div>
+            <ShareComponent text="Check out this awesome project on WeAlign" />
             <div className="space-y-1">
               <h3 className="text-sm text-gray-600 font-bold">Posted</h3>
               <div className="flex space-x-2 items-center">
@@ -243,7 +229,7 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
             <h3 className="text-sm font-bold">Collaborators</h3>
             <div className="flex flex-col gap-2 flex-wrap">
               {collaborators.map((c) => (
-                <div className="flex items-center space-x-2">
+                <div key={c.id} className="flex items-center space-x-2">
                   <div className="border border-gray-200 p-1 rounded-full">
                     <Image
                       src={c.avatar || "/images/profile-placeholder.png"}
@@ -299,7 +285,10 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
                 {[...feedbacks]
                   .filter((f) => isOwner || f.owner.id === currentUserProfileId)
                   .map((f) => (
-                    <div className="border border-gray-200 py-3 px-2 rounded flex flex-col items-end">
+                    <div
+                      key={f.id}
+                      className="border border-gray-200 py-3 px-2 rounded flex flex-col items-end"
+                    >
                       <div className="flex items-center space-x-1">
                         {f.owner.id === currentUserProfileId && (
                           <div>

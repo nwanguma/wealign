@@ -9,6 +9,9 @@ import NotificationIcon from "@/components/ui/NotificationIcon";
 import ProfileIcon from "@/components/ui/ProfileIcon";
 import { RootState } from "@/store";
 import MessagesIcon from "../ui/MessagesIcon";
+import { LogoMin } from "../ui/Logo";
+import LogoWithText from "../ui/LogoWithText";
+import { WithTooltip } from "../ui/WithTooltip";
 
 export default function DashboardNav() {
   /** User here to get user profile's avatar on sign up
@@ -32,24 +35,12 @@ export default function DashboardNav() {
     <nav className="flex flex-wrap justify-end xxs:flex-nowrap xs:justify-between items-center lg:space-x-0 px-2 py-2 xs:py-0 xs:px-6 xs:h-14 bg-white">
       <ul>
         <li className="hover:scale-110 transform transition duration-300">
-          <Link href="/home" className="hidden md:block">
-            <Image
-              src="/icons/collabhub-logo.svg"
-              alt="home"
-              className="w-24 h-14 hover:opacity-80 transition duration-300"
-              width={0}
-              height={0}
-            />
-          </Link>
-          <Link href="/home" className="block md:hidden">
-            <Image
-              src="/icons/test-logo-min.svg"
-              alt="home"
-              className="w-5 h-5 hover:opacity-80 transition duration-300"
-              width={0}
-              height={0}
-            />
-          </Link>
+          <span className="hidden md:block">
+            <LogoWithText />
+          </span>
+          <span className="block md:hidden">
+            <LogoMin />
+          </span>
         </li>
       </ul>
       <ul className="flex flex-wrap xxs:flex-nowrap justify-between items-center text-sm text-gray-700">
@@ -73,13 +64,16 @@ export default function DashboardNav() {
                   : "border-transparent group-hover:border-b-violet-700 group-hover:text-violet-700 group-hover:font-normal"
               } transition-all duration-300 ease-in-out delay-150`}
             >
-              <Image
-                src={`/icons/${link.name.toLowerCase()}.svg`}
-                alt=""
-                className="w-5 h-5"
-                width={0}
-                height={0}
-              />
+              {WithTooltip(
+                link.name,
+                <Image
+                  src={`/icons/${link.name.toLowerCase()}.svg`}
+                  alt=""
+                  className="w-5 h-5"
+                  width={0}
+                  height={0}
+                />
+              )}
             </Link>
           </li>
         ))}
