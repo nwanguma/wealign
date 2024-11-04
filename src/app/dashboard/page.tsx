@@ -258,7 +258,7 @@ const MainFeed: React.FC = () => {
             <div
               className={`p-4 rounded-lg border border-gray-300 space-y-5 s:space-y-3 flex flex-col s:flex-row items-center justify-between`}
             >
-              {currentUser.id && (
+              {currentUser?.id && (
                 <div className="flex-1 space-y-4">
                   <div className="flex flex-col text-center s:text-left s:flex-row items-center space-x-2">
                     <div className="border border-gray-300 p-1 rounded-full">
@@ -307,7 +307,7 @@ const MainFeed: React.FC = () => {
                   </div>
                 </div>
               )}
-              {!currentUser.id && <SkeletonCardRounded />}
+              {!currentUser?.id && <SkeletonCardRounded />}
               <div className="space-y-3 xs:space-y-6">
                 <div className="">
                   <div className="flex justify-start xs:justify-end items-center space-x-2">
@@ -453,7 +453,7 @@ const MainFeed: React.FC = () => {
                   <div className="space-y-3">
                     {projects &&
                       projects?.map((project) => (
-                        <ProjectCard key={project.id} project={project} />
+                        <ProjectCard key={project?.id} project={project} />
                       ))}
                     <PaginationComponent
                       data={projects || []}
@@ -470,7 +470,7 @@ const MainFeed: React.FC = () => {
                       events?.map((event) => {
                         return (
                           <div
-                            key={event.id}
+                            key={event?.id}
                             className="w-full border border-gray-300 rounded-lg p-4 h-auto md:h-48"
                           >
                             <EventCardPreview event={event} />
@@ -491,7 +491,7 @@ const MainFeed: React.FC = () => {
                     {articles &&
                       articles?.map((article) => (
                         <div
-                          key={article.id}
+                          key={article?.id}
                           className="w-full border border-gray-300 rounded-lg p-4 h-auto md:h-48"
                         >
                           <ArticleCardPreview article={article} />
@@ -521,7 +521,7 @@ const MainFeed: React.FC = () => {
                 {activities &&
                   activities.map((activity) => (
                     <ActivityComponent
-                      key={activity.id}
+                      key={activity?.id}
                       activity={activity}
                       currentUserProfileId={currentUser?.profile?.id}
                     />
@@ -544,11 +544,11 @@ const MainFeed: React.FC = () => {
                         .map((following) => {
                           return following.profile_id as string;
                         })
-                        .includes(profile.id);
+                        .includes(profile?.id);
 
                     return (
                       <div
-                        key={profile.id}
+                        key={profile?.id}
                         className="border-b border-b-gray-200 pb-4 last:border-0"
                       >
                         <ProfilePreviewCard
@@ -556,7 +556,7 @@ const MainFeed: React.FC = () => {
                           currentUserProfileId={currentUser?.profile?.id}
                           name={profile.first_name + " " + profile.last_name}
                           title={profile.title}
-                          profile_id={profile.id}
+                          profile_id={profile?.id}
                           user_id={profile.user_id}
                           avatar={
                             profile.avatar || "/images/profile-placeholder.png"
