@@ -7,7 +7,7 @@ import * as yup from "yup";
 import { Controller } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 
-import { Job, Option } from "@/common/constants";
+import { Job, Location, Option } from "@/common/constants";
 import NativeSelect from "./NativeSelectComponent";
 import ReactSelectComponent from "./ReactSelectComponent";
 import Input from "./Input";
@@ -18,6 +18,8 @@ import { createJob, updateJob } from "@/api";
 import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
 import { CustomError } from "@/lib/helpers/class";
 import { feedbackTextMapper } from "@/lib/helpers/constants";
+import InputWithDropdown from "./InputWithDropdown";
+import { useLocations } from "@/app/hooks/useLocations";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "../../app/globals.css";
@@ -26,11 +28,13 @@ const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")
-    .min(3, "Must be at least 2 characters"),
+    .min(3, "Must be at least 2 characters")
+    .max(100, "Must not exceed 100 characters"),
   description: yup
     .string()
     .required("Description is required")
-    .min(10, "Description must be at least 10 characters"),
+    .min(10, "Description must be at least 10 characters")
+    .max(2000, "Must not exceed 2000 characters"),
   status: yup.string().required("Status is required"),
   website: yup.string().url("Must be a valid URL"),
   application_url: yup.string().url("Must be a valid URL").required(),
@@ -67,6 +71,8 @@ const JobForm: React.FC<IJobFormProps> = ({
       : new Date(),
   };
   const { data: skills } = useSkills();
+  const { data: locations } = useLocations();
+
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues,
@@ -103,6 +109,13 @@ const JobForm: React.FC<IJobFormProps> = ({
     return { value: skill.title, label: skill.title };
   });
 
+  const locationsOptions = (locations || [])?.map((location: Location) => {
+    return {
+      value: location.city + " " + location.country,
+      label: location.city + ", " + location.country,
+    };
+  });
+
   const onSubmit = (data: any) => {
     setLoading(true);
     const formattedData = serializeData(data);
@@ -124,7 +137,7 @@ const JobForm: React.FC<IJobFormProps> = ({
         <div>
           <Input
             id="title"
-            label="Title"
+            label={`Title (${watch("title").length}/100)`}
             value={watch("title")}
             onChange={(e) => setValue("title", e.target.value)}
             error={errors.title?.message as string}
@@ -193,33 +206,35 @@ const JobForm: React.FC<IJobFormProps> = ({
             onChange={(e) => setValue("website", e.target.value)}
             error={errors.website?.message as string}
             otherClasses={methods.register("website")}
-            placeholder="https://"
+            placeholder="https://example.com"
           />
         </div>
-        <Input
+        <InputWithDropdown
           id="location"
           label="Location"
-          placeholder="e.g Lagos, Nigeria"
-          value={watch("location")}
-          onChange={(e) => setValue("location", e.target.value)}
+          value={watch("location") as string}
+          setValue={setValue}
+          options={locationsOptions}
           error={errors.location?.message as string}
           otherClasses={methods.register("location")}
+          required
         />
         <div>
           <Input
             id="application_url"
             label="Application Url"
+            type="url"
             value={watch("application_url") as string}
             onChange={(e) => setValue("application_url", e.target.value)}
             error={errors.application_url?.message as string}
             otherClasses={methods.register("application_url")}
-            placeholder="https://"
+            placeholder="https://example.com/careers"
             required
           />
         </div>
         <TextArea
           id="description"
-          label="Description"
+          label={`Description (${watch("description").length}/2000)`}
           value={watch("description")}
           onChange={(e) => setValue("description", e.target.value)}
           error={errors.description?.message as string}

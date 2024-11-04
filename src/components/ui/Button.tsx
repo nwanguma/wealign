@@ -17,6 +17,7 @@ const AuthButton: React.FC<IAuthSocialButtonProps> = ({
 }) => {
   return (
     <button
+      disabled={loading}
       type={type}
       onClick={onclick}
       className={`rounded-xl flex justify-center items-center py-4 ${style}`}

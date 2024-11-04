@@ -10,6 +10,7 @@ interface NativeSelectProps {
   placeholder?: string;
   required?: boolean;
   options: { value: string; label: string }[];
+  limitWidth?: boolean;
 }
 
 const NativeSelect: React.FC<NativeSelectProps> = ({
@@ -22,12 +23,13 @@ const NativeSelect: React.FC<NativeSelectProps> = ({
   required,
   placeholder,
   options,
+  limitWidth,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
     <div className="relative">
-      <div className="relative z-0 w-full group">
+      <div className={`relative z-0 ${limitWidth ? "w-36" : "w-full"} group`}>
         {label && (
           <label
             htmlFor={id}

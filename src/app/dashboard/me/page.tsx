@@ -65,6 +65,7 @@ export default function ProfilePage() {
           onClose={() => {
             setUpdateProfileModalIsOpen(false);
           }}
+          width="w-full sm:w-[80%] md:w-[65%] lg:w-[55%] xl:w-[50%] xxl:w-[25%]"
         >
           <UpdateProfileForm
             handleModalClose={() => setUpdateProfileModalIsOpen(false)}

@@ -27,11 +27,13 @@ import { RootState } from "@/store";
 import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
 import { feedbackTextMapper } from "@/lib/helpers/constants";
 import { CustomError } from "@/lib/helpers/class";
+import dynamic from "next/dynamic";
+import { useLocations } from "@/app/hooks/useLocations";
+import InputWithDropdown from "./InputWithDropdown";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
-import dynamic from "next/dynamic";
 
 const Loading = () => (
   <div className="w-full h-96 block border border-gray-300 rounded-lg"></div>
@@ -46,11 +48,13 @@ const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")
-    .min(3, "Must be at least 3 characters"),
+    .min(3, "Must be at least 3 characters")
+    .min(100, "Description must not exceed 100 characters"),
   description: yup
     .string()
     .required("Description is required")
-    .min(30, "Must be at least 30 characters"),
+    .min(30, "Must be at least 30 characters")
+    .min(2000, "Description must not exceed 2000 characters"),
   location: yup.string(),
   // required("Location is required"),
   status: yup.string(),
@@ -130,6 +134,8 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
     formState: { errors },
   } = methods;
   const { data: skills } = useSkills();
+  const { data: locations } = useLocations();
+
   const [deletedAttachment, setDeletedAttachment] = useState(false);
   const [fileUploadLoading, setFileUploadLoading] = useState(false);
   const [attachment, setAttachment] = useState<File | null>(null);
@@ -159,6 +165,13 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
 
   const skillsOptions = (skills || [])?.map((skill) => {
     return { value: skill.title, label: skill.title };
+  });
+
+  const locationsOptions = (locations || [])?.map((location) => {
+    return {
+      value: location.city + " " + location.country,
+      label: location.city + ", " + location.country,
+    };
   });
 
   const handleAttachmentDrop = (acceptedFiles: File[]) => {
@@ -222,7 +235,7 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
         <div>
           <Input
             id="title"
-            label="Title"
+            label={`Title (${watch("title").length}/100)`}
             value={watch("title")}
             onChange={(e) => setValue("title", e.target.value)}
             error={errors.title?.message}
@@ -230,7 +243,6 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
             required
           />
         </div>
-
         <div>
           <Input
             id="website"
@@ -240,7 +252,7 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
             onChange={(e) => setValue("website", e.target.value)}
             error={errors.website?.message}
             otherClasses={methods.register("website")}
-            placeholder="https://"
+            placeholder="https://example.com"
           />
         </div>
         <div>
@@ -275,14 +287,15 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
             </div>
           </div>
         </div>
-        <Input
+        <InputWithDropdown
           id="location"
           label="Location"
-          placeholder="e.g Lagos, Nigeria"
-          value={watch("location")}
-          onChange={(e) => setValue("location", e.target.value)}
+          value={watch("location") as string}
+          setValue={setValue}
+          options={locationsOptions}
           error={errors.location?.message as string}
           otherClasses={methods.register("location")}
+          required
         />
         <NativeSelect
           id="status"
@@ -318,7 +331,7 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
         </div>
         <TextArea
           id="description"
-          label="Description"
+          label={`Description (${watch("description").length}/2000)`}
           value={watch("description") as string}
           onChange={(e: any) => setValue("description", e.target.value)}
           error={errors.description?.message as string}

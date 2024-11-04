@@ -45,7 +45,7 @@ export default function DashboardNav() {
       </ul>
       <ul className="flex flex-wrap xxs:flex-nowrap justify-between items-center text-sm text-gray-700">
         {links.map((link) => (
-          <li key={link.href} className="relative group">
+          <li key={link.href} className="relative group cursor-pointer">
             <Link
               href={link.href}
               className={`hidden md:block px-3 md:px-5 lg:px-8 py-2 border-b ${

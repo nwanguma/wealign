@@ -30,6 +30,8 @@ import { CustomError } from "@/lib/helpers/class";
 
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
+import { useLocations } from "@/app/hooks/useLocations";
+import InputWithDropdown from "./InputWithDropdown";
 
 export enum ProfileStatus {
   HIRING = "hiring",
@@ -41,17 +43,17 @@ const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")
-    .min(10, "Title must be at least 10 characters"),
+    .min(10, "Title must be at least 10 characters")
+    .max(50, "Title must not exceed 50 characters"),
   heading: yup
     .string()
-    // .required("Heading is required")
-    .min(10, "Heading must be at least 10 characters"),
+    .min(10, "Heading must be at least 10 characters")
+    .max(150, "Heading must not exceed 150 characters"),
   bio: yup
     .string()
-    // .required("Bio is required")
-    .min(10, "Bio must be at least 10 characters"),
+    .min(10, "Bio must be at least 10 characters")
+    .max(2000, "Bio must not exceed 2000 characters"),
   location: yup.string(),
-  // .required("Location is required"),
   status: yup.string(),
   phone: yup
     .string()
@@ -134,6 +136,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
     defaultValues,
   });
   const { data: skills } = useSkills();
+  const { data: locations } = useLocations();
   const dispatch = useDispatch<AppDispatch>();
   const {
     control,
@@ -187,6 +190,13 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
 
   const skillsOptions = (skills || [])?.map((skill) => {
     return { value: skill.title, label: skill.title };
+  });
+
+  const locationsOptions = (locations || [])?.map((location) => {
+    return {
+      value: location.city + ", " + location.country,
+      label: location.city + ", " + location.country,
+    };
   });
 
   const handleAvatarDrop = (acceptedFiles: File[]) => {
@@ -270,6 +280,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
       ...formattedData,
       languages: data?.languages.map((l: Option) => l.value),
       skills: data?.skills.map((s: Option) => ({ title: s.label })),
+      location: data.location.value,
     };
 
     (async function () {
@@ -360,7 +371,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
         </div>
         <Input
           id="title"
-          label="Title"
+          label={`Title (${watch("title").length}/50)`}
           value={watch("title")}
           onChange={(e) => setValue("title", e.target.value)}
           error={errors.title?.message as string}
@@ -369,7 +380,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
         />
         <Input
           id="heading"
-          label="Heading"
+          label={`Heading (${watch("heading")!.length}/150)`}
           value={watch("heading")}
           onChange={(e) => setValue("heading", e.target.value)}
           error={errors.heading?.message as string}
@@ -377,25 +388,17 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
         />
         <TextArea
           id="bio"
-          label="Bio"
+          label={`Bio (${watch("bio")!.length}/2000)`}
           value={watch("bio") as string}
           onChange={(e) => setValue("bio", e.target.value)}
           error={errors.bio?.message as string}
           otherClasses={methods.register("bio")}
         />
-        <Input
-          id="location"
-          label="Location"
-          placeholder="e.g Lagos, Nigeria"
-          value={watch("location")}
-          onChange={(e) => setValue("location", e.target.value)}
-          error={errors.location?.message as string}
-          otherClasses={methods.register("location")}
-        />
         <div className="grid grid-cols-2 gap-6">
           <Input
             id="phone"
             label="Phone"
+            placeholder="e.g +23490312345678"
             type="text"
             value={watch("phone") as string}
             onChange={(e) => setValue("phone", e.target.value)}
@@ -406,18 +409,29 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
             id="website"
             label="Website"
             type="url"
+            placeholder="https://website.com"
             value={watch("website") as string}
             onChange={(e) => setValue("website", e.target.value)}
             error={errors.website?.message as string}
             otherClasses={methods.register("website")}
           />
         </div>
-
+        <InputWithDropdown
+          id="location"
+          label="Location"
+          value={watch("location") as string}
+          setValue={setValue}
+          options={locationsOptions}
+          error={errors.location?.message as string}
+          otherClasses={methods.register("location")}
+          required
+        />
         <div className="grid grid-cols-2 gap-6">
           <Input
             id="linkedin"
             label="LinkedIn"
             type="url"
+            placeholder="https://linkedin.com"
             value={watch("linkedin") as string}
             onChange={(e) => setValue("linkedin", e.target.value)}
             error={errors.linkedin?.message as string}
@@ -426,6 +440,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
           <Input
             id="github"
             label="GitHub"
+            placeholder="https://github.com"
             type="url"
             value={watch("github") as string}
             onChange={(e) => setValue("github", e.target.value)}

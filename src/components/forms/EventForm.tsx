@@ -9,7 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 
-import { Event } from "@/common/constants";
+import { Event, Location } from "@/common/constants";
 import NativeSelect from "./NativeSelectComponent";
 import Input from "./Input";
 import TextArea from "./TextArea";
@@ -21,19 +21,22 @@ import {
 } from "@/lib/helpers";
 import { WithTooltip } from "../ui/WithTooltip";
 import { createEvent, updateEvent } from "@/api";
+import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
+import { feedbackTextMapper } from "@/lib/helpers/constants";
+import { CustomError } from "@/lib/helpers/class";
+import { useLocations } from "@/app/hooks/useLocations";
+import InputWithDropdown from "./InputWithDropdown";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
-import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
-import { feedbackTextMapper } from "@/lib/helpers/constants";
-import { CustomError } from "@/lib/helpers/class";
 
 const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")
-    .min(3, "Must be at least 3 characters"),
+    .min(3, "Must be at least 3 characters")
+    .max(200, "Must not exceed 200 characters"),
   banner: yup.string(),
   attachment: yup.string(),
   type: yup.string().required("Event type is required"),
@@ -55,7 +58,8 @@ const schema = yup.object().shape({
   description: yup
     .string()
     .required("Description is required")
-    .min(10, "Description must be at least 10 characters"),
+    .min(10, "Description must be at least 10 characters")
+    .max(2000, "Description must not exceed 2000 characters"),
   start_date: yup.mixed(),
   end_date: yup.mixed(),
 });
@@ -93,6 +97,7 @@ const EventForm: React.FC<IEventFormProps> = ({
     resolver: yupResolver(schema) as any,
     defaultValues,
   });
+  const { data: locations } = useLocations();
 
   const {
     // control,
@@ -217,6 +222,13 @@ const EventForm: React.FC<IEventFormProps> = ({
     })();
   };
 
+  const locationsOptions = (locations || [])?.map((location: Location) => {
+    return {
+      value: location.city + " " + location.country,
+      label: location.city + ", " + location.country,
+    };
+  });
+
   return (
     <FormProvider {...methods}>
       <form
@@ -226,7 +238,7 @@ const EventForm: React.FC<IEventFormProps> = ({
         <div>
           <Input
             id="title"
-            label="Title"
+            label={`Title (${watch("title").length}/200)`}
             value={watch("title")}
             onChange={(e) => setValue("title", e.target.value)}
             error={errors.title?.message as string}
@@ -362,18 +374,19 @@ const EventForm: React.FC<IEventFormProps> = ({
             onChange={(e) => setValue("website", e.target.value)}
             error={errors.website?.message as string}
             otherClasses={methods.register("website")}
-            placeholder="https://"
+            placeholder="https://example.com"
           />
         </div>
         <div>
           <Input
             id="ticket_link"
             label="Ticket Link"
+            type="url"
             value={watch("ticket_link") as string}
             onChange={(e) => setValue("ticket_link", e.target.value)}
             error={errors.ticket_link?.message as string}
             otherClasses={methods.register("ticket_link")}
-            placeholder="https://"
+            placeholder="https://example.com"
           />
         </div>
         <NativeSelect
@@ -401,31 +414,33 @@ const EventForm: React.FC<IEventFormProps> = ({
           <div>
             <Input
               id="link"
+              type="url"
               label="Event link (for virtual events)"
               value={watch("link") as string}
               onChange={(e) => setValue("link", e.target.value)}
               error={errors.link?.message as string}
               otherClasses={methods.register("link")}
-              placeholder="https://"
+              placeholder="https://example.com"
             />
           </div>
         )}
         {["hybrid", "onsite"].includes(watch("type")) && (
           <div>
-            <Input
+            <InputWithDropdown
               id="location"
               label="Location"
-              placeholder="e.g Lagos, Nigeria"
               value={watch("location") as string}
-              onChange={(e) => setValue("location", e.target.value)}
+              setValue={setValue}
+              options={locationsOptions}
               error={errors.location?.message as string}
               otherClasses={methods.register("location")}
+              required
             />
           </div>
         )}
         <TextArea
           id="description"
-          label="Description"
+          label={`Description (${watch("description").length}/2000)`}
           value={watch("description")}
           onChange={(e) => setValue("description", e.target.value)}
           error={errors.description?.message as string}

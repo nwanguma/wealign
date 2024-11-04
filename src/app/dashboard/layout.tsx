@@ -19,7 +19,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     <Provider store={store}>
       <PersistGate loading={<PageLoadingComponent />} persistor={persistor}>
         <div
-          className={`w-full h-screen bg-[#f7f7f7] text-custom-gray font-app-normal`}
+          className={`w-full min-h-screen bg-[#f7f7f7] text-custom-gray font-app-normal`}
         >
           <DashboadHeader>
             <DashboardNav />

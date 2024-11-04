@@ -40,7 +40,8 @@ const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")
-    .min(3, "Must be at least 3 characters"),
+    .min(3, "Must be at least 3 characters")
+    .max(200, "Must not exceed 200 characters"),
   banner: yup.string(),
   body: yup
     .string()
@@ -153,7 +154,7 @@ const ArticleForm: React.FC<IArticleFormProps> = ({
         <div>
           <Input
             id="title"
-            label="Title"
+            label={`Title (${watch("title").length}/200)`}
             value={watch("title")}
             onChange={(e) => setValue("title", e.target.value)}
             error={errors.title?.message as string}
@@ -261,6 +262,15 @@ const ArticleForm: React.FC<IArticleFormProps> = ({
               {errors.body?.message}
             </p>
           )}
+        </div>
+        <div className="text-sm text-gray-600">
+          To maintain a high-quality and respectful environment, each article
+          submitted to our platform should fully align with our established
+          content{" "}
+          <Link href="/dashboard/content-guidelines" className="text-blue-700">
+            guidelines
+          </Link>
+          .
         </div>
         <div className="flex items-center space-x-2 justify-end">
           <button

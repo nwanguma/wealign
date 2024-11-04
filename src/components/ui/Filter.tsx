@@ -168,6 +168,7 @@ const FilterComponent: React.FC<IFilterComponentProps> = ({
                 value={filters.skills as string}
                 onChange={(e) => handleFiltersChange(e)}
                 options={options?.skillsOptions as Option[]}
+                limitWidth
               />
             )}
             {filterFields.includes("status") && options?.statusOptions && (
@@ -177,6 +178,7 @@ const FilterComponent: React.FC<IFilterComponentProps> = ({
                 value={filters.status as string}
                 onChange={(e) => handleFiltersChange(e)}
                 options={options?.statusOptions as Option[]}
+                limitWidth
               />
             )}
             {filterFields.includes("type") && options?.typeOptions && (
@@ -186,6 +188,7 @@ const FilterComponent: React.FC<IFilterComponentProps> = ({
                 value={filters.type as string}
                 onChange={(e) => handleFiltersChange(e)}
                 options={options.typeOptions as Option[]}
+                limitWidth
               />
             )}
             {filterFields.includes("createdAt") && (

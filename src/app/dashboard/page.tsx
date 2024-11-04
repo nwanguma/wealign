@@ -530,11 +530,12 @@ const MainFeed: React.FC = () => {
             </div>
           )} */}
             <div className="p-4 bg-white rounded-lg border border-gray-300">
-              <h3 className="font-app-medium mb-6  text-gray-700 text-base">
+              <h3 className="font-app-medium mb-5  text-gray-700 text-base">
                 Connect with professionals
               </h3>
               <div className="space-y-4">
                 {profilesRecommendations &&
+                  profilesRecommendations.length > 0 &&
                   profilesRecommendations.map((profile) => {
                     let hasFollowed = false;
 
@@ -565,6 +566,11 @@ const MainFeed: React.FC = () => {
                       </div>
                     );
                   })}
+                {profilesRecommendations?.length == 0 && (
+                  <div className="text-sm text-gray-600">
+                    Looks like there is nothing to show.
+                  </div>
+                )}
               </div>
             </div>
           </aside>

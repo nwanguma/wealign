@@ -99,6 +99,11 @@ export interface Skill {
   title: string;
 }
 
+export interface Location {
+  city: string;
+  country: string;
+}
+
 export interface Profile {
   id: string;
   first_name: string;
