@@ -10,6 +10,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import Input from "./Input";
 import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
 import { CustomError } from "@/lib/helpers/class";
+import { selectCurrentUser } from "@/lib/selectors";
 
 const schema = yup.object().shape({
   old_password: yup.string().required("Old password is required"),
@@ -38,7 +39,7 @@ const AccountSettingsForm: React.FC<IAccountSettingsFormProps> = ({
   const methods = useForm({
     resolver: yupResolver(schema),
   });
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
 
   const [loading, setLoading] = useState(false);
   const passwordChangeMutation = useMutation({

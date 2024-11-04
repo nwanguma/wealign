@@ -5,23 +5,33 @@ import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 
 import { RootState } from "@/store";
-import { SkeletonCard } from "@/components/ui/SkeletonLoader";
+// import { SkeletonCard } from "@/components/ui/SkeletonLoader";
 import { Profile } from "@/common/constants";
 import { fetchProfile } from "@/api";
 import { SkeletonLoaderPage } from "@/components/ui/SkeletonLoader";
-import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
+// import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
 import { ProfileCardMain } from "@/components/ui/ProfileCardMain";
 import { getHasFollowed } from "@/lib/helpers";
+import {
+  selectConnectionsData,
+  selectCurrentUser,
+  // selectIsRecommendationsLoading,
+  // selectProfilesRecommendations,
+} from "@/lib/selectors";
 
 export default function ProfilePage() {
-  const { recommendations, user } = useSelector((state: RootState) => ({
-    recommendations: state.recommendations,
-    user: state.user,
-  }));
   const {
-    isLoading: isRecommendationsLoading,
-    profiles: profileRecommendations,
-  } = recommendations;
+    // isRecommendationsLoading,
+    // profileRecommendations,
+    connectionsData,
+    user,
+  } = useSelector((state: RootState) => ({
+    // isRecommendationsLoading: selectIsRecommendationsLoading(state),
+    // profileRecommendations: selectProfilesRecommendations(state),
+    user: selectCurrentUser(state),
+    connectionsData: selectConnectionsData(state),
+  }));
+
   const params = useParams();
   const id = params?.id;
 
@@ -36,7 +46,7 @@ export default function ProfilePage() {
   });
 
   const isOwner = user?.profile?.id === profile?.id;
-  const hasFollowed = getHasFollowed(user?.profile, profile?.id!);
+  const hasFollowed = getHasFollowed(connectionsData, profile?.id!);
 
   return (
     <div className="min-h-screen w-full bg-white">
@@ -67,7 +77,7 @@ export default function ProfilePage() {
                     .slice(0, 4)
                     .map((profile: Profile) => {
                       const hasFollowed = getHasFollowed(
-                        user?.profile,
+                        connections.data,
                         profile.id
                       );
 

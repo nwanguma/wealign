@@ -2,13 +2,12 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import PaginationComponent from "@/components/ui/PaginationComponent";
 import { RootState, AppDispatch } from "@/store";
-import { fetchCurrentUser, fetchFollowing } from "@/store/user";
-import { fetchConversations } from "@/store/conversations";
+import { fetchConnections } from "@/store/connections";
 import { setMainFeedSettings } from "@/store/ui";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import AppModal from "@/components/ui/Modal";
@@ -16,10 +15,8 @@ import CreateProjectForm from "@/components/forms/ProjectForm";
 import AddEventForm from "@/components/forms/EventForm";
 import { EventCardPreview } from "@/components/ui/EventCard";
 import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
-// import { ActivityComponent } from "@/components/ui/Activity";
 import AddItemButton from "@/components/ui/AddItemButton";
-import { fetchRecommendations } from "@/store/recommendations";
-import { Event, User, Project } from "@/common/constants";
+import { Event, User, Project, Connection } from "@/common/constants";
 import { WithTooltip } from "@/components/ui/WithTooltip";
 import CreateArticleForm from "@/components/forms/ArticleForm";
 import { ArticleCardPreview } from "@/components/ui/ArticleCard";
@@ -27,32 +24,43 @@ import {
   SkeletonCardRounded,
   SkeletonLoader,
 } from "@/components/ui/SkeletonLoader";
+import { fetchProjectsData, fetchEventsData, fetchArticlesData } from "@/api";
+import RecommendationsComponent from "@/components/ui/RecommendationsComponent";
 import {
-  fetchActivities,
-  fetchProjectsData,
-  fetchEventsData,
-  fetchArticlesData,
-} from "@/api";
+  selectProfilesRecommendations,
+  selectUpcomingEventsRecommendations,
+  selectLiveEventsRecommendations,
+  selectEventsRecommendations,
+  selectIsRecommendationsLoading,
+  selectCurrentUser,
+  selectConnectionsData,
+} from "../../lib/selectors";
 
 import "../../app/globals.css";
-import { successToast, errorToast, infoToast } from "@/lib/helpers/toast";
-import RecommendationsComponent from "@/components/ui/RecommendationsComponent";
 
 const MainFeed: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { mainFeedSettings } = useSelector((state: RootState) => state.ui);
-  const currentUser: User = useSelector((state: RootState) => state.user);
   const {
-    profiles: profilesRecommendations,
-    upcomingEvents: upcomingEventsRecommendations,
-    liveEvents: liveEventsRecommendations,
-    events: eventsRecommendations,
-    isLoading: isRecommendationsLoading,
-    // jobs: jobsRecommendations,
-    // projects: projectsRecommendations,
-    // articles: articlesRecommendations,
-    error,
-  } = useSelector((state: RootState) => state.recommendations);
+    profilesRecommendations,
+    upcomingEventsRecommendations,
+    liveEventsRecommendations,
+    eventsRecommendations,
+    isRecommendationsLoading,
+    currentUser,
+    connectionsData,
+  } = useSelector(
+    (state: RootState) => ({
+      profilesRecommendations: selectProfilesRecommendations(state),
+      upcomingEventsRecommendations: selectUpcomingEventsRecommendations(state),
+      liveEventsRecommendations: selectLiveEventsRecommendations(state),
+      eventsRecommendations: selectEventsRecommendations(state),
+      isRecommendationsLoading: selectIsRecommendationsLoading(state),
+      currentUser: selectCurrentUser(state),
+      connectionsData: selectConnectionsData(state),
+    }),
+    shallowEqual
+  );
 
   const [eventsPagination, setEventsPagination] = useState({
     page: 1,
@@ -66,11 +74,6 @@ const MainFeed: React.FC = () => {
     page: 1,
     limit: 5,
   });
-
-  // const { data: activities } = useQuery({
-  //   queryKey: ["activities"],
-  //   queryFn: fetchActivities,
-  // });
 
   const { data: projectsData, isLoading: projectsIsLoading } = useQuery({
     queryKey: [
@@ -184,31 +187,6 @@ const MainFeed: React.FC = () => {
     setFollowingModalIsOpen((o) => !o);
   };
 
-  useEffect(() => {
-    const sessionKey = "initialDataFetched";
-
-    if (localStorage.getItem(sessionKey)) {
-      return;
-    }
-
-    const fetchData = async () => {
-      const fetchPromises = [];
-
-      if (!currentUser?.id) {
-        fetchPromises.push(dispatch(fetchCurrentUser()));
-      }
-
-      fetchPromises.push(dispatch(fetchRecommendations()));
-      fetchPromises.push(dispatch(fetchConversations()));
-
-      await Promise.all(fetchPromises);
-
-      localStorage.setItem(sessionKey, "true");
-    };
-
-    fetchData();
-  }, [currentUser?.id, dispatch]);
-
   const eventsToDisplay =
     upcomingEventsRecommendations?.length > 0
       ? upcomingEventsRecommendations
@@ -242,8 +220,8 @@ const MainFeed: React.FC = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchFollowing());
-  }, [dispatch]);
+    dispatch(fetchConnections());
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-white p-6">
@@ -287,21 +265,21 @@ const MainFeed: React.FC = () => {
                     <span
                       className="underline cursor-pointer"
                       onClick={() =>
-                        !!currentUser.profile.followers?.length &&
+                        !!connectionsData.followers?.length &&
                         handleToggleFollowersModal()
                       }
                     >
-                      <span>{currentUser.profile.followers?.length}</span>{" "}
+                      <span>{connectionsData.followers?.length}</span>{" "}
                       <span>Followers</span>
                     </span>
                     <span
                       className="underline cursor-pointer"
                       onClick={() =>
-                        !!currentUser.profile.following?.length &&
+                        !!connectionsData.following?.length &&
                         handleToggleFollowingModal()
                       }
                     >
-                      <span>{currentUser.profile.following?.length}</span>{" "}
+                      <span>{connectionsData.following?.length}</span>{" "}
                       <span className="underline">Following</span>
                     </span>
                   </div>
@@ -540,9 +518,9 @@ const MainFeed: React.FC = () => {
                     let hasFollowed = false;
 
                     if (currentUser)
-                      hasFollowed = (currentUser.profile.following || [])
+                      hasFollowed = (connectionsData.following || [])
                         .map((following) => {
-                          return following.profile_id as string;
+                          return (following as Connection).profile_id as string;
                         })
                         .includes(profile?.id);
 
@@ -610,8 +588,8 @@ const MainFeed: React.FC = () => {
                 let hasFollowed = false;
 
                 if (currentUser)
-                  hasFollowed = (currentUser.profile?.following || [])
-                    .map((following) => following.profile_id)
+                  hasFollowed = (connectionsData.following || [])
+                    .map((following) => (following as Connection).profile_id)
                     .includes(profile.profile_id);
 
                 return (
@@ -644,28 +622,28 @@ const MainFeed: React.FC = () => {
       >
         <div className="p-4">
           <div className="space-y-4">
-            {currentUser?.profile?.followers &&
-              currentUser?.profile?.followers.map((profile) => {
+            {connectionsData?.followers &&
+              connectionsData?.followers.map((follower: Connection) => {
                 let hasFollowed = false;
 
                 if (currentUser)
-                  hasFollowed = (currentUser.profile?.following || [])
-                    .map((following) => following.profile_id)
-                    .includes(profile.profile_id);
+                  hasFollowed = (connectionsData.following || [])
+                    .map((following) => (following as Connection).profile_id)
+                    .includes(follower.profile_id);
                 return (
                   <div
-                    key={profile.profile_id}
+                    key={follower.profile_id}
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
-                      email={profile.email}
+                      email={follower.email}
                       currentUserProfileId={currentUser?.profile?.id}
-                      name={profile.first_name + " " + profile.last_name}
-                      title={profile.title || ""}
-                      profile_id={profile.profile_id}
-                      user_id={profile.user_id}
+                      name={follower.first_name + " " + follower.last_name}
+                      title={follower.title || ""}
+                      profile_id={follower.profile_id}
+                      user_id={follower.user_id}
                       avatar={
-                        profile.avatar || "/images/profile-placeholder.png"
+                        follower.avatar || "/images/profile-placeholder.png"
                       }
                       hasFollowed={hasFollowed}
                     />

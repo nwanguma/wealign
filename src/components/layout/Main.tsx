@@ -2,13 +2,14 @@
 import { RootState } from "@/store";
 import { useSelector } from "react-redux";
 import Link from "next/link";
+import { selectCurrentUser } from "@/lib/selectors";
 
 interface IMainProps {
   children: React.ReactNode;
 }
 
 const Main: React.FC<IMainProps> = ({ children }) => {
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
   const requiresProfileUpdate = user?.profile?.requires_update;
 
   return (

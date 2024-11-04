@@ -9,11 +9,13 @@ export interface ConversationsSlice {
   latestConversation: string;
   isLoading: boolean;
   error: string | null;
+  hasFetched: boolean;
 }
 
 const initialState: ConversationsSlice = {
   data: [],
   latestConversation: "",
+  hasFetched: false,
   isLoading: false,
   error: null,
 };
@@ -51,6 +53,7 @@ const conversationsSlice = createSlice({
     builder.addCase(fetchConversations.fulfilled, (state, action) => {
       state.data = action.payload;
       state.isLoading = false;
+      state.hasFetched = true;
     });
     builder.addCase(fetchConversations.rejected, (state, action) => {
       state.isLoading = false;

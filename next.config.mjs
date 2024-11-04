@@ -1,5 +1,12 @@
+// import injectWhyDidYouRender from "./src/scripts/why-did-you-render/index.js";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // webpack: (config, context) => {
+  //   injectWhyDidYouRender(config, context);
+  //   return config;
+  // },
+  reactStrictMode: false,
   images: {
     remotePatterns: [
       {

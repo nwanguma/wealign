@@ -15,6 +15,7 @@ interface RecommendationsState {
   liveEvents: Event[];
   isLoading: boolean;
   error: string | null;
+  hasFetched: boolean;
 }
 
 const initialState: RecommendationsState = {
@@ -28,17 +29,12 @@ const initialState: RecommendationsState = {
   profilesToFollow: [],
   isLoading: false,
   error: null,
+  hasFetched: false,
 };
 
 export const fetchRecommendations = createAsyncThunk(
   "recommendations/fetchRecommendations",
-  async (_, { getState, rejectWithValue }) => {
-    // const state = getState() as RootState;
-
-    // if (Object.keys(state.recommendations).length > 0) {
-    //   return rejectWithValue("Recommendations already fetched");
-    // }
-
+  async () => {
     const response = await axiosInstance.get("/api/proxy/recommendations");
 
     return response.data.data;
@@ -73,6 +69,7 @@ const recommendationsSlice = createSlice({
       state.upcomingEvents = upcomingEvents || [];
       state.liveEvents = liveEvents || [];
       state.profilesToFollow = profilesToFollow || [];
+      state.hasFetched = true;
     });
     builder.addCase(fetchRecommendations.rejected, (state, action) => {
       state.isLoading = false;

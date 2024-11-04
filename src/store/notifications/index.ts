@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import axiosInstance from "@/lib/axiosInstance";
 import { fetchConversations } from "../conversations";
+import { arraysEqual } from "@/lib/helpers";
 
 export const fetchNotifications = createAsyncThunk(
   "notifications/fetchNotifications",
@@ -54,13 +55,20 @@ const notificationsSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.data = Array.from(
-          new Set([...state.data, ...action.payload.data])
-        );
-        state.messages = Array.from(
-          new Set([...state.messages, ...action.payload.messages])
-        );
+        if (action.payload.data?.length > 0) {
+          state.status = "succeeded";
+
+          const newData = [...state.data, ...action.payload.data];
+          const newMessages = [...state.messages, ...action.payload.messages];
+
+          if (!arraysEqual(state.data, newData)) {
+            state.data = Array.from(new Set(newData));
+          }
+
+          if (!arraysEqual(state.messages, newMessages)) {
+            state.messages = Array.from(new Set(newMessages));
+          }
+        }
       })
       .addCase(fetchNotifications.rejected, (state, action) => {
         state.status = "failed";

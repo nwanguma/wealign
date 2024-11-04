@@ -1,5 +1,5 @@
 import CryptoJS from "crypto-js";
-import { Profile } from "@/common/constants";
+import { Connections, Profile } from "@/common/constants";
 import { DateInfo, FormatDateOptions } from "./constants";
 import { CustomError } from "./class";
 
@@ -90,10 +90,10 @@ export const stripHtml = (html: string) => {
 };
 
 export const getHasFollowed = (
-  userProfile: Profile,
+  connections: Connections,
   followingProfileId: string
 ) => {
-  return (userProfile.following || [])
+  return (connections.following || [])
     .map((following) => {
       return following.profile_id as string;
     })
@@ -189,3 +189,9 @@ export function formatErrorResponse(error: CustomError): string {
 
 export const capitalizeFirstLetter = (text: string): string =>
   text.charAt(0).toUpperCase() + text.slice(1);
+
+export const arraysEqual = (arr1: string[], arr2: string[]) => {
+  if (arr1.length !== arr2.length) return false;
+  const set1 = new Set(arr1);
+  return arr2.every((item) => set1.has(item));
+};

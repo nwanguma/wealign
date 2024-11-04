@@ -18,15 +18,22 @@ import RecommendationsComponent from "@/components/ui/RecommendationsComponent";
 import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
 import { feedbackTextMapper } from "@/lib/helpers/constants";
 import { CustomError } from "@/lib/helpers/class";
+import {
+  selectCurrentUser,
+  selectEventsRecommendations,
+  selectIsRecommendationsLoading,
+} from "@/lib/selectors";
 
 export default function EventPage() {
   const router = useRouter();
-  const { recommendations, user } = useSelector((state: RootState) => ({
-    recommendations: state.recommendations,
-    user: state.user,
-  }));
-  const { isLoading: isRecommendationsLoading, events: eventRecommendations } =
-    recommendations;
+  const { isRecommendationsLoading, eventRecommendations, user } = useSelector(
+    (state: RootState) => ({
+      recommendations: state.recommendations,
+      user: selectCurrentUser(state),
+      isRecommendationsLoading: selectIsRecommendationsLoading(state),
+      eventRecommendations: selectEventsRecommendations(state),
+    })
+  );
   const params = useParams();
   const id = params?.id;
 

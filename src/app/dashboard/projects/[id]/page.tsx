@@ -19,13 +19,20 @@ import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
 import { CustomError } from "@/lib/helpers/class";
 import { feedbackTextMapper } from "@/lib/helpers/constants";
 import FeedbackForm from "@/components/forms/FeedbackForm";
+import {
+  selectCurrentUser,
+  selectIsRecommendationsLoading,
+  selectProjectRecommendations,
+} from "@/lib/selectors";
 
 export default function ProjectPage() {
   const router = useRouter();
-  const { recommendations, user } = useSelector((state: RootState) => ({
-    recommendations: state.recommendations,
-    user: state.user,
-  }));
+  const { isRecommendationsLoading, projectRecommendations, user } =
+    useSelector((state: RootState) => ({
+      isRecommendationsLoading: selectIsRecommendationsLoading(state),
+      projectRecommendations: selectProjectRecommendations(state),
+      user: selectCurrentUser(state),
+    }));
   const params = useParams();
   const id = params?.id;
   const [addProjectModalIsOpen, setAddProjectModalIsOpen] =
@@ -34,10 +41,6 @@ export default function ProjectPage() {
     useState<boolean>(false);
   const [editFeedbackModalIsOpen, setEditFeedbackModalIsOpen] =
     useState<string>("");
-  const {
-    isLoading: isRecommendationsLoading,
-    projects: projectRecommendations,
-  } = recommendations;
 
   const {
     refetch,

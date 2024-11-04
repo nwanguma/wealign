@@ -34,6 +34,7 @@ import InputWithDropdown from "./InputWithDropdown";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
+import { selectCurrentUser } from "@/lib/selectors";
 
 const Loading = () => (
   <div className="w-full h-96 block border border-gray-300 rounded-lg"></div>
@@ -96,7 +97,7 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
   handleModalClose,
   triggerRefetch,
 }) => {
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
   const defaultValues = {
     title: data?.title || "",
     website: data?.website || "",

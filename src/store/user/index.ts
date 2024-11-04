@@ -50,15 +50,6 @@ export const fetchCurrentUser = createAsyncThunk(
   }
 );
 
-export const fetchFollowing = createAsyncThunk(
-  "user/fetchFollowing",
-  async () => {
-    const response = await axiosInstance.get("api/proxy/profiles/following");
-
-    return response.data.data;
-  }
-);
-
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -81,13 +72,6 @@ const userSlice = createSlice({
       fetchCurrentUser.fulfilled,
       (state, action: PayloadAction<User>) => {
         return action.payload;
-      }
-    );
-    builder.addCase(
-      fetchFollowing.fulfilled,
-      (state, action: PayloadAction<any>) => {
-        state.profile.followers = action.payload.followers as any;
-        state.profile.following = action.payload.following as any;
       }
     );
   },

@@ -9,9 +9,10 @@ import {
   setLatestConversation,
 } from "@/store/conversations";
 import { initiateConversation, followUser, unfollowUser } from "@/api";
-import { fetchFollowing } from "@/store/user";
+import { fetchConnections } from "@/store/connections";
 import { CustomError } from "@/lib/helpers/class";
 import { errorToastWithCustomError } from "@/lib/helpers/toast";
+import { selectConversationsData } from "@/lib/selectors";
 
 interface JustFollowed {
   [key: string]: boolean;
@@ -20,7 +21,7 @@ interface JustFollowed {
 export const useFollow = (handleCloseModal?: () => void) => {
   const router = useRouter();
   const { conversations } = useSelector((state: RootState) => ({
-    conversations: state.conversations.data,
+    conversations: selectConversationsData(state),
   }));
   const dispatch = useDispatch<AppDispatch>();
   const [justFollowed, setJustFollowed] = useState<JustFollowed>({});
@@ -32,7 +33,7 @@ export const useFollow = (handleCloseModal?: () => void) => {
         [profileId]: true,
       }));
 
-      dispatch(fetchFollowing());
+      dispatch(fetchConnections());
     },
     onError: (error: CustomError) => {
       errorToastWithCustomError(error);
@@ -46,7 +47,7 @@ export const useFollow = (handleCloseModal?: () => void) => {
         [profileId]: false,
       }));
 
-      dispatch(fetchFollowing());
+      dispatch(fetchConnections());
     },
     onError: (error: CustomError) => {
       errorToastWithCustomError(error);

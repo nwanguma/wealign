@@ -18,15 +18,21 @@ import { feedbackTextMapper } from "@/lib/helpers/constants";
 import { errorToastWithCustomError, successToast } from "@/lib/helpers/toast";
 import RecommendationsComponent from "@/components/ui/RecommendationsComponent";
 import PageMainContent from "@/components/ui/MainContentWrapper";
+import {
+  selectCurrentUser,
+  selectIsRecommendationsLoading,
+  selectJobRecommendations,
+} from "@/lib/selectors";
 
 export default function JobPage() {
   const router = useRouter();
-  const { recommendations, user } = useSelector((state: RootState) => ({
-    recommendations: state.recommendations,
-    user: state.user,
-  }));
-  const { isLoading: isRecommendationsLoading, jobs: jobsRecommendations } =
-    recommendations;
+  const { isRecommendationsLoading, jobsRecommendations, user } = useSelector(
+    (state: RootState) => ({
+      isRecommendationsLoading: selectIsRecommendationsLoading(state),
+      user: selectCurrentUser(state),
+      jobsRecommendations: selectJobRecommendations(state),
+    })
+  );
   const params = useParams();
   const id = params?.id;
   const {

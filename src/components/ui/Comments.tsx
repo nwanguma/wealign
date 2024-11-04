@@ -4,17 +4,18 @@ import Link from "next/link";
 
 import { formatDateLong } from "@/lib/helpers";
 import { WithTooltip } from "./WithTooltip";
-import { Comment, Reaction } from "@/common/constants";
+import { Comment, Connection, Reaction } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import { createComment, deleteComment, createReaction } from "@/api";
 import { ProfilePreviewCard } from "./ProfileCardPreview";
 import AppModal from "./Modal";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-
-import "../../app/globals.css";
 import { CustomError } from "@/lib/helpers/class";
 import { errorToastWithCustomError } from "@/lib/helpers/toast";
+
+import "../../app/globals.css";
+import { selectConnectionsData, selectCurrentUser } from "@/lib/selectors";
 
 interface ICommentsProps {
   isOwner: boolean;
@@ -36,9 +37,11 @@ export const Comments: React.FC<ICommentsProps> = ({
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [fansModalIsOpen, setFansModalIsOpen] = useState(false);
-  const user = useSelector((state: RootState) => state.user);
+  const { user, connectionsData } = useSelector((state: RootState) => ({
+    user: selectCurrentUser(state),
+    connectionsData: selectConnectionsData(state),
+  }));
   const currentUserProfileId = user?.profile?.id;
-
   const commentMutation = useMutation({
     mutationFn: ({
       resource,
@@ -294,9 +297,9 @@ export const Comments: React.FC<ICommentsProps> = ({
               reactions.map((reaction: Reaction) => {
                 let hasFollowed = false;
 
-                if (user)
-                  hasFollowed = (user.profile?.following || [])
-                    .map((following) => following.profile_id)
+                if (user && connectionsData)
+                  hasFollowed = (connectionsData.following || [])
+                    .map((following) => (following as Connection).profile_id)
                     .includes(reaction.owner?.id!);
                 return (
                   <div

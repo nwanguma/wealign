@@ -1,11 +1,13 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+
 import userReducer from "./user";
 import uiReducer from "./ui";
 import recommendationsReducer from "./recommendations";
 import conversationsReducer from "./conversations";
 import notificationsReducer from "./notifications";
+import connectionsReducer from "./connections";
 
 const persistConfig = {
   key: "root",
@@ -16,6 +18,7 @@ const persistConfig = {
     "conversations",
     "ui",
     "notifications",
+    "connections",
   ],
 };
 
@@ -25,6 +28,7 @@ const rootReducer = combineReducers({
   recommendations: recommendationsReducer,
   conversations: conversationsReducer,
   notifications: notificationsReducer,
+  connections: connectionsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

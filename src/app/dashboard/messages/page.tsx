@@ -8,27 +8,34 @@ import { useDispatch, useSelector } from "react-redux";
 import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
 import { AppDispatch, RootState } from "@/store";
 import AppModal from "@/components/ui/Modal";
-import { Conversation } from "@/common/constants";
+import { Conversation, Connection } from "@/common/constants";
 import { getTime, isWithinLast10Minutes, timeAgo } from "@/lib/helpers";
 import { fetchMessages, sendMessage } from "@/api";
 import { fetchConversations } from "@/store/conversations";
 import PaginationComponent from "@/components/ui/PaginationComponent";
 import { CustomError } from "@/lib/helpers/class";
 import { errorToastWithCustomError } from "@/lib/helpers/toast";
+import {
+  selectConversationsData,
+  selectCurrentUser,
+  selectLatestConversation,
+  selectProfilesRecommendations,
+  selectConnectionsData,
+} from "@/lib/selectors";
 
 export default function MessagesPage() {
   const newMessages = useSelector(
     (state: RootState) => state.notifications.messages
   );
   const dispatch = useDispatch<AppDispatch>();
-  const { user, conversations, latestConversation } = useSelector(
-    (state: RootState) => ({
-      user: state.user,
-      profiles: state.recommendations?.profiles,
-      conversations: state.conversations.data,
-      latestConversation: state.conversations.latestConversation,
-    })
-  );
+  const { user, conversations, latestConversation, connectionsData } =
+    useSelector((state: RootState) => ({
+      user: selectCurrentUser(state),
+      profiles: selectProfilesRecommendations(state),
+      conversations: selectConversationsData(state),
+      latestConversation: selectLatestConversation(state),
+      connectionsData: selectConnectionsData(state),
+    }));
   const [messagesPagination, setMessagesPagination] = useState({
     page: 1,
     limit: 20,
@@ -460,8 +467,8 @@ export default function MessagesPage() {
                 let hasFollowed = false;
 
                 if (user)
-                  hasFollowed = (user.profile?.following || [])
-                    .map((following) => following.profile_id)
+                  hasFollowed = (connectionsData.following || [])
+                    .map((following: Connection) => following.profile_id)
                     .includes(profile.profile_id);
                 return (
                   <div

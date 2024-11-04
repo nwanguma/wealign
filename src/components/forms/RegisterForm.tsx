@@ -62,7 +62,7 @@ const RegisterForm: React.FC = () => {
   };
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    // setLoading(true);
+    setLoading(true);
 
     try {
       await handleSignUp(data);
@@ -82,9 +82,9 @@ const RegisterForm: React.FC = () => {
       }
     } catch (error) {
       errorToastWithCustomError(error as CustomError);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (

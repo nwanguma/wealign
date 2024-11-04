@@ -11,6 +11,7 @@ import {
   Profile,
   ProfilesWithPagination,
   IFilters,
+  Connection,
 } from "@/common/constants";
 import { useSkills } from "@/app/hooks/useSkills";
 import PaginationComponent from "@/components/ui/PaginationComponent";
@@ -22,6 +23,7 @@ import {
 import { fetchProfiles } from "@/api";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { selectConnectionsData, selectCurrentUser } from "@/lib/selectors";
 
 export default function Profiles() {
   const [pagination, setPagination] = useState({ page: 1, limit: 5 });
@@ -44,7 +46,10 @@ export default function Profiles() {
     queryFn: () => fetchProfiles(pagination, filters as IFilters),
     placeholderData: keepPreviousData,
   });
-  const user = useSelector((state: RootState) => state.user);
+  const { user, connectionsData } = useSelector((state: RootState) => ({
+    user: selectCurrentUser(state),
+    connectionsData: selectConnectionsData(state),
+  }));
 
   const { data: skills } = useSkills();
 
@@ -91,9 +96,9 @@ export default function Profiles() {
                   (profiles as Profile[])?.map((profile) => {
                     let hasFollowed = false;
 
-                    if (user)
-                      hasFollowed = (user.profile?.following || [])
-                        .map((following) => following.profile_id)
+                    if (user && connectionsData)
+                      hasFollowed = (connectionsData.following || [])
+                        .map((following: Connection) => following.profile_id)
                         .includes(profile.id);
 
                     return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { Provider } from "react-redux";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
@@ -13,26 +13,35 @@ import DashboardNav from "@/components/layout/DashboardNav";
 import NotificationsPollingComponent from "@/components/ui/NotificationsPolling";
 import PageLoadingComponent from "@/components/ui/PageLoading";
 import Main from "@/components/layout/Main";
+import AppDataComponent from "@/components/features/AppData";
+
+const TestComponent = () => {
+  console.log("we rendered my man");
+  return <div>make another one</div>;
+};
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <Provider store={store}>
-      <PersistGate loading={<PageLoadingComponent />} persistor={persistor}>
-        <div
-          className={`w-full min-h-screen bg-[#f7f7f7] text-custom-gray font-app-normal`}
-        >
-          <DashboadHeader>
-            <DashboardNav />
-          </DashboadHeader>
-          <NotificationsPollingComponent />
-          <Main>
-            <QueryClientProvider client={queryClient}>
-              {children}
-            </QueryClientProvider>
-          </Main>
-        </div>
-        <Toaster />
-      </PersistGate>
-    </Provider>
+    <>
+      {" "}
+      <TestComponent />
+      <Provider store={store}>
+        <PersistGate loading={<PageLoadingComponent />} persistor={persistor}>
+          <QueryClientProvider client={queryClient}>
+            <div
+              className={`w-full min-h-screen bg-[#f7f7f7] text-custom-gray font-app-normal`}
+            >
+              <DashboadHeader>
+                <DashboardNav />
+              </DashboadHeader>
+              <NotificationsPollingComponent />
+              <AppDataComponent />
+              <Main>{children}</Main>
+            </div>
+            <Toaster />
+          </QueryClientProvider>
+        </PersistGate>
+      </Provider>
+    </>
   );
 }

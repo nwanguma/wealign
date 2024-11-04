@@ -6,10 +6,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { signIn } from "next-auth/react";
 
-import AuthSocialsButton from "@/components/ui/AuthSocialsButton";
 import AuthButton from "@/components/ui/Button";
 import Input from "@/components/forms/Input";
 import { useRouter } from "next/navigation";
+import { errorToast, errorToastWithCustomError } from "@/lib/helpers/toast";
+import { CustomError } from "@/lib/helpers/class";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -52,18 +53,30 @@ const LoginForm: React.FC = () => {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setLoading(true);
 
-    const res = await signIn("credentials", {
-      redirect: true,
-      email: data.email,
-      password: data.password,
-      callbackUrl: "/dashboard",
-    });
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+        callbackUrl: "/dashboard",
+      });
 
-    if (res?.error) {
-      setError(res.error);
+      if (res?.error) {
+        if (res?.status === 401) {
+          errorToast(
+            "Invalid login credentials. Please check your username and password and try again."
+          );
+        }
+
+        setError(res.error);
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      errorToastWithCustomError(error as CustomError);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (

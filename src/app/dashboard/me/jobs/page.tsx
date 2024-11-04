@@ -28,6 +28,7 @@ import {
   SkeletonLoaderGrid,
   SkeletonLoader,
 } from "@/components/ui/SkeletonLoader";
+import { selectCurrentUser } from "@/lib/selectors";
 
 const fetchJobs = async (
   pagination: IPagination,
@@ -52,7 +53,7 @@ const fetchJobs = async (
 };
 
 export default function Jobs() {
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
   const [pagination, setPagination] = useState({ page: 1, limit: 5 });
   const [filters, setFilters] = useState({
     keyword: "",

@@ -1,4 +1,6 @@
+import React from "react";
 import type { Metadata } from "next";
+import wdyr from "@welldone-software/why-did-you-render";
 
 import "./globals.css";
 

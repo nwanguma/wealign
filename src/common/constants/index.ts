@@ -122,8 +122,8 @@ export interface Profile {
   title: string;
   heading: string;
   views?: number;
-  followers?: Follower[];
-  following?: Follower[];
+  followers?: Connection[];
+  following?: Connection[];
   comments?: Comment[];
   reactions: Reaction[];
   events?: Event[];
@@ -138,7 +138,7 @@ export interface Profile {
   visibility_status?: string;
 }
 
-export interface Follower {
+export interface Connection {
   profile_id: string;
   first_name: string;
   last_name: string;
@@ -146,6 +146,11 @@ export interface Follower {
   avatar?: string;
   title?: string;
   user_id?: string;
+}
+
+export interface Connections {
+  followers: Connection[];
+  following: Connection[];
 }
 
 export interface Feedback {

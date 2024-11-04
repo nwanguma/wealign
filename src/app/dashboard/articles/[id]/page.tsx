@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 
 import { Article } from "@/common/constants";
 import { ArticleCardPreview } from "@/components/ui/ArticleCard";
@@ -18,17 +18,24 @@ import { CustomError } from "@/lib/helpers/class";
 import PageWrapperWithError from "@/components/ui/PageWrapper";
 import RecommendationsComponent from "@/components/ui/RecommendationsComponent";
 import PageMainContent from "@/components/ui/MainContentWrapper";
+import {
+  selectCurrentUser,
+  selectArticleRecommendations,
+  selectIsRecommendationsLoading,
+} from "@/lib/selectors";
 
 export default function ArticlePage() {
   const router = useRouter();
-  const { recommendations, user } = useSelector((state: RootState) => ({
-    recommendations: state.recommendations,
-    user: state.user,
-  }));
-  const {
-    isLoading: isRecommendationsLoading,
-    articles: articleRecommendations,
-  } = recommendations;
+  const { articleRecommendations, isRecommendationsLoading, user } =
+    useSelector(
+      (state: RootState) => ({
+        recommendations: state.recommendations,
+        user: selectCurrentUser(state),
+        articleRecommendations: selectArticleRecommendations(state),
+        isRecommendationsLoading: selectIsRecommendationsLoading(state),
+      }),
+      shallowEqual
+    );
   const params = useParams();
   const id = params?.id;
   const {

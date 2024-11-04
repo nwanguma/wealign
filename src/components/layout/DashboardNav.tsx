@@ -1,8 +1,7 @@
-"use client";
-
+import React, { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useSelector } from "react-redux";
+import { useSelector, shallowEqual } from "react-redux";
 import { usePathname } from "next/navigation";
 
 import NotificationIcon from "@/components/ui/NotificationIcon";
@@ -12,24 +11,26 @@ import MessagesIcon from "../ui/MessagesIcon";
 import { LogoMin } from "../ui/Logo";
 import LogoWithText from "../ui/LogoWithText";
 import { WithTooltip } from "../ui/WithTooltip";
+import { selectCurrentUser } from "@/lib/selectors";
 
-export default function DashboardNav() {
-  /** User here to get user profile's avatar on sign up
-   *  Todo: Update user profile everytime a profile update is made
-   * */
-  const user = useSelector((state: RootState) => state.user);
+const DashboardNav: React.FC = React.memo(() => {
   const pathname = usePathname();
+  const user = useSelector(
+    (state: RootState) => selectCurrentUser(state),
+    shallowEqual
+  );
 
-  //Todo: Fix nav active state for nested pages e.g events/{id}
-  const links = [
-    { name: "Home", href: "/dashboard" },
-    { name: "Profiles", href: "/dashboard/profiles" },
-    { name: "Projects", href: "/dashboard/projects" },
-    { name: "Events", href: "/dashboard/events" },
-    { name: "Articles", href: "/dashboard/articles" },
-    { name: "Jobs", href: "/dashboard/jobs" },
-    // { name: "Spotlight", href: "/dashboard/spotlight" },
-  ];
+  const links = useMemo(
+    () => [
+      { name: "Home", href: "/dashboard" },
+      { name: "Profiles", href: "/dashboard/profiles" },
+      { name: "Projects", href: "/dashboard/projects" },
+      { name: "Events", href: "/dashboard/events" },
+      { name: "Articles", href: "/dashboard/articles" },
+      { name: "Jobs", href: "/dashboard/jobs" },
+    ],
+    []
+  );
 
   return (
     <nav className="flex flex-wrap justify-end xxs:flex-nowrap xs:justify-between items-center lg:space-x-0 px-2 py-2 xs:py-0 xs:px-6 xs:h-14 bg-white">
@@ -91,4 +92,8 @@ export default function DashboardNav() {
       </ul>
     </nav>
   );
-}
+});
+
+DashboardNav.displayName = "DashboardNav";
+
+export default DashboardNav;

@@ -32,6 +32,7 @@ import "react-quill/dist/quill.snow.css";
 import "../../app/globals.css";
 import { useLocations } from "@/app/hooks/useLocations";
 import InputWithDropdown from "./InputWithDropdown";
+import { selectCurrentUser } from "@/lib/selectors";
 
 export enum ProfileStatus {
   HIRING = "hiring",
@@ -104,7 +105,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
   handleModalClose,
   triggerRefetch,
 }) => {
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
   const [loading, setLoading] = useState(false);
   const defaultValues = {
     avatar: user?.profile?.avatar || "",

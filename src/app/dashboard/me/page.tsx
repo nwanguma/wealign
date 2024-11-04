@@ -15,7 +15,10 @@ import { SkeletonLoaderPage } from "@/components/ui/SkeletonLoader";
 import { getHasFollowed } from "@/lib/helpers";
 
 export default function ProfilePage() {
-  const user = useSelector((state: RootState) => state.user);
+  const { user, connectionsData } = useSelector((state: RootState) => ({
+    user: state.user,
+    connectionsData: state.connections.data,
+  }));
   const id = user.profile.id;
 
   const [accountsSettingsModalIsOpen, setAccountsSettingsModalIsOpen] =
@@ -34,7 +37,7 @@ export default function ProfilePage() {
     queryFn: () => fetchProfile(id as string),
     enabled: !!id,
   });
-  const hasFollowed = getHasFollowed(user?.profile, profile?.id!);
+  const hasFollowed = getHasFollowed(connectionsData, profile?.id!);
 
   return (
     <div className="bg-white">
