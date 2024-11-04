@@ -40,7 +40,7 @@ const ShareComponent = ({ text }: { text: string }) => {
                 rel="noopener noreferrer"
               >
                 <Image
-                  src={`/icons/${platform}-share.svg`}
+                  src={`/icons/${platform?.toLowerCase()}-share.svg`}
                   alt={`${platform} share icon`}
                   width={20}
                   height={20}
