@@ -23,6 +23,7 @@ import { ViewsComponent } from "./ViewsComponent";
 import { Comments } from "./Comments";
 import { useFollow } from "@/app/hooks/useFollow";
 import TopIconBar from "./TopIconBar";
+import AvatarComponent from "./AvatarComponent";
 
 interface IProfileCardMainProps {
   profile: Profile;
@@ -198,15 +199,7 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
       <div className="relative space-y-4">
         <div className="flex flex-col space-y-6 border-b border-b-gray-200 py-2 lg:py-4">
           <div className="flex flex-col xs:flex-row items-center xs:space-x-6 justify-center xs:justify-normal">
-            <div className="border border-gray-300 p-1 rounded-full">
-              <Image
-                src={avatar || "/images/profile-placeholder.png"}
-                width={150}
-                height={150}
-                alt="avatar"
-                className="rounded-full"
-              />
-            </div>
+            <AvatarComponent avatar={avatar} className="w-32 h-32" />
             <div className="flex flex-col space-y-2">
               <div className="flex flex-col space-y-2">
                 <div className="flex flex-col space-y-1">
@@ -407,7 +400,14 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                 </div>
                 <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 lg:gap-x-5">
                   {[...projects]?.splice(0, 2).map((project) => {
-                    return <ProjectCard key={project.id} project={project} />;
+                    return (
+                      <div
+                        key={project.id}
+                        className="border border-gray-300 p-2 md:p-3 rounded-lg"
+                      >
+                        <ProjectCard project={project} />
+                      </div>
+                    );
                   })}
                 </div>
                 {!(projects as Project[]).length && (
@@ -515,7 +515,12 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                 </div>
                 <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 gap-x-5">
                   {[...jobs]?.splice(0, 2).map((job) => (
-                    <JobCard key={job.id} job={job} />
+                    <div
+                      key={job.id}
+                      className="border border-gray-300 p-2 md:p-3 rounded-lg"
+                    >
+                      <JobCard job={job} />
+                    </div>
                   ))}
                 </div>
                 {!(jobs as Job[]).length && (

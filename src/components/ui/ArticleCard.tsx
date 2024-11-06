@@ -28,13 +28,12 @@ export const ArticleCardPreview: React.FC<IArticleCardPreviewProps> = ({
             {banner && (
               <Image
                 src={banner!}
-                alt="avatar"
+                alt="banner"
                 className="rounded-lg"
                 layout="fill"
               />
             )}
           </div>
-
           <div className="flex flex-col flex-1 space-y-4">
             <div className="flex flex-col space-y-2 py-2">
               <div className="flex flex-col space-y-1">

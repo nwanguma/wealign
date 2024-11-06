@@ -9,13 +9,14 @@ import { useMutation } from "@tanstack/react-query";
 import { createComment, deleteComment, createReaction } from "@/api";
 import { ProfilePreviewCard } from "./ProfileCardPreview";
 import AppModal from "./Modal";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { CustomError } from "@/lib/helpers/class";
 import { errorToastWithCustomError } from "@/lib/helpers/toast";
+import { selectConnectionsData, selectCurrentUser } from "@/lib/selectors";
+import AvatarComponent from "./AvatarComponent";
 
 import "../../app/globals.css";
-import { selectConnectionsData, selectCurrentUser } from "@/lib/selectors";
 
 interface ICommentsProps {
   isOwner: boolean;
@@ -37,10 +38,13 @@ export const Comments: React.FC<ICommentsProps> = ({
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [fansModalIsOpen, setFansModalIsOpen] = useState(false);
-  const { user, connectionsData } = useSelector((state: RootState) => ({
-    user: selectCurrentUser(state),
-    connectionsData: selectConnectionsData(state),
-  }));
+  const { user, connectionsData } = useSelector(
+    (state: RootState) => ({
+      user: selectCurrentUser(state),
+      connectionsData: selectConnectionsData(state),
+    }),
+    shallowEqual
+  );
   const currentUserProfileId = user?.profile?.id;
   const commentMutation = useMutation({
     mutationFn: ({
@@ -205,18 +209,10 @@ export const Comments: React.FC<ICommentsProps> = ({
                 className="px-2 py-1.5 rounded-lg flex items-center space-x-3 border-b border-gray-100 justify-between"
               >
                 <div className="flex items-center space-x-4">
-                  <div className="border border-gray-200 p-1 rounded-full">
-                    <Image
-                      src={
-                        comment.owner.avatar ||
-                        "/images/profile-placeholder.png"
-                      }
-                      width={30}
-                      height={30}
-                      alt="avatar"
-                      className="rounded-full"
-                    />
-                  </div>
+                  <AvatarComponent
+                    avatar={comment.owner.avatar}
+                    className="w-7 h-7"
+                  />
                   <div className="flex-1 space-y-1.5">
                     <div className="flex items-center space-x-2">
                       <Link

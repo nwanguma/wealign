@@ -5,20 +5,16 @@ import { RootState, AppDispatch } from "@/store";
 import { fetchCurrentUser } from "@/store/user";
 import { fetchRecommendations } from "@/store/recommendations";
 import { fetchConversations } from "@/store/conversations";
-import {
-  selectCurrentUser,
-  selectRecommendationsHasFetched,
-} from "@/lib/selectors";
+import { selectCurrentUser } from "@/lib/selectors";
+import { fetchConnections } from "@/store/connections";
 
 const AppDataComponent = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
-  const { currentUser, recommendationsHasFetched, conversations } = useSelector(
+  const { currentUser } = useSelector(
     (state: RootState) => ({
       currentUser: selectCurrentUser(state),
-      recommendationsHasFetched: selectRecommendationsHasFetched(state),
-      conversations: state.conversations,
     }),
     shallowEqual
   );
@@ -30,23 +26,15 @@ const AppDataComponent = () => {
       if (!currentUser?.id) {
         fetchPromises.push(dispatch(fetchCurrentUser()));
       }
-      if (!recommendationsHasFetched) {
-        fetchPromises.push(dispatch(fetchRecommendations()));
-      }
-      if (!conversations.hasFetched) {
-        fetchPromises.push(dispatch(fetchConversations()));
-      }
+
+      fetchPromises.push(dispatch(fetchRecommendations()));
+      fetchPromises.push(dispatch(fetchConversations()));
+      fetchPromises.push(dispatch(fetchConnections()));
 
       await Promise.all(fetchPromises);
       setInitialFetchDone(true);
     }
-  }, [
-    initialFetchDone,
-    currentUser?.id,
-    recommendationsHasFetched,
-    conversations.hasFetched,
-    dispatch,
-  ]);
+  }, [initialFetchDone, currentUser?.id, dispatch]);
 
   useEffect(() => {
     fetchData();

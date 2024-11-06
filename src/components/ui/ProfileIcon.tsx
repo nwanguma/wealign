@@ -5,6 +5,7 @@ import Image from "next/image";
 
 import { signOut } from "next-auth/react";
 import { handleSignOut } from "@/store";
+import AvatarComponent from "./AvatarComponent";
 
 export default function ProfileIcon({ avatar }: { avatar?: string | null }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -27,16 +28,11 @@ export default function ProfileIcon({ avatar }: { avatar?: string | null }) {
 
   return (
     <div className="relative" ref={profileRef}>
-      <div className="border border-gray-300 p-1 rounded-full">
-        <Image
-          src={avatar || "/images/profile-placeholder.png"}
-          width={0}
-          height={0}
-          alt="user avatar"
-          className="cursor-pointer w-4 h-4 lg:w-6 lg:h-6 rounded-full"
-          onClick={() => setIsProfileOpen(!isProfileOpen)}
-        />
-      </div>
+      <AvatarComponent
+        avatar={avatar}
+        className="w-4 h-4 lg:w-6 lg:h-6 cursor-pointer"
+        handleOnClick={() => setIsProfileOpen(!isProfileOpen)}
+      />
       {isProfileOpen && (
         <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 shadow-lg rounded-lg z-50">
           <div className="p-4">

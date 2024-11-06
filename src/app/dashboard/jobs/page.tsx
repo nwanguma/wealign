@@ -160,7 +160,14 @@ export default function Jobs() {
             {!isLoading && (
               <ContentWrapper data={jobs as Job[]}>
                 {jobsData &&
-                  jobs?.map((job) => <JobCard key={job.id} job={job} />)}
+                  jobs?.map((job: Job) => (
+                    <div
+                      key={job.id}
+                      className="border border-gray-300 p-2 md:p-3 rounded-lg"
+                    >
+                      <JobCard job={job} />
+                    </div>
+                  ))}
               </ContentWrapper>
             )}
             {isLoading && (
@@ -173,7 +180,7 @@ export default function Jobs() {
                 </div>
               </>
             )}
-            {jobsData && jobs && (
+            {!isLoading && jobsData && jobs && (
               <PaginationComponent
                 data={jobs}
                 total={total}

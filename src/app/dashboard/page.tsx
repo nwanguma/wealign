@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+import React, { useMemo, useState } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
@@ -37,6 +36,7 @@ import {
 } from "../../lib/selectors";
 
 import "../../app/globals.css";
+import AvatarComponent from "@/components/ui/AvatarComponent";
 
 const MainFeed: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -219,10 +219,6 @@ const MainFeed: React.FC = () => {
     ]
   );
 
-  useEffect(() => {
-    dispatch(fetchConnections());
-  }, []);
-
   return (
     <div className="min-h-screen w-full bg-white p-6">
       <div className="flex lg:space-x-5">
@@ -239,18 +235,10 @@ const MainFeed: React.FC = () => {
               {currentUser?.id && (
                 <div className="flex-1 space-y-4">
                   <div className="flex flex-col text-center s:text-left s:flex-row items-center space-x-2">
-                    <div className="border border-gray-300 p-1 rounded-full">
-                      <Image
-                        src={
-                          currentUser.profile.avatar ||
-                          "/images/profile-placeholder.png"
-                        }
-                        width={80}
-                        height={80}
-                        alt="avatar"
-                        className="rounded-full"
-                      />
-                    </div>
+                    <AvatarComponent
+                      avatar={currentUser.profile.avatar}
+                      className="w-16 h-16"
+                    />
                     <div className="flex flex-col space-y-1">
                       <span className="font-medium text-base text-custom-gray-heading font-custom font-app-medium">
                         {currentUser.profile.first_name}{" "}
@@ -431,7 +419,12 @@ const MainFeed: React.FC = () => {
                   <div className="space-y-3">
                     {projects &&
                       projects?.map((project) => (
-                        <ProjectCard key={project?.id} project={project} />
+                        <div
+                          key={project?.id}
+                          className="border border-gray-300 p-2 md:p-3 rounded-lg"
+                        >
+                          <ProjectCard project={project} />
+                        </div>
                       ))}
                     <PaginationComponent
                       data={projects || []}
@@ -583,29 +576,29 @@ const MainFeed: React.FC = () => {
       >
         <div className="p-4">
           <div className="space-y-4">
-            {currentUser?.profile?.following &&
-              currentUser?.profile?.following.map((profile) => {
+            {connectionsData?.following &&
+              connectionsData?.following.map((follower: Connection) => {
                 let hasFollowed = false;
 
                 if (currentUser)
                   hasFollowed = (connectionsData.following || [])
-                    .map((following) => (following as Connection).profile_id)
-                    .includes(profile.profile_id);
+                    .map((following: Connection) => following.profile_id)
+                    .includes(follower.profile_id);
 
                 return (
                   <div
-                    key={profile.profile_id}
+                    key={follower.profile_id}
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
-                      email={profile.email}
+                      email={follower.email}
                       currentUserProfileId={currentUser?.profile?.id}
-                      name={profile.first_name + " " + profile.last_name}
-                      title={profile.title || ""}
-                      profile_id={profile.profile_id}
-                      user_id={profile.user_id}
+                      name={follower.first_name + " " + follower.last_name}
+                      title={follower.title || ""}
+                      profile_id={follower.profile_id}
+                      user_id={follower.user_id}
                       avatar={
-                        profile.avatar || "/images/profile-placeholder.png"
+                        follower.avatar || "/images/profile-placeholder.png"
                       }
                       hasFollowed={hasFollowed}
                     />
@@ -628,7 +621,7 @@ const MainFeed: React.FC = () => {
 
                 if (currentUser)
                   hasFollowed = (connectionsData.following || [])
-                    .map((following) => (following as Connection).profile_id)
+                    .map((following: Connection) => following.profile_id)
                     .includes(follower.profile_id);
                 return (
                   <div

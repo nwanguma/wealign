@@ -52,7 +52,25 @@ export const selectRecommendationsHasFetched = createSelector(
   (recommendations) => !!recommendations.hasFetched
 );
 
-export const selectCurrentUser = createSelector(selectUser, (user) => user);
+export const selectRecommendationsError = createSelector(
+  selectRecommendations,
+  (recommendations) => recommendations.error
+);
+
+export const selectCurrentUser = createSelector(
+  selectUser,
+  (user) => user.data
+);
+
+export const selectCurrentUserProfileUpdateStatus = createSelector(
+  selectUser,
+  (user) => user?.data?.profile?.requires_update
+);
+
+export const selectCurrentUserError = createSelector(
+  selectUser,
+  (user) => user.error
+);
 
 export const selectConnectionsData = createSelector(
   selectConnections,
@@ -62,6 +80,11 @@ export const selectConnectionsData = createSelector(
 export const selectConversationsData = createSelector(
   selectConversations,
   (conversations) => [...conversations.data]
+);
+
+export const selectConversationsError = createSelector(
+  selectUser,
+  (conversations) => conversations.error
 );
 
 export const selectLatestConversation = createSelector(

@@ -21,7 +21,7 @@ import {
   SkeletonLoader,
 } from "@/components/ui/SkeletonLoader";
 import { fetchProfiles } from "@/api";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { selectConnectionsData, selectCurrentUser } from "@/lib/selectors";
 
@@ -46,10 +46,13 @@ export default function Profiles() {
     queryFn: () => fetchProfiles(pagination, filters as IFilters),
     placeholderData: keepPreviousData,
   });
-  const { user, connectionsData } = useSelector((state: RootState) => ({
-    user: selectCurrentUser(state),
-    connectionsData: selectConnectionsData(state),
-  }));
+  const { user, connectionsData } = useSelector(
+    (state: RootState) => ({
+      user: selectCurrentUser(state),
+      connectionsData: selectConnectionsData(state),
+    }),
+    shallowEqual
+  );
 
   const { data: skills } = useSkills();
 
@@ -126,7 +129,7 @@ export default function Profiles() {
                 </div>
               </>
             )}
-            {profilesData && profiles && (
+            {!isLoading && profilesData && profiles && (
               <PaginationComponent
                 data={profiles as Profile[]}
                 total={total}

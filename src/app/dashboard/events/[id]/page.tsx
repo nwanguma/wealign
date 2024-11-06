@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 
 import { Event } from "@/common/constants";
 import { EventCardMain } from "@/components/ui/EventCardMain";
@@ -28,11 +28,11 @@ export default function EventPage() {
   const router = useRouter();
   const { isRecommendationsLoading, eventRecommendations, user } = useSelector(
     (state: RootState) => ({
-      recommendations: state.recommendations,
       user: selectCurrentUser(state),
       isRecommendationsLoading: selectIsRecommendationsLoading(state),
       eventRecommendations: selectEventsRecommendations(state),
-    })
+    }),
+    shallowEqual
   );
   const params = useParams();
   const id = params?.id;
@@ -76,6 +76,7 @@ export default function EventPage() {
   const MemoizedRecommendations = useMemo(
     () => (
       <RecommendationsComponent
+        resourceId={params?.id as string}
         recommendations={eventRecommendations}
         isLoading={isRecommendationsLoading}
         render={(event) => (

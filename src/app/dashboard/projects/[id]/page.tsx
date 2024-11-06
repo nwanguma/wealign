@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
@@ -28,11 +28,14 @@ import {
 export default function ProjectPage() {
   const router = useRouter();
   const { isRecommendationsLoading, projectRecommendations, user } =
-    useSelector((state: RootState) => ({
-      isRecommendationsLoading: selectIsRecommendationsLoading(state),
-      projectRecommendations: selectProjectRecommendations(state),
-      user: selectCurrentUser(state),
-    }));
+    useSelector(
+      (state: RootState) => ({
+        isRecommendationsLoading: selectIsRecommendationsLoading(state),
+        projectRecommendations: selectProjectRecommendations(state),
+        user: selectCurrentUser(state),
+      }),
+      shallowEqual
+    );
   const params = useParams();
   const id = params?.id;
   const [addProjectModalIsOpen, setAddProjectModalIsOpen] =
@@ -105,9 +108,14 @@ export default function ProjectPage() {
   const MemoizedRecommendations = useMemo(
     () => (
       <RecommendationsComponent
+        resourceId={params?.id as string}
         recommendations={projectRecommendations}
         isLoading={isRecommendationsLoading}
-        render={(project) => <ProjectCard project={project as Project} />}
+        render={(project) => (
+          <div className="border-b border-gray-200 last:border-0">
+            <ProjectCard project={project as Project} />
+          </div>
+        )}
         title="Projects for you"
       />
     ),

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 
 import { RootState } from "@/store";
 import AppModal from "@/components/ui/Modal";
@@ -13,12 +13,16 @@ import { Profile } from "@/common/constants";
 import { fetchProfile } from "@/api";
 import { SkeletonLoaderPage } from "@/components/ui/SkeletonLoader";
 import { getHasFollowed } from "@/lib/helpers";
+import { selectConnectionsData, selectCurrentUser } from "@/lib/selectors";
 
 export default function ProfilePage() {
-  const { user, connectionsData } = useSelector((state: RootState) => ({
-    user: state.user,
-    connectionsData: state.connections.data,
-  }));
+  const { user, connectionsData } = useSelector(
+    (state: RootState) => ({
+      user: selectCurrentUser(state),
+      connectionsData: selectConnectionsData(state),
+    }),
+    shallowEqual
+  );
   const id = user.profile.id;
 
   const [accountsSettingsModalIsOpen, setAccountsSettingsModalIsOpen] =
@@ -42,7 +46,7 @@ export default function ProfilePage() {
   return (
     <div className="bg-white">
       <div className="min-h-screen w-full md:w-11/12 lg:w-10/12 bg-white mx-auto">
-        {isLoading && <SkeletonLoaderPage />}
+        {(isLoading || !profile) && <SkeletonLoaderPage />}
         {!isLoading && profile && (
           <div className="flex space-x-5 p-2 md:p-6">
             <div className="flex-1 p-4 flex flex-col space-y-5 w-full rounded-lg">

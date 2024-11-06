@@ -151,6 +151,11 @@ const ArticleForm: React.FC<IArticleFormProps> = ({
         onSubmit={handleSubmit(onSubmit)}
         className="space-y-6 p-6 max-w-4xl mx-auto"
       >
+        {fileUploadLoading && (
+          <div className="w-full h-1 bg-gray-300 rounded-full overflow-hidden">
+            <div className="h-full bg-blue-700 rounded-full animate-progress"></div>
+          </div>
+        )}
         <div>
           <Input
             id="title"

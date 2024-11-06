@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 
 import ContentWrapper from "@/components/ui/ContentWrapper";
 import AppModal from "@/components/ui/Modal";
@@ -51,7 +51,10 @@ const fetchProjects = async (
 };
 
 export default function Projects() {
-  const user = useSelector((state: RootState) => selectCurrentUser(state));
+  const user = useSelector(
+    (state: RootState) => selectCurrentUser(state),
+    shallowEqual
+  );
   const [pagination, setPagination] = useState({ page: 1, limit: 5 });
   const [filters, setFilters] = useState({
     skills: "",
@@ -160,7 +163,12 @@ export default function Projects() {
               <ContentWrapper data={projects}>
                 {projectsData &&
                   projects?.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
+                    <div
+                      key={project.id}
+                      className="border border-gray-300 p-2 md:p-3 rounded-lg"
+                    >
+                      <ProjectCard project={project} />
+                    </div>
                   ))}
               </ContentWrapper>
             )}
@@ -174,7 +182,7 @@ export default function Projects() {
                 </div>
               </>
             )}
-            {projectsData && projects && (
+            {!isLoading && projectsData && projects && (
               <PaginationComponent
                 data={projects}
                 total={total}

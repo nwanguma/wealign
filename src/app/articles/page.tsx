@@ -49,8 +49,8 @@ export default function Articles() {
       <div className="flex w-full space-x-0 md:space-x-5">
         <div className="w-full min-h-screen px-2 s:px-5 md:px-10 lg:px-20">
           <DashboardPageHeader
-            title="Discover Articles to Connect and Collaborate with Top Talent"
-            description="Explore articles where innovators, creators, and skilled professionals come together. Whether you're seeking collaboration opportunities or looking to grow your network, find the perfect article to connect with individuals who share your vision and expertise."
+            title="Connect, Learn, and Collaborate Through Insightful Articles"
+            description="Explore a curated collection of articles written by top professionals and innovators across various fields. Whether you’re looking to collaborate on projects, exchange ideas, or gain new insights, discover articles that connect you with people who share your vision and can help you grow your expertise."
           />
           <div className="py-5 flex flex-col space-y-5 w-full">
             <FilterComponent
@@ -90,7 +90,7 @@ export default function Articles() {
                 </div>
               </>
             )}
-            {articlesData && articles && (
+            {!isLoading && articlesData && articles && (
               <PaginationComponent
                 data={articles}
                 total={total}

@@ -3,7 +3,7 @@
 import { useCallback, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 
 import { Job } from "@/common/constants";
 import { RootState } from "@/store";
@@ -31,7 +31,8 @@ export default function JobPage() {
       isRecommendationsLoading: selectIsRecommendationsLoading(state),
       user: selectCurrentUser(state),
       jobsRecommendations: selectJobRecommendations(state),
-    })
+    }),
+    shallowEqual
   );
   const params = useParams();
   const id = params?.id;
@@ -71,9 +72,14 @@ export default function JobPage() {
   const MemoizedRecommendations = useMemo(
     () => (
       <RecommendationsComponent
+        resourceId={params?.id as string}
         recommendations={jobsRecommendations}
         isLoading={isRecommendationsLoading}
-        render={(job) => <JobCard job={job as Job} />}
+        render={(job) => (
+          <div className="border-b border-gray-200 last:border-0">
+            <JobCard job={job as Job} />
+          </div>
+        )}
         title="Jobs you may be interested in"
       />
     ),

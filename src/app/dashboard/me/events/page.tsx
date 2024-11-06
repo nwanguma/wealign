@@ -3,7 +3,7 @@
 import { useState } from "react";
 import AppModal from "@/components/ui/Modal";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 
 import ContentWrapper from "@/components/ui/ContentWrapper";
 import FilterComponent from "@/components/ui/Filter";
@@ -50,7 +50,10 @@ const fetchEvents = async (
 };
 
 export default function Events() {
-  const user = useSelector((state: RootState) => selectCurrentUser(state));
+  const user = useSelector(
+    (state: RootState) => selectCurrentUser(state),
+    shallowEqual
+  );
   const [pagination, setPagination] = useState({ page: 1, limit: 5 });
   const [filters, setFilters] = useState({
     keyword: "",
@@ -173,7 +176,7 @@ export default function Events() {
                 </div>
               </>
             )}
-            {eventsData && events && (
+            {!isLoading && eventsData && events && (
               <PaginationComponent
                 data={events}
                 total={total}

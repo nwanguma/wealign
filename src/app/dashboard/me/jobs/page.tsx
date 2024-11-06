@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 import { keepPreviousData } from "@tanstack/react-query";
 
 import AppModal from "@/components/ui/Modal";
@@ -53,7 +53,10 @@ const fetchJobs = async (
 };
 
 export default function Jobs() {
-  const user = useSelector((state: RootState) => selectCurrentUser(state));
+  const user = useSelector(
+    (state: RootState) => selectCurrentUser(state),
+    shallowEqual
+  );
   const [pagination, setPagination] = useState({ page: 1, limit: 5 });
   const [filters, setFilters] = useState({
     keyword: "",
@@ -165,7 +168,14 @@ export default function Jobs() {
             {!isLoading && (
               <ContentWrapper data={jobs as Job[]}>
                 {jobsData &&
-                  jobs?.map((job) => <JobCard key={job.id} job={job} />)}
+                  jobs?.map((job) => (
+                    <div
+                      key={job.id}
+                      className="border border-gray-300 p-2 md:p-3 rounded-lg"
+                    >
+                      <JobCard job={job} />
+                    </div>
+                  ))}
               </ContentWrapper>
             )}
             {isLoading && (
@@ -178,7 +188,7 @@ export default function Jobs() {
                 </div>
               </>
             )}
-            {jobsData && jobs && (
+            {!isLoading && jobsData && jobs && (
               <PaginationComponent
                 data={jobs}
                 total={total}

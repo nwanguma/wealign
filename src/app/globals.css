@@ -355,3 +355,20 @@ body {
   border: 0;
   border-top: 1px solid #e2e8f0;
 }
+
+/* Animation */
+@keyframes progressAnimation {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+.animate-progress {
+  animation: progressAnimation 2s ease-in-out infinite;
+}

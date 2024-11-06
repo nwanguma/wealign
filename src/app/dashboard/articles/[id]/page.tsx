@@ -29,7 +29,6 @@ export default function ArticlePage() {
   const { articleRecommendations, isRecommendationsLoading, user } =
     useSelector(
       (state: RootState) => ({
-        recommendations: state.recommendations,
         user: selectCurrentUser(state),
         articleRecommendations: selectArticleRecommendations(state),
         isRecommendationsLoading: selectIsRecommendationsLoading(state),

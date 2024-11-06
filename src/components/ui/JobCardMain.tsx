@@ -60,7 +60,7 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
                 src="/icons/google.svg"
                 width={70}
                 height={70}
-                alt="avatar"
+                alt=""
                 className="rounded-lg"
               />
             </div> */}
