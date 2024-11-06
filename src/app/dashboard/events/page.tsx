@@ -169,7 +169,7 @@ export default function Events() {
                 </div>
               </>
             )}
-            {eventsData && events && (
+            {!isLoading && eventsData && events && (
               <PaginationComponent
                 data={events}
                 total={total}

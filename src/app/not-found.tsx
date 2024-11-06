@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
-import LogoWithText from "@/components/ui/LogoWithText";
+
 import HomeNav from "@/components/ui/HomeNav";
 
 const NotFoundPage: React.FC = ({ searchParams, params }: any) => {
@@ -11,7 +10,7 @@ const NotFoundPage: React.FC = ({ searchParams, params }: any) => {
   return (
     <div className="flex flex-col w-full h-screen bg-gradient-to-r from-blue-100 via-purple-100 to-white">
       <header className="py-4">
-        <HomeNav actionParam={actionParam} pathname={pathname} />
+        <HomeNav actionParam={actionParam} pathname={pathname} hideActions />
       </header>
       <div className="flex-grow w-full flex flex-col justify-center relative">
         <div className="w-11/12 sm:w-10/12 lg:w-7/12 mx-auto space-y-2 sm:space-y-3">

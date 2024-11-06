@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 
 import { RootState } from "@/store";
 // import { SkeletonCard } from "@/components/ui/SkeletonLoader";
@@ -25,12 +25,15 @@ export default function ProfilePage() {
     // profileRecommendations,
     connectionsData,
     user,
-  } = useSelector((state: RootState) => ({
-    // isRecommendationsLoading: selectIsRecommendationsLoading(state),
-    // profileRecommendations: selectProfilesRecommendations(state),
-    user: selectCurrentUser(state),
-    connectionsData: selectConnectionsData(state),
-  }));
+  } = useSelector(
+    (state: RootState) => ({
+      // isRecommendationsLoading: selectIsRecommendationsLoading(state),
+      // profileRecommendations: selectProfilesRecommendations(state),
+      user: selectCurrentUser(state),
+      connectionsData: selectConnectionsData(state),
+    }),
+    shallowEqual
+  );
 
   const params = useParams();
   const id = params?.id;

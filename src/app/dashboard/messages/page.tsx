@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 
 import { ProfilePreviewCard } from "@/components/ui/ProfileCardPreview";
 import { AppDispatch, RootState } from "@/store";
@@ -22,6 +22,7 @@ import {
   selectProfilesRecommendations,
   selectConnectionsData,
 } from "@/lib/selectors";
+import AvatarComponent from "@/components/ui/AvatarComponent";
 
 export default function MessagesPage() {
   const newMessages = useSelector(
@@ -29,13 +30,16 @@ export default function MessagesPage() {
   );
   const dispatch = useDispatch<AppDispatch>();
   const { user, conversations, latestConversation, connectionsData } =
-    useSelector((state: RootState) => ({
-      user: selectCurrentUser(state),
-      profiles: selectProfilesRecommendations(state),
-      conversations: selectConversationsData(state),
-      latestConversation: selectLatestConversation(state),
-      connectionsData: selectConnectionsData(state),
-    }));
+    useSelector(
+      (state: RootState) => ({
+        user: selectCurrentUser(state),
+        profiles: selectProfilesRecommendations(state),
+        conversations: selectConversationsData(state),
+        latestConversation: selectLatestConversation(state),
+        connectionsData: selectConnectionsData(state),
+      }),
+      shallowEqual
+    );
   const [messagesPagination, setMessagesPagination] = useState({
     page: 1,
     limit: 20,
@@ -125,17 +129,19 @@ export default function MessagesPage() {
                       {conversations?.length}
                     </span>
                   </div>
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => setFollowingModalIsOpen((o) => !o)}
-                  >
-                    <Image
-                      src="/icons/new-chat.svg"
-                      alt=""
-                      width={20}
-                      height={20}
-                    />
-                  </div>
+                  {connectionsData?.following.length > 0 && (
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => setFollowingModalIsOpen((o) => !o)}
+                    >
+                      <Image
+                        src="/icons/new-chat.svg"
+                        alt=""
+                        width={20}
+                        height={20}
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="mb-2 relative">
                   <input
@@ -169,15 +175,12 @@ export default function MessagesPage() {
                       >
                         <div className="flex items-center space-x-3 relative">
                           <div className="relative">
-                            <Image
-                              src={
+                            <AvatarComponent
+                              avatar={
                                 conversation.participants?.participant.profile
-                                  .avatar as string
+                                  .avatar
                               }
-                              width={45}
-                              height={45}
-                              alt="avatar"
-                              className="rounded-full"
+                              className="w-10 h-10"
                             />
                             {isWithinLast10Minutes(
                               conversation.participants?.participant
@@ -237,18 +240,13 @@ export default function MessagesPage() {
                 <div className="flex flex-col h-full bg-gray-50 md:rounded-lg p-2 relative">
                   <div className="sticky top-0 bg-gray-50 z-10 p-2 md:p-4">
                     <div className="flex items-center space-x-3">
-                      <div className="border border-gray-300 p-1 rounded-full">
-                        <Image
-                          src={
-                            activeConversation.participants.participant.profile
-                              .avatar
-                          }
-                          width={50}
-                          height={50}
-                          alt="avatar"
-                          className="rounded-full"
-                        />
-                      </div>
+                      <AvatarComponent
+                        avatar={
+                          activeConversation.participants.participant.profile
+                            .avatar
+                        }
+                        className="w-10 h-10"
+                      />
                       <div className="flex flex-col">
                         <span className="font-app-medium">
                           {activeConversation.participants?.participant.profile
@@ -309,25 +307,16 @@ export default function MessagesPage() {
                                     }`}
                                   >
                                     {msg.sender?.uuid !== user.id && (
-                                      <div
-                                        style={{
-                                          width: "40px",
-                                        }}
-                                      >
-                                        <Image
-                                          src={
-                                            msg.sender?.uuid === user.id
-                                              ? activeConversation.participants
-                                                  ?.user.profile.avatar
-                                              : activeConversation.participants
-                                                  ?.participant.profile.avatar
-                                          }
-                                          width={40}
-                                          height={40}
-                                          alt="avatar"
-                                          className="rounded-full"
-                                        />
-                                      </div>
+                                      <AvatarComponent
+                                        avatar={
+                                          msg.sender?.uuid === user.id
+                                            ? activeConversation.participants
+                                                ?.user.profile.avatar
+                                            : activeConversation.participants
+                                                ?.participant.profile.avatar
+                                        }
+                                        className="w-10 h-10"
+                                      />
                                     )}
                                     <div
                                       className={`max-w-[80%] md:max-w-[66%] p-2 md:p-3 rounded-lg md:rounded-xl ${
@@ -341,25 +330,16 @@ export default function MessagesPage() {
                                       </p>
                                     </div>
                                     {msg.sender?.uuid === user.id && (
-                                      <div
-                                        style={{
-                                          width: "40px",
-                                        }}
-                                      >
-                                        <Image
-                                          src={
-                                            msg.sender?.uuid === user.id
-                                              ? activeConversation.participants
-                                                  ?.user.profile.avatar
-                                              : activeConversation.participants
-                                                  ?.participant.profile.avatar
-                                          }
-                                          width={40}
-                                          height={40}
-                                          alt="avatar"
-                                          className="rounded-full"
-                                        />
-                                      </div>
+                                      <AvatarComponent
+                                        avatar={
+                                          msg.sender?.uuid === user.id
+                                            ? activeConversation.participants
+                                                ?.user.profile.avatar
+                                            : activeConversation.participants
+                                                ?.participant.profile.avatar
+                                        }
+                                        className="w-10 h-10"
+                                      />
                                     )}
                                   </div>
                                 );
@@ -408,45 +388,47 @@ export default function MessagesPage() {
                         Start a conversation
                       </p>
                       <p className="text-sm leading-snug">
-                        Message your friends and colleagues to find out what is
-                        new with them.
+                        Message your connections to find out what is new with
+                        them.
                       </p>
                     </div>
-                    <div
-                      onClick={handleToggleFollowingModal}
-                      className="cursor-pointer flex space-x-2 items-center bg-blue-600 text-white text-xs-sm px-3 py-2 rounded-lg"
-                    >
-                      <span>Send a message</span>
-                      <svg
-                        className="w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                    {connectionsData?.following.length > 0 && (
+                      <div
+                        onClick={handleToggleFollowingModal}
+                        className="cursor-pointer flex space-x-2 items-center bg-blue-600 text-white text-xs-sm px-3 py-2 rounded-lg"
                       >
-                        <path
-                          d="M8.5 19H8C4 19 2 18 2 13V8C2 4 4 2 8 2H16C20 2 22 4 22 8V13C22 17 20 19 16 19H15.5C15.19 19 14.89 19.15 14.7 19.4L13.2 21.4C12.54 22.28 11.46 22.28 10.8 21.4L9.3 19.4C9.14 19.18 8.77 19 8.5 19Z"
-                          stroke="#ffffff"
-                          strokeWidth="1.5"
-                          strokeMiterlimit="10"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M7 8H17"
-                          stroke="#ffffff"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M7 13H13"
-                          stroke="#ffffff"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
+                        <span>Send a message</span>
+                        <svg
+                          className="w-4 h-4"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8.5 19H8C4 19 2 18 2 13V8C2 4 4 2 8 2H16C20 2 22 4 22 8V13C22 17 20 19 16 19H15.5C15.19 19 14.89 19.15 14.7 19.4L13.2 21.4C12.54 22.28 11.46 22.28 10.8 21.4L9.3 19.4C9.14 19.18 8.77 19 8.5 19Z"
+                            stroke="#ffffff"
+                            strokeWidth="1.5"
+                            strokeMiterlimit="10"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M7 8H17"
+                            stroke="#ffffff"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M7 13H13"
+                            stroke="#ffffff"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -462,30 +444,24 @@ export default function MessagesPage() {
       >
         <div className="p-4">
           <div className="space-y-4">
-            {user?.profile?.following &&
-              user?.profile?.following.map((profile) => {
-                let hasFollowed = false;
-
-                if (user)
-                  hasFollowed = (connectionsData.following || [])
-                    .map((following: Connection) => following.profile_id)
-                    .includes(profile.profile_id);
+            {connectionsData.following &&
+              connectionsData.following.map((connection: Connection) => {
                 return (
                   <div
-                    key={profile.profile_id}
+                    key={connection.profile_id}
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
                       handleCloseModal={() => handleToggleFollowingModal()}
                       currentUserProfileId={user?.profile?.id}
-                      name={profile.first_name + " " + profile.last_name}
-                      title={profile.title || ""}
-                      profile_id={profile.profile_id}
-                      user_id={profile.user_id}
+                      name={connection.first_name + " " + connection.last_name}
+                      title={connection.title || ""}
+                      profile_id={connection.profile_id}
+                      user_id={connection.user_id}
                       avatar={
-                        profile.avatar || "/images/profile-placeholder.png"
+                        connection.avatar || "/images/profile-placeholder.png"
                       }
-                      hasFollowed={hasFollowed}
+                      hasFollowed={true}
                     />
                   </div>
                 );

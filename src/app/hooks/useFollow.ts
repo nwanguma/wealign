@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 
@@ -20,9 +20,12 @@ interface JustFollowed {
 
 export const useFollow = (handleCloseModal?: () => void) => {
   const router = useRouter();
-  const { conversations } = useSelector((state: RootState) => ({
-    conversations: selectConversationsData(state),
-  }));
+  const { conversations } = useSelector(
+    (state: RootState) => ({
+      conversations: selectConversationsData(state),
+    }),
+    shallowEqual
+  );
   const dispatch = useDispatch<AppDispatch>();
   const [justFollowed, setJustFollowed] = useState<JustFollowed>({});
   const followMutation = useMutation({

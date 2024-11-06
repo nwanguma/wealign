@@ -55,7 +55,7 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
             {banner && (
               <Image
                 src={banner!}
-                alt="avatar"
+                alt="banner"
                 className="rounded-lg"
                 layout="fill"
               />

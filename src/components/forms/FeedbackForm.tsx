@@ -18,7 +18,7 @@ const schema = yup.object().shape({
   text: yup
     .string()
     .required("Feedback is required")
-    .min(50, "Feedback must be at least 50 characters"),
+    .min(25, "Feedback must be at least 25 characters"),
 });
 
 interface IFeedbackFormProps {

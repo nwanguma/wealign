@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "@/lib/axiosInstance";
 import { fetchConversations } from "../conversations";
 import { arraysEqual } from "@/lib/helpers";
+import { fetchConnections } from "../connections";
 
 export const fetchNotifications = createAsyncThunk(
   "notifications/fetchNotifications",
@@ -11,6 +12,10 @@ export const fetchNotifications = createAsyncThunk(
       const response = await axiosInstance.get(
         "/api/proxy/notifications/long-poll"
       );
+
+      if (response.data.data.length > 0) {
+        dispatch(fetchConnections());
+      }
 
       if (response.data.messages.length > 0) {
         dispatch(fetchConversations());

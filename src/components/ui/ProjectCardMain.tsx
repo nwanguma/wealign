@@ -11,6 +11,7 @@ import TopIconBar from "./TopIconBar";
 import ShareComponent from "./ShareComponent";
 
 import "../../app/globals.css";
+import AvatarComponent from "./AvatarComponent";
 
 interface IProjectCardMainProps {
   currentUserProfileId: string;
@@ -83,7 +84,7 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
                 src="/icons/google.svg"
                 width={70}
                 height={70}
-                alt="avatar"
+                alt=""
                 className="rounded-lg"
               />
             </div> */}
@@ -273,7 +274,7 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
           !!feedbacks.length && (
             <div className="space-y-2 border-b border-b-gray-200 pb-4 overflow-y-scroll overflow-x-auto hide-scroll max-h-72">
               <h3 className="text-sm font-bold">Feedback</h3>
-              {!requires_feedback && feedback_guide && (
+              {requires_feedback && feedback_guide && (
                 <div className="flex flex-col space-y-2">
                   <div className="text-xs-sm text-gray-700">
                     <span className="font-app-medium">Question or guide:</span>{" "}
@@ -336,18 +337,10 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
                         </div>
                       </div>
                       <div className="w-full flex items-start space-x-2">
-                        <div className="border border-gray-200 p-1 rounded-full">
-                          <Image
-                            src={
-                              f.owner.avatar ||
-                              "/images/profile-placeholder.png"
-                            }
-                            width={30}
-                            height={30}
-                            alt="avatar"
-                            className="rounded-full"
-                          />
-                        </div>
+                        <AvatarComponent
+                          avatar={f.owner.avatar}
+                          className="w-7 h-7"
+                        />
                         <div className="flex-1 flex flex-col">
                           <Link
                             href={`/dashboard/profiles/${f.owner.id}`}

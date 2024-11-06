@@ -8,9 +8,11 @@ interface IRecommendationsComponentProps {
   recommendations: RecommendationData[];
   render: (data: RecommendationData) => React.ReactNode;
   title: string;
+  resourceId?: string;
 }
 
 const RecommendationsComponent: React.FC<IRecommendationsComponentProps> = ({
+  resourceId,
   isLoading,
   recommendations,
   render,
@@ -25,17 +27,23 @@ const RecommendationsComponent: React.FC<IRecommendationsComponentProps> = ({
           <div className="space-y-4">
             {recommendations &&
               recommendations.length > 0 &&
-              [...recommendations].slice(0, 4).map((data) => {
-                return (
-                  <div
-                    key={data.id}
-                    className="border-b border-b-gray-200 py-3"
-                  >
-                    {render(data)}
-                  </div>
-                );
-              })}
-            {recommendations.length == 0 && (
+              [...recommendations]
+                .filter((data) => data.id !== resourceId)
+                .slice(0, 4)
+                .map((data) => {
+                  return (
+                    <div
+                      key={data.id}
+                      className="border-b border-b-gray-200 py-3 last:border-0"
+                    >
+                      {render(data)}
+                    </div>
+                  );
+                })}
+            {(recommendations.length == 0 ||
+              (resourceId &&
+                recommendations.filter((data) => data.id !== resourceId)
+                  .length == 0)) && (
               <div className="text-sm text-gray-600 pt-2">
                 Looks like there is nothing to show.
               </div>

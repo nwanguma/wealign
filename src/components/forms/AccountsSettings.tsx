@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
@@ -39,7 +39,10 @@ const AccountSettingsForm: React.FC<IAccountSettingsFormProps> = ({
   const methods = useForm({
     resolver: yupResolver(schema),
   });
-  const user = useSelector((state: RootState) => selectCurrentUser(state));
+  const user = useSelector(
+    (state: RootState) => selectCurrentUser(state),
+    shallowEqual
+  );
 
   const [loading, setLoading] = useState(false);
   const passwordChangeMutation = useMutation({

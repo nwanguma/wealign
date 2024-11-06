@@ -5,6 +5,7 @@ import { Notification } from "@/common/constants";
 import { timeAgo } from "@/lib/helpers";
 import { markAsRead, resetNotifications } from "@/store/notifications";
 import { AppDispatch } from "@/store";
+import AvatarComponent from "./AvatarComponent";
 
 const FollowNotification = ({
   notification,
@@ -18,15 +19,10 @@ const FollowNotification = ({
   return (
     <div className="border-b border-gray-200 px-2 sm:px-4 lg:px-10 py-2 lg:py-4 relative hover:bg-slate-50">
       <div className="flex items-center space-x-3">
-        <div className="border border-gray-200 p-1 rounded-full">
-          <Image
-            src={notification.initiator.profile.avatar!}
-            className="rounded-full"
-            alt=""
-            width={45}
-            height={45}
-          />
-        </div>
+        <AvatarComponent
+          avatar={notification.initiator.profile.avatar}
+          className="w-10 h-10"
+        />
         <div className="space-y-1 flex-col flex">
           <span className="text-xs-sm font-app-light">
             <Link
@@ -64,15 +60,10 @@ const CommentNotification = ({
   return (
     <div className="border-b border-gray-200 px-2 sm:px-4 lg:px-10 py-2 lg:py-4 relative hover:bg-slate-50">
       <div className="flex items-start space-x-3">
-        <div className="border border-gray-200 p-1 rounded-full">
-          <Image
-            src={notification.initiator.profile.avatar!}
-            className="rounded-full"
-            alt=""
-            width={45}
-            height={45}
-          />
-        </div>
+        <AvatarComponent
+          avatar={notification.initiator.profile.avatar}
+          className="w-10 h-10"
+        />
         <div className="space-y-4 flex-col flex w-full">
           <div className="space-y-1 flex-col flex">
             <span className="text-sm font-app-light">
@@ -131,15 +122,10 @@ const ReactionNotification = ({
   return (
     <div className="border-b border-gray-200 px-2 sm:px-4 lg:px-10 py-2 lg:py-4 relative hover:bg-slate-50">
       <div className="flex items-start space-x-3">
-        <div className="border border-gray-200 p-1 rounded-full">
-          <Image
-            src={notification.initiator.profile.avatar!}
-            className="rounded-full"
-            alt=""
-            width={45}
-            height={45}
-          />
-        </div>
+        <AvatarComponent
+          avatar={notification.initiator.profile.avatar}
+          className="w-10 h-10"
+        />
         <div className="space-y-4 flex-col flex w-full">
           <div className="space-y-1 flex-col flex">
             <span className="text-xs-sm font-app-light">

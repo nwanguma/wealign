@@ -16,7 +16,7 @@ const excludedRoutes = [
 axiosInstance.interceptors.request.use(
   async (config) => {
     const profileRequiresUpdate =
-      store.getState()?.user?.profile?.requires_update;
+      store.getState()?.user?.data?.profile?.requires_update;
 
     const isExcludedRoute = excludedRoutes.some(
       (route) =>

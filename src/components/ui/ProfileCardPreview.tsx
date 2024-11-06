@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import MoreActionsComponent from "./MoreActions";
 import { useFollow } from "@/app/hooks/useFollow";
+import AvatarComponent from "./AvatarComponent";
 
 interface IProfilePreviewCardProps {
   currentUserProfileId: string;
@@ -39,15 +40,7 @@ export const ProfilePreviewCard: React.FC<IProfilePreviewCardProps> = ({
   return (
     <div className="flex items-center justify-between">
       <div className="flex-1 flex items-center space-x-2">
-        <div className="border border-gray-300 p-1 rounded-full">
-          <Image
-            src={avatar || "/images/profile-placeholder.png"}
-            width={40}
-            height={40}
-            alt="avatar"
-            className="rounded-full"
-          />
-        </div>
+        <AvatarComponent avatar={avatar} className="w-10 h-10" />
         <div className="flex flex-col flex-1">
           <Link
             className="font-app-medium text-sm"

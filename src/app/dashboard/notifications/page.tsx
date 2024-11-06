@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 
 import axiosInstance from "@/lib/axiosInstance";
 import PaginationComponent from "@/components/ui/PaginationComponent";
@@ -25,7 +25,8 @@ const fetchNotifications = async (
 
 export default function Notifications() {
   const newNotificationsData = useSelector(
-    (state: RootState) => state.notifications
+    (state: RootState) => state.notifications,
+    shallowEqual
   );
   const newNotifications = newNotificationsData.data;
   const dispatch = useDispatch<AppDispatch>();
@@ -82,7 +83,7 @@ export default function Notifications() {
             </>
           )}
           {isLoading && <SkeletonLoader />}
-          {notifications && (
+          {!isLoading && notifications && (
             <PaginationComponent
               data={notifications}
               total={total}

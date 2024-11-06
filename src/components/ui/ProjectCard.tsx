@@ -26,7 +26,7 @@ export const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
   } = project;
   return (
     <div className="block h-auto">
-      <div className="border border-gray-300 p-3 md:p-5 rounded-lg flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4">
         <div className="flex flex-col justify-center xs:justify-normal text-center xs:text-left xs:flex-row items-center xs:items-start space-x-3">
           {/* <div className="border border-gray-300 p-2 rounded-lg">
             <Image src="/icons/google.svg" width={40} height={40} alt="logo" />

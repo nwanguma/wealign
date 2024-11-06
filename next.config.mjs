@@ -6,7 +6,7 @@ const nextConfig = {
   //   injectWhyDidYouRender(config, context);
   //   return config;
   // },
-  reactStrictMode: false,
+  // reactStrictMode: false,
   images: {
     remotePatterns: [
       {

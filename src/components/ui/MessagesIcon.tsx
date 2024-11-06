@@ -2,14 +2,17 @@
 
 import Image from "next/image";
 
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
 import { resetNotifications } from "@/store/notifications";
 import { useRouter } from "next/navigation";
 
 export default function MessagesIcon() {
-  const notifications = useSelector((state: RootState) => state.notifications);
+  const notifications = useSelector(
+    (state: RootState) => state.notifications,
+    shallowEqual
+  );
 
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();

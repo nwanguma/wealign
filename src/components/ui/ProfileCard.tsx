@@ -7,6 +7,7 @@ import MoreActionsComponent from "./MoreActions";
 import { truncateString } from "@/lib/helpers";
 import TopIconBar from "./TopIconBar";
 import CommentsReactionsUI from "./CommentsReactionsUI";
+import AvatarComponent from "./AvatarComponent";
 
 interface IProfileCardProps {
   profile: Partial<Profile>;
@@ -121,15 +122,7 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
       <div className="flex w-full items-center justify-between relative">
         <div className="flex flex-col space-y-6 pt-2 w-full">
           <div className="flex-1 flex flex-col sm:flex-row items-center space-x-2">
-            <div className="border border-gray-300 p-1 rounded-full">
-              <Image
-                src={avatar || "/images/profile-placeholder.png"}
-                width={75}
-                height={75}
-                alt="avatar"
-                className="rounded-full"
-              />
-            </div>
+            <AvatarComponent avatar={avatar} className="w-16 h-16" />
             <div className="flex-1 space-y-3 text-center sm:text-left">
               <div className="flex flex-col space-y-1">
                 <Link

@@ -7,7 +7,7 @@ import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 
 import NativeSelect from "./NativeSelectComponent";
 import ReactSelectComponent from "./ReactSelectComponent";
@@ -50,12 +50,12 @@ const schema = yup.object().shape({
     .string()
     .required("Title is required")
     .min(3, "Must be at least 3 characters")
-    .min(100, "Description must not exceed 100 characters"),
+    .max(100, "Title must not exceed 100 characters"),
   description: yup
     .string()
     .required("Description is required")
     .min(30, "Must be at least 30 characters")
-    .min(2000, "Description must not exceed 2000 characters"),
+    .max(2000, "Description must not exceed 2000 characters"),
   location: yup.string(),
   // required("Location is required"),
   status: yup.string(),
@@ -97,7 +97,10 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
   handleModalClose,
   triggerRefetch,
 }) => {
-  const user = useSelector((state: RootState) => selectCurrentUser(state));
+  const user = useSelector(
+    (state: RootState) => selectCurrentUser(state),
+    shallowEqual
+  );
   const defaultValues = {
     title: data?.title || "",
     website: data?.website || "",
@@ -222,7 +225,7 @@ const ProjectForm: React.FC<IProjectFormProps> = ({
       await projectMutation.mutate({
         ...formattedData,
         skills: data?.skills.map((s: any) => ({ title: s.label })),
-        requires_feedback: data?.requires_feeback === "yes",
+        requires_feedback: data?.requires_feedback === "yes",
       });
     })();
   };

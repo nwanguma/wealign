@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { RootState } from "@/store";
 import ReactSelectComponent from "./ReactSelectComponent";
 import Input from "./Input";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import axiosInstance from "@/lib/axiosInstance";
 import { Option, Profile, Skill } from "@/common/constants";
 import { AppDispatch } from "@/store";
@@ -33,6 +33,7 @@ import "../../app/globals.css";
 import { useLocations } from "@/app/hooks/useLocations";
 import InputWithDropdown from "./InputWithDropdown";
 import { selectCurrentUser } from "@/lib/selectors";
+import AvatarComponent from "../ui/AvatarComponent";
 
 export enum ProfileStatus {
   HIRING = "hiring",
@@ -44,15 +45,15 @@ const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required")
-    .min(10, "Title must be at least 10 characters")
+    .min(3, "Title must be at least 10 characters")
     .max(50, "Title must not exceed 50 characters"),
   heading: yup
     .string()
-    .min(10, "Heading must be at least 10 characters")
+    .min(3, "Heading must be at least 10 characters")
     .max(150, "Heading must not exceed 150 characters"),
   bio: yup
     .string()
-    .min(10, "Bio must be at least 10 characters")
+    .min(3, "Bio must be at least 10 characters")
     .max(2000, "Bio must not exceed 2000 characters"),
   location: yup.string(),
   status: yup.string(),
@@ -105,7 +106,10 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
   handleModalClose,
   triggerRefetch,
 }) => {
-  const user = useSelector((state: RootState) => selectCurrentUser(state));
+  const user = useSelector(
+    (state: RootState) => selectCurrentUser(state),
+    shallowEqual
+  );
   const [loading, setLoading] = useState(false);
   const defaultValues = {
     avatar: user?.profile?.avatar || "",
@@ -273,7 +277,7 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
     maxFiles: 1,
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit: any = (data: any) => {
     setLoading(true);
     const formattedData = serializeData(data);
 
@@ -306,19 +310,14 @@ const UpdateProfileForm: React.FC<IUpdateProfileFormProps> = ({
           <div className="flex flex-col space-y-6 border-b border-b-gray-200 pb-3">
             <div className="flex items-center space-x-7">
               <div className="relative">
-                <div className="border border-gray-300 p-1 rounded-full">
-                  <Image
-                    src={
-                      !deletedAvatar && user?.profile?.avatar
-                        ? user?.profile?.avatar
-                        : "/images/profile-placeholder.png"
-                    }
-                    width={80}
-                    height={80}
-                    alt="avatar"
-                    className="rounded-full"
-                  />
-                </div>
+                <AvatarComponent
+                  avatar={
+                    !deletedAvatar && user?.profile?.avatar
+                      ? user?.profile?.avatar
+                      : "/images/profile-placeholder.png"
+                  }
+                  className="w-20 h-20"
+                />
                 <div className="absolute bottom-0 -right-1">
                   {WithTooltip(
                     "Remove",
