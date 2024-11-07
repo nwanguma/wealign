@@ -317,10 +317,12 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
                 <ShareComponent text="Collaborate with this professional on WeAlign" />
               </div>
             </div>
-            <div className="space-y-2 border-b border-b-gray-200 py-4">
-              <h3 className="text-sm font-bold">About</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{bio}</p>
-            </div>
+            {bio && (
+              <div className="space-y-2 border-b border-b-gray-200 py-4">
+                <h3 className="text-sm font-bold">About</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{bio}</p>
+              </div>
+            )}
             {is_mentor && mentor_note && (
               <div className="space-y-2 border-b border-b-gray-200 py-4">
                 <h3 className="text-sm font-bold">Mentor Note</h3>

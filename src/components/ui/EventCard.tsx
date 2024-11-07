@@ -71,9 +71,11 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
                   {location}
                 </span>
               </div>
-              <span className="text-sm text-custom-gray-paragraph font-light leading-snug">
-                {truncateString(description as string, 70)}
-              </span>
+              {description && (
+                <span className="text-sm text-custom-gray-paragraph font-light leading-snug">
+                  {truncateString(description as string, 70)}
+                </span>
+              )}
             </div>
           </div>
         </div>
