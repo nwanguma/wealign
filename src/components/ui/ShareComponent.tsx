@@ -1,13 +1,19 @@
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 import { WithTooltip } from "./WithTooltip";
 
-const ShareComponent = ({ text }: { text: string }) => {
+const ShareComponent = ({ text, page }: { text: string; page?: string }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [copied, setCopied] = useState(false);
 
-  const url = `${process.env.NEXT_PUBLIC_APP_URL}${pathname}${
+  const url = `${process.env.NEXT_PUBLIC_APP_URL}${
+    pathname.includes("dashboard")
+      ? pathname.split("/dashboard").join("")
+      : pathname
+  }${
     searchParams
       ? `${searchParams.toString() ? "?" : ""}${searchParams.toString()}`
       : ""
@@ -17,13 +23,19 @@ const ShareComponent = ({ text }: { text: string }) => {
     Linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
       url
     )}`,
-    Google: `https://plus.google.com/share?url=${encodeURIComponent(url)}`,
     Twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(
       url
     )}&text=${encodeURIComponent(text || "")}`,
     Facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
       url
     )}`,
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   return (
@@ -40,7 +52,7 @@ const ShareComponent = ({ text }: { text: string }) => {
                 rel="noopener noreferrer"
               >
                 <Image
-                  src={`/icons/${platform?.toLowerCase()}-share.svg`}
+                  src={`/icons/${platform.toLowerCase()}-share.svg`}
                   alt={`${platform} share icon`}
                   width={20}
                   height={20}
@@ -49,6 +61,21 @@ const ShareComponent = ({ text }: { text: string }) => {
             )}
           </div>
         ))}
+        {page === "article" && (
+          <div>
+            {WithTooltip(
+              copied ? "Copied!" : "Copy Link",
+              <button onClick={handleCopyLink} className="focus:outline-none">
+                <Image
+                  src="/icons/copy-link.svg"
+                  alt="Copy link icon"
+                  width={20}
+                  height={20}
+                />
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

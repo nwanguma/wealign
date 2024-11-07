@@ -5,7 +5,7 @@ import wdyr from "@welldone-software/why-did-you-render";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "WeAlign | Connect, Collaborate, and Grow with Top Developers",
+  title: "WeAlign | Connect, Collaborate, Build",
   description:
     "Join WeAlign to find collaborators, discover tech events, access valuable resources, and turn side projects into thriving businesses. Perfect for developers looking to network and accelerate project growth.",
   keywords: [

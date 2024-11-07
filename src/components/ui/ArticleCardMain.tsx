@@ -54,7 +54,7 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
         </div>
       </TopIconBar>
       <div className="relative space-y-5">
-        <div className="flex flex-col xs:flex-row items-center xs:space-x-5">
+        <div className="flex flex-col xs:flex-row items-start xs:items-center xs:space-x-5">
           <div className="relative w-full md:w-2/3 h-40 md:h-80 bg-orange-50">
             {banner && (
               <Image
@@ -65,7 +65,7 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
               />
             )}
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 my-2 xs:my-0">
             <div className="space-y-1">
               <h3 className="text-sm text-gray-400">Author</h3>
               <div className="flex space-x-2 items-center">
@@ -85,11 +85,14 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
                 </span>
               </div>
             </div>
-            <ShareComponent text="This article on WeAlign is everything" />
+            <ShareComponent
+              text="This article on WeAlign is everything"
+              page="article"
+            />
           </div>
         </div>
-        <div className="space-y-2">
-          <p className="text-gray-800 text-xl font-app-medium leading-relaxed">
+        <div className="space-y-2 w-full">
+          <p className="text-gray-800 text-xl font-app-medium leading-normal xs:leading-relaxed">
             {title}
           </p>
         </div>

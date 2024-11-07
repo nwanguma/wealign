@@ -20,7 +20,7 @@ const AuthButton = ({
   return (
     <button
       onClick={onClick}
-      className={`${className} text-sm px-1 xs:px-2 lg:px-4 py-2 lg:py-3 text-md sm:text-base rounded ${
+      className={`${className} text-sm px-2 lg:px-4 py-2 lg:py-3 text-md sm:text-base rounded ${
         variant !== "filled"
           ? "text-gray-700 hover:bg-slate-50"
           : "bg-blue-600 text-white hover:bg-blue-700"
