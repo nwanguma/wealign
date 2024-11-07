@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 
 import AuthButton from "@/components/ui/Button";
 import Input from "@/components/forms/Input";
@@ -52,6 +52,9 @@ const LoginForm: React.FC = () => {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setLoading(true);
+
+    signOut();
+    localStorage.clear();
 
     try {
       const res = await signIn("credentials", {
