@@ -134,15 +134,19 @@ export const ProfileCard: React.FC<IProfileCardProps> = ({
                 <span className="text-xs text-gray-700 font-normal">
                   {title}
                 </span>
-                <span className="text-xs text-custom-gray-paragraph">
-                  {heading}
-                </span>
+                {heading && (
+                  <span className="text-xs text-custom-gray-paragraph">
+                    {heading}
+                  </span>
+                )}
               </div>
-              <div className="w-full sm:w-3/4 text-left leading-4 text-gray-700">
-                <span className="text-sm text-custom-gray-paragraph font-light">
-                  {truncateString(bio!, 180)}
-                </span>
-              </div>
+              {bio && (
+                <div className="w-full sm:w-3/4 text-left leading-4 text-gray-700">
+                  <span className="text-sm text-custom-gray-paragraph font-light">
+                    {truncateString(bio!, 180)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
           <div className="flex gap-2 flex-wrap">
