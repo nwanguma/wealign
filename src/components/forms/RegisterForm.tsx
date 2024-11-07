@@ -63,7 +63,6 @@ const RegisterForm: React.FC = () => {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setLoading(true);
-    signOut();
     localStorage.clear();
 
     try {
