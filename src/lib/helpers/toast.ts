@@ -44,7 +44,7 @@ export const infoToast = (message: string, id?: string) =>
     position: "top-right",
     duration: 6000,
     style: {
-      backgroundColor: "#ffffff",
+      backgroundColor: "#dbeafe",
       fontSize: "15px",
     },
     iconTheme: {
