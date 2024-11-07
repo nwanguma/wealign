@@ -39,6 +39,10 @@ async function handler(req: Request) {
       .get("content-type")
       ?.includes("multipart/form-data");
 
+    console.log(
+      `${process.env.BACKEND_URL}/${slug}${url.search ? url.search : ""}`
+    );
+
     const response = await axios({
       method: req.method,
       url: `${process.env.BACKEND_URL}/${slug}${url.search ? url.search : ""}`,
