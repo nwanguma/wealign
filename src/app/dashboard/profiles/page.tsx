@@ -61,7 +61,7 @@ export default function Profiles() {
 
   if (profilesData) {
     const { total: pageTotal } = profilesData;
-    profiles = profilesData.data;
+    profiles = profilesData?.data;
     total = pageTotal;
   }
 
@@ -93,7 +93,7 @@ export default function Profiles() {
                 sortByOptions: [{ value: "views", label: "Views" }],
               }}
             />
-            {!isLoading && (
+            {!isLoading && profilesData && profiles && connectionsData && (
               <ContentWrapper data={profiles as Profile[]}>
                 {profilesData &&
                   (profiles as Profile[])?.map((profile) => {

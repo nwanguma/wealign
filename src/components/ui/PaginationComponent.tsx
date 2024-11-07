@@ -37,7 +37,7 @@ const PaginationComponent: React.FC<IPaginationComponentProps> = ({
   return (
     <div className="w-full flex items-center justify-center">
       <button
-        disabled={count ? count === total : data.length === total}
+        disabled={count ? count === total : data?.length === total}
         onClick={() =>
           setPagination((prev: IPagination) => ({
             page: setPage ? prev.page + fixedPagination.page : prev.page,
@@ -46,7 +46,7 @@ const PaginationComponent: React.FC<IPaginationComponentProps> = ({
         }
         className="cursor-pointer p-2 text-xs-sm border text-gray-700 border-gray-300 bg-slate-50 rounded"
       >
-        {(count ? count < total : data.length < total)
+        {(count ? count < total : data?.length < total)
           ? "Load more" + " " + tag
           : "You have reached the end"}
       </button>

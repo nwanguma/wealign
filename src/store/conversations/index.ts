@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
 
 import { Conversation } from "@/common/constants";
 import axiosInstance from "@/lib/axiosInstance";

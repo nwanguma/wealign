@@ -16,7 +16,7 @@ export const fetchConnections = createAsyncThunk(
   async () => {
     const response = await axiosInstance.get("api/proxy/profiles/following");
 
-    return response.data.data;
+    return response.data?.data;
   }
 );
 

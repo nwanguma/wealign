@@ -20,12 +20,9 @@ interface JustFollowed {
 
 export const useFollow = (handleCloseModal?: () => void) => {
   const router = useRouter();
-  const { conversations } = useSelector(
-    (state: RootState) => ({
-      conversations: selectConversationsData(state),
-    }),
-    shallowEqual
-  );
+  const { conversations } = useSelector((state: RootState) => ({
+    conversations: selectConversationsData(state),
+  }));
   const dispatch = useDispatch<AppDispatch>();
   const [justFollowed, setJustFollowed] = useState<JustFollowed>({});
   const followMutation = useMutation({

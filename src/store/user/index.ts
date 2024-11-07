@@ -45,7 +45,7 @@ export const fetchUser = createAsyncThunk(
   "user/fetchUser",
   async (userId: string) => {
     const response = await axiosInstance.get(`/api/proxy/users/${userId}`);
-    return response.data.data;
+    return response.data?.data;
   }
 );
 
@@ -54,7 +54,7 @@ export const fetchCurrentUser = createAsyncThunk(
   async () => {
     const response = await axiosInstance.get(`/api/proxy/users/me`);
 
-    return response.data.data;
+    return response.data?.data;
   }
 );
 

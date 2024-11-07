@@ -69,7 +69,7 @@ export const selectCurrentUserProfileUpdateStatus = createSelector(
 
 export const selectCurrentUserError = createSelector(
   selectUser,
-  (user) => user.error
+  (user) => user?.error
 );
 
 export const selectConnectionsData = createSelector(
@@ -79,15 +79,18 @@ export const selectConnectionsData = createSelector(
 
 export const selectConversationsData = createSelector(
   selectConversations,
-  (conversations) => [...conversations.data]
+  (conversations) =>
+    typeof conversations?.data === "object" && conversations?.data?.length
+      ? [...conversations.data]
+      : []
 );
 
 export const selectConversationsError = createSelector(
-  selectUser,
-  (conversations) => conversations.error
+  selectConversations,
+  (conversations) => conversations?.error
 );
 
 export const selectLatestConversation = createSelector(
   selectConversations,
-  (conversations) => conversations.latestConversation
+  (conversations) => conversations?.latestConversation
 );

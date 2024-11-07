@@ -106,7 +106,7 @@ export default function MessagesPage() {
     activeConversationMessagesData?.data &&
     Object.keys(activeConversationMessagesData?.data).length > 0
   ) {
-    activeConversationMessages = activeConversationMessagesData.data;
+    activeConversationMessages = activeConversationMessagesData?.data;
   }
 
   return (

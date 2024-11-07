@@ -37,7 +37,7 @@ export const fetchRecommendations = createAsyncThunk(
   async () => {
     const response = await axiosInstance.get("/api/proxy/recommendations");
 
-    return response.data.data;
+    return response.data?.data;
   }
 );
 
