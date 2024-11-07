@@ -74,7 +74,7 @@ const HomeAuthControls = ({
       >
         <div>
           <LoginPage />
-          <div className="flex justify-center space-x-1 pb-5 font-light">
+          <div className="flex justify-center space-x-1 pb-5 font-light text-sm md:text-base">
             <span className="inline-block">Don&apos;t have an account?</span>
             <span className="inline-block text-blue-600 cursor-pointer font-normal">
               <span
@@ -98,7 +98,7 @@ const HomeAuthControls = ({
       >
         <div>
           <RegisterPage />
-          <div className="flex justify-center space-x-1 pb-5 font-light">
+          <div className="flex justify-center space-x-1 pb-5 font-light text-sm md:text-base">
             <span className="inline-block">Already have an account?</span>
             <span className="inline-block text-blue-600 cursor-pointer font-normal">
               <span
