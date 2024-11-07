@@ -4,8 +4,9 @@ import axios from "axios";
 import { JWT } from "next-auth/jwt";
 
 interface Credentials {
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
+  token?: string;
 }
 
 interface Token extends JWT {
@@ -28,19 +29,31 @@ const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
+        token: { label: "Token", type: "token" },
       },
       async authorize(
         credentials?: Credentials
       ): Promise<UserWithTokens | null> {
         if (!credentials) return null;
 
+        let authCredentials;
+
+        if (credentials.token === process.env.GUEST_AUTH_TOKEN) {
+          authCredentials = {
+            email: process.env.GUEST_AUTH_EMAIL,
+            password: process.env.GUEST_AUTH_PASSWORD,
+          };
+        } else {
+          authCredentials = {
+            email: credentials.email,
+            password: credentials.password,
+          };
+        }
+
         try {
           const response = await axios.post(
             `${process.env.BACKEND_URL}/auth/login`,
-            {
-              email: credentials.email,
-              password: credentials.password,
-            },
+            authCredentials,
             {
               headers: {
                 "x-client-api-key": process.env.CLIENT_API_KEY,
