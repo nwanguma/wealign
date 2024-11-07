@@ -70,6 +70,7 @@ const recommendationsSlice = createSlice({
       state.liveEvents = liveEvents || [];
       state.profilesToFollow = profilesToFollow || [];
       state.hasFetched = true;
+      state.error = null;
     });
     builder.addCase(fetchRecommendations.rejected, (state, action) => {
       state.isLoading = false;

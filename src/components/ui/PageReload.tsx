@@ -6,6 +6,7 @@ import Link from "next/link";
 import { fetchCurrentUser } from "@/store/user";
 import { fetchRecommendations } from "@/store/recommendations";
 import { fetchConversations } from "@/store/conversations";
+import { useRouter } from "next/navigation";
 
 interface IPageReloadProps {
   userError: string | null;
@@ -18,6 +19,7 @@ const PageReload: React.FC<IPageReloadProps> = ({
   recommendationsError,
   conversationsError,
 }) => {
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
   return (
@@ -47,6 +49,8 @@ const PageReload: React.FC<IPageReloadProps> = ({
                 if (userError) dispatch(fetchCurrentUser());
                 if (recommendationsError) dispatch(fetchRecommendations());
                 if (conversationsError) dispatch(fetchConversations());
+
+                if (typeof window !== "undefined") window.location.reload();
               }}
             >
               Reload
