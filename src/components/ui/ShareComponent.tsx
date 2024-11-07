@@ -9,7 +9,7 @@ const ShareComponent = ({ text, page }: { text: string; page?: string }) => {
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
 
-  const url = `${process.env.NEXT_PUBLIC_APP_URL}${
+  const url = `${process.env.NEXT_PUBLIC_APP_URL || "https://wealign.fly.dev"}${
     pathname.includes("dashboard")
       ? pathname.split("/dashboard").join("")
       : pathname
