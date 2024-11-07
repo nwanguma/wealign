@@ -53,7 +53,7 @@ export default function AppModal({
                 <div
                   className={`flex ${
                     !title ? "justify-end" : "justify-between"
-                  } items-center px-4`}
+                  } items-center px-1 xs:px-2 lg:px-4`}
                 >
                   {title && (
                     <DialogTitle

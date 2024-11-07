@@ -20,7 +20,7 @@ const AuthButton: React.FC<IAuthSocialButtonProps> = ({
       disabled={loading}
       type={type}
       onClick={onclick}
-      className={`rounded-xl flex justify-center items-center py-4 ${style}`}
+      className={`text-sm md:text-base rounded-lg md:rounded-xl flex justify-center items-center py-2.5 md:py-4 ${style}`}
     >
       {loading ? "Loading..." : text}
     </button>

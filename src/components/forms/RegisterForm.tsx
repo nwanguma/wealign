@@ -89,12 +89,12 @@ const RegisterForm: React.FC = () => {
 
   return (
     <>
-      <div className="w-full pt-4 px-2">
+      <div className="w-full pt-4 px-1 xs:px-2">
         <div className="space-y-2 text-center mx-auto">
-          <div className="text-2xl font-bold text-gray-700">
+          <div className="text-xl md:text-2xl font-bold text-gray-700">
             Join <span className="text-blue-700">WeAlign</span> today!
           </div>
-          <p className="text-gray-400 font-light">
+          <p className="text-gray-400 font-light text-sm md:text-base">
             Sign up to connect with top talent, collaborate on projects, and
             explore new opportunities.
           </p>
@@ -117,9 +117,9 @@ const RegisterForm: React.FC = () => {
           <span className="-mt-1">or</span>
           <span className="border-b border-b-3 border-gray-300 w-1/3"></span>
         </div> */}
-        <div className="p-4">
+        <div className="p-1 xs:p-2 lg:p-4">
           <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
-            <div className="space-y-4">
+            <div className="space-y-2 md:space-y-4">
               <div className="flex justify-between space-x-5">
                 <div className="w-full">
                   <Input
@@ -164,7 +164,7 @@ const RegisterForm: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="mt-10">
+            <div className="mt-3 xs:mt-5 md:mt-10">
               <AuthButton
                 text="Register"
                 style="bg-blue-600 text-white w-full hover:bg-blue-700"
