@@ -8,9 +8,11 @@ import { ViewsComponent } from "./ViewsComponent";
 import { WithTooltip } from "./WithTooltip";
 import { Comments } from "./Comments";
 import TopIconBar from "./TopIconBar";
+import ShareComponent from "./ShareComponent";
+import { infoToast } from "@/lib/helpers/toast";
+import { PublicComments } from "./PublicCommentsComponent";
 
 import "../../app/globals.css";
-import ShareComponent from "./ShareComponent";
 
 interface IArticleCardMainProps {
   article: Article;
@@ -111,6 +113,9 @@ export const ArticleCardMain: React.FC<IArticleCardMainProps> = ({
             comments={comments}
             reactions={reactions}
           />
+        )}
+        {isPublic && (
+          <PublicComments comments={comments} reactions={reactions} />
         )}
       </div>
     </>
