@@ -74,6 +74,7 @@ export default function ArticlePage() {
   const MemoizedRecommendations = useMemo(
     () => (
       <RecommendationsComponent
+        resourceId={params?.id as string}
         recommendations={articleRecommendations}
         isLoading={isRecommendationsLoading}
         render={(article) => (
