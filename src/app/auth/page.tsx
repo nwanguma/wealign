@@ -12,7 +12,7 @@ interface AuthPageProps {
 
 const AuthPage: React.FC<AuthPageProps> = ({ searchParams }) => {
   const router = useRouter();
-  const actionParam = searchParams?.guestAuthToken;
+  const actionParam = searchParams?.guestAuthSignin;
 
   useEffect(() => {
     (async function () {
