@@ -14,7 +14,9 @@ const initialState = {
 export const fetchConnections = createAsyncThunk(
   "connections/fetchConnections",
   async () => {
-    const response = await axiosInstance.get("api/proxy/profiles/following");
+    const response = await axiosInstance.get(
+      "api/proxy/profiles/connections/all"
+    );
 
     return response.data?.data;
   }

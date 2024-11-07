@@ -13,11 +13,11 @@ export const fetchNotifications = createAsyncThunk(
         "/api/proxy/notifications/long-poll"
       );
 
-      if (response.data.data.length > 0) {
+      if (response.data?.data?.length > 0) {
         dispatch(fetchConnections());
       }
 
-      if (response.data.messages.length > 0) {
+      if (response.data?.messages?.length > 0) {
         dispatch(fetchConversations());
       }
 
