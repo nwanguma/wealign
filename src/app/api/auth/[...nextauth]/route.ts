@@ -38,7 +38,10 @@ const authOptions: NextAuthOptions = {
 
         let authCredentials;
 
-        if (credentials.token === process.env.GUEST_AUTH_TOKEN) {
+        if (
+          credentials.token &&
+          credentials.token === process.env.GUEST_AUTH_TOKEN
+        ) {
           authCredentials = {
             email: process.env.GUEST_AUTH_EMAIL,
             password: process.env.GUEST_AUTH_PASSWORD,
