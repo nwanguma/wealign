@@ -26,7 +26,7 @@ const PageMainContent: React.FC<IPageMainContentProps> = ({
         !asideContent ? "w-full lg:w-9/12 mx-auto" : "w-full"
       } bg-white`}
     >
-      <div className="flex space-x-5 p-2 xs:p-4 sm:p-6 bg-rose-50">
+      <div className="flex space-x-5 p-2 xs:p-4 sm:p-6">
         <div className="flex-1 p-2 md:p-4 flex flex-col space-y-5 w-full border border-gray-300 rounded-lg relative">
           {isLoading && <SkeletonLoaderPage />}
           {!isLoading && contentData && (

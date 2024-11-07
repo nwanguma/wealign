@@ -48,7 +48,7 @@ export const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
               )}
               {requires_feedback && (
                 <div className="space-y-2">
-                  <span className="capitalize text-xs font-medium rounded text-gray-700 bg-rose-200 py-1 px-1">
+                  <span className="capitalize text-xs font-medium rounded text-gray-700 py-1 px-1">
                     Requires feedback
                   </span>
                 </div>
