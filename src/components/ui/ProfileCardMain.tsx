@@ -242,78 +242,96 @@ export const ProfileCardMain: React.FC<IProfileCardMainProps> = ({
             <div className="space-y-3 border-b border-b-gray-200 py-2 lg:py-4">
               <h3 className="text-sm font-bold">Details</h3>
               <div className="flex-1 grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
-                <div className="space-y-1">
-                  <h3 className="text-sm text-gray-600 font-bold">Location</h3>
-                  <div className="flex space-x-2 items-center">
-                    <span className="text-xs">{location}</span>
+                {location && (
+                  <div className="space-y-1">
+                    <h3 className="text-sm text-gray-600 font-bold">
+                      Location
+                    </h3>
+                    <div className="flex space-x-2 items-center">
+                      <span className="text-xs">{location}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm text-gray-600 font-bold">Phone</h3>
-                  <div className="flex space-x-2 items-center">
-                    <span className="text-xs text-blue-800">{phone}</span>
+                )}
+                {phone && (
+                  <div className="space-y-1">
+                    <h3 className="text-sm text-gray-600 font-bold">Phone</h3>
+                    <div className="flex space-x-2 items-center">
+                      <span className="text-xs text-blue-800">{phone}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm text-gray-600 font-bold">Linkedin</h3>
-                  <div className="flex space-x-2 items-center">
-                    <Link
-                      href={linkedin!}
-                      className="text-xs text-blue-800 break-all"
-                      target="_blank"
-                    >
-                      {linkedin}
-                    </Link>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm text-gray-600 font-bold">Website</h3>
-                  <div className="flex space-x-2 items-center">
-                    <Link
-                      href={website!}
-                      className="text-xs text-blue-800 break-all"
-                      target="_blank"
-                    >
-                      {website}
-                    </Link>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm text-gray-600 font-bold">Github</h3>
-                  <div className="flex space-x-2 items-center">
-                    <Link
-                      href={github!}
-                      className="text-xs text-blue-800 break-all"
-                      target="_blank"
-                    >
-                      {github}
-                    </Link>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm text-gray-600 font-bold">Languages</h3>
-                  <div className="flex space-x-3">
-                    {(languages as string[]).map((language: string) => (
-                      <span
-                        className="rounded-full inline-block bg-slate-50 p-1 shadow"
-                        key={language}
+                )}
+                {linkedin && (
+                  <div className="space-y-1">
+                    <h3 className="text-sm text-gray-600 font-bold">
+                      Linkedin
+                    </h3>
+                    <div className="flex space-x-2 items-center">
+                      <Link
+                        href={linkedin!}
+                        className="text-xs text-blue-800 break-all"
+                        target="_blank"
                       >
-                        {WithTooltip(
-                          language,
-                          <Image
-                            src={`/icons/${
-                              (mapLanguageToFlag as any)[language]
-                            }.svg`}
-                            alt=""
-                            width={23}
-                            height={23}
-                            className="rounded-full"
-                          />
-                        )}
-                      </span>
-                    ))}
+                        {linkedin}
+                      </Link>
+                    </div>
                   </div>
-                </div>
+                )}
+                {website && (
+                  <div className="space-y-1">
+                    <h3 className="text-sm text-gray-600 font-bold">Website</h3>
+                    <div className="flex space-x-2 items-center">
+                      <Link
+                        href={website!}
+                        className="text-xs text-blue-800 break-all"
+                        target="_blank"
+                      >
+                        {website}
+                      </Link>
+                    </div>
+                  </div>
+                )}
+                {github && (
+                  <div className="space-y-1">
+                    <h3 className="text-sm text-gray-600 font-bold">Github</h3>
+                    <div className="flex space-x-2 items-center">
+                      <Link
+                        href={github!}
+                        className="text-xs text-blue-800 break-all"
+                        target="_blank"
+                      >
+                        {github}
+                      </Link>
+                    </div>
+                  </div>
+                )}
+                {languages && languages?.length > 0 && (
+                  <div className="space-y-1">
+                    <h3 className="text-sm text-gray-600 font-bold">
+                      Languages
+                    </h3>
+                    <div className="flex space-x-3">
+                      {(languages as string[]).map((language: string) => (
+                        <span
+                          className="rounded-full inline-block bg-slate-50 p-1 shadow"
+                          key={language}
+                        >
+                          {WithTooltip(
+                            language,
+                            <Image
+                              src={`/icons/${
+                                (mapLanguageToFlag as any)[language]
+                              }.svg`}
+                              alt=""
+                              width={23}
+                              height={23}
+                              className="rounded-full"
+                            />
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <ShareComponent text="Collaborate with this professional on WeAlign" />
               </div>
             </div>

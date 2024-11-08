@@ -38,19 +38,21 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
     <div className={`h-full ${!isPreview ? "pb-3" : "pb-0"} relative`}>
       <Link href={`/dashboard/events/${id}`}>
         <div className="h-full flex items-center space-x-5">
-          <div className="max-w-28 sm:max-w-20">
-            <div className="flex flex-col justify-center items-center">
-              <span className="text-xs text-custom-gray-paragraph">
-                {dayOfWeek}
-              </span>
-              <span className="text-lg font-app-medium text-custom-gray-heading">
-                {day}
-              </span>
-              <span className="text-xs text-custom-gray-paragraph">
-                {month}
-              </span>
+          {event_start_date && (
+            <div className="max-w-28 sm:max-w-20">
+              <div className="flex flex-col justify-center items-center">
+                <span className="text-xs text-custom-gray-paragraph">
+                  {dayOfWeek}
+                </span>
+                <span className="text-lg font-app-medium text-custom-gray-heading">
+                  {day}
+                </span>
+                <span className="text-xs text-custom-gray-paragraph">
+                  {month}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
           <div className="hidden sm:block w-1/3 h-full min-h-20 relative rounded-lg bg-orange-50">
             {banner && (
               <Image
@@ -64,12 +66,16 @@ export const EventCardPreview: React.FC<IEventCardPreviewProps> = ({
           <div className="flex flex-col flex-1 space-y-4">
             <div className="flex flex-col space-y-2 py-2">
               <div className="flex flex-col">
-                <span className="font-app-medium">
-                  {truncateString(title as string, 25)}
-                </span>
-                <span className="text-xs text-custom-gray-paragraph">
-                  {location}
-                </span>
+                {title && (
+                  <span className="font-app-medium">
+                    {truncateString(title as string, 25)}
+                  </span>
+                )}
+                {location && (
+                  <span className="text-xs text-custom-gray-paragraph">
+                    {location}
+                  </span>
+                )}
               </div>
               {description && (
                 <span className="text-sm text-custom-gray-paragraph font-light leading-snug">

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -70,22 +69,26 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
             )}
           </div>
           <div className="space-y-2 w-full sm:w-1/2">
-            <div className="space-y-1">
-              <h3 className="text-sm text-gray-600 font-bold">Starts</h3>
-              <div className="flex space-x-2 items-center">
-                <span className="text-xs">
-                  {formatDateLong(event_start_date as string)}
-                </span>
+            {event_start_date && (
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Starts</h3>
+                <div className="flex space-x-2 items-center">
+                  <span className="text-xs">
+                    {formatDateLong(event_start_date as string)}
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm text-gray-600 font-bold">Ends</h3>
-              <div className="flex space-x-2 items-center">
-                <span className="text-xs">
-                  {formatDateLong(event_end_date as string)}
-                </span>
+            )}
+            {event_end_date && (
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Ends</h3>
+                <div className="flex space-x-2 items-center">
+                  <span className="text-xs">
+                    {formatDateLong(event_end_date as string)}
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
             {website && (
               <div className="space-y-1">
                 <h3 className="text-sm text-gray-600 font-bold">Website</h3>
@@ -136,9 +139,11 @@ export const EventCardMain: React.FC<IEventCardMainProps> = ({
               ? "Event Ended"
               : "In progress"}
           </span>
-          <p className="text-gray-800 text-xl font-app-medium leading-relaxed">
-            {title}
-          </p>
+          {title && (
+            <p className="text-gray-800 text-xl font-app-medium leading-relaxed">
+              {title}
+            </p>
+          )}
           {meeting_link && (
             <p className="text-xs text-blue-800">{meeting_link}</p>
           )}
