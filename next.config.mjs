@@ -7,6 +7,7 @@ const nextConfig = {
   //   return config;
   // },
   // reactStrictMode: false,
+  productionBrowserSourceMaps: true,
   images: {
     remotePatterns: [
       {
