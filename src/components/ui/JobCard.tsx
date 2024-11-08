@@ -47,17 +47,19 @@ export const JobCard: React.FC<IJobCardProps> = ({ job }) => {
             )}
           </div>
           <div className="space-y-1">
-            <span className="flex items-center space-x-2">
-              <Image src="/icons/link-2.svg" alt="" width={15} height={15} />
-              <Link
-                href={website as string}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-blue-800 break-all"
-              >
-                {website}
-              </Link>
-            </span>
+            {website && (
+              <span className="flex items-center space-x-2">
+                <Image src="/icons/link-2.svg" alt="" width={15} height={15} />
+                <Link
+                  href={website as string}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-800 break-all"
+                >
+                  {website}
+                </Link>
+              </span>
+            )}
             {application_url && (
               <span className="flex items-center space-x-2">
                 {/* Todo: Icon with text */}

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,6 +8,7 @@ import { WithTooltip } from "./WithTooltip";
 import { Comments } from "./Comments";
 import TopIconBar from "./TopIconBar";
 import ShareComponent from "./ShareComponent";
+
 interface IJobCardMainProps {
   job: Partial<Job>;
   isOwner?: boolean;
@@ -83,14 +83,16 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
         <div className="space-y-3 border-b border-b-gray-200 pb-4">
           <h3 className="text-sm font-bold">Details</h3>
           <div className="flex-1 grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
-            <div className="space-y-1">
-              <h3 className="text-sm text-gray-600 font-bold">Deadline</h3>
-              <div className="flex space-x-2 items-center">
-                <span className="text-xs">
-                  {formatDateLong(deadline as string)}
-                </span>
+            {deadline && (
+              <div className="space-y-1">
+                <h3 className="text-sm text-gray-600 font-bold">Deadline</h3>
+                <div className="flex space-x-2 items-center">
+                  <span className="text-xs">
+                    {formatDateLong(deadline as string)}
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
             {website && (
               <div className="space-y-1">
                 <h3 className="text-sm text-gray-600 font-bold">Website</h3>
@@ -133,10 +135,14 @@ export const JobCardMain: React.FC<IJobCardMainProps> = ({
             </div>
           </div>
         </div>
-        <div className="space-y-2 border-b border-b-gray-200 pb-4">
-          <h3 className="text-sm font-bold">Description</h3>
-          <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
-        </div>
+        {description && (
+          <div className="space-y-2 border-b border-b-gray-200 pb-4">
+            <h3 className="text-sm font-bold">Description</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              {description}
+            </p>
+          </div>
+        )}
         {skills && !!skills.length && (
           <div className="space-y-2 border-b border-b-gray-200 pb-4">
             <h3 className="text-sm font-bold">Skills</h3>

@@ -184,10 +184,14 @@ export const ProjectCardMain: React.FC<IProjectCardMainProps> = ({
             )}
           </div>
         </div>
-        <div className="space-y-2 border-b border-b-gray-200 pb-4">
-          <h3 className="text-sm font-bold">Description</h3>
-          <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
-        </div>
+        {description && (
+          <div className="space-y-2 border-b border-b-gray-200 pb-4">
+            <h3 className="text-sm font-bold">Description</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              {description}
+            </p>
+          </div>
+        )}
         {attachment && (
           <div className="w-full border-b border-b-gray-200 py-4">
             <div className="space-y-2 w-2/3">
