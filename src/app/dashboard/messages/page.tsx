@@ -158,7 +158,8 @@ export default function MessagesPage() {
                         conversation.participants.participant?.profile
                           .first_name +
                         " " +
-                        conversation.participants.participant?.profile.last_name
+                        conversation.participants.participant?.profile
+                          ?.last_name
                       )
                         .toLowerCase()
                         .includes(searchTerm.toLowerCase());
@@ -177,7 +178,7 @@ export default function MessagesPage() {
                           <div className="relative">
                             <AvatarComponent
                               avatar={
-                                conversation.participants?.participant.profile
+                                conversation.participants?.participant?.profile
                                   .avatar
                               }
                               className="w-10 h-10"
@@ -197,10 +198,10 @@ export default function MessagesPage() {
                           </div>
                           <div className="flex flex-col space-y-1">
                             <span className="font-app-medium text-sm">
-                              {conversation.participants?.participant.profile
+                              {conversation.participants?.participant?.profile
                                 .first_name +
                                 " " +
-                                conversation.participants?.participant.profile
+                                conversation.participants?.participant?.profile
                                   .last_name}
                             </span>
                             {conversation.latest_message?.text && (
@@ -242,23 +243,23 @@ export default function MessagesPage() {
                     <div className="flex items-center space-x-3">
                       <AvatarComponent
                         avatar={
-                          activeConversation.participants.participant.profile
+                          activeConversation.participants?.participant?.profile
                             .avatar
                         }
                         className="w-10 h-10"
                       />
                       <div className="flex flex-col">
                         <span className="font-app-medium">
-                          {activeConversation.participants?.participant.profile
+                          {activeConversation.participants?.participant?.profile
                             .first_name +
                             " " +
-                            activeConversation.participants?.participant.profile
-                              .last_name}
+                            activeConversation.participants?.participant
+                              ?.profile.last_name}
                         </span>
                         <span className="text-xs-sm text-gray-600">
                           {
-                            activeConversation.participants?.participant.profile
-                              .title
+                            activeConversation.participants?.participant
+                              ?.profile.title
                           }
                         </span>
                         {activeConversation.participants?.participant
@@ -311,9 +312,9 @@ export default function MessagesPage() {
                                         avatar={
                                           msg.sender?.uuid === user.id
                                             ? activeConversation.participants
-                                                ?.user.profile.avatar
+                                                ?.user?.profile.avatar
                                             : activeConversation.participants
-                                                ?.participant.profile.avatar
+                                                ?.participant?.profile.avatar
                                         }
                                         className="w-10 h-10"
                                       />
@@ -448,7 +449,7 @@ export default function MessagesPage() {
               connectionsData.following.map((connection: Connection) => {
                 return (
                   <div
-                    key={connection.profile_id}
+                    key={connection?.profile_id}
                     className="border-b border-b-gray-200 pb-4 last:border-0"
                   >
                     <ProfilePreviewCard
