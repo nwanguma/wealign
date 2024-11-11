@@ -86,7 +86,7 @@ export default function MessagesPage() {
       const message = {
         text: inputMessage,
         user_id: user.id,
-        receiver_id: activeConversation.participants?.participant.id,
+        receiver_id: activeConversation.participants?.participant?.id,
         conversation_id: activeConversation.id,
       };
 
@@ -185,7 +185,7 @@ export default function MessagesPage() {
                             />
                             {isWithinLast10Minutes(
                               conversation.participants?.participant
-                                .last_seen as Date
+                                ?.last_seen as Date
                             ) && (
                               <span
                                 className="absolute bottom-1 right-0 flex bg-green-600 text-white rounded-full text-xs items-center justify-center"
@@ -267,7 +267,7 @@ export default function MessagesPage() {
                           <span className="text-xs text-gray-500 mt-2">
                             {timeAgo(
                               activeConversation.participants?.participant
-                                .last_seen
+                                ?.last_seen
                             )}
                           </span>
                         )}
@@ -335,9 +335,9 @@ export default function MessagesPage() {
                                         avatar={
                                           msg.sender?.uuid === user.id
                                             ? activeConversation.participants
-                                                ?.user.profile.avatar
+                                                ?.user.profile?.avatar
                                             : activeConversation.participants
-                                                ?.participant.profile.avatar
+                                                ?.participant?.profile.avatar
                                         }
                                         className="w-10 h-10"
                                       />
