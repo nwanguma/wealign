@@ -64,11 +64,11 @@ export const useFollow = (handleCloseModal?: () => void) => {
         dispatch(setLatestConversation(data.id));
       } else {
         dispatch(addToConversations(data));
-
-        setTimeout(() => {
-          router.push("/dashboard/messages");
-        }, 2000);
       }
+
+      setTimeout(() => {
+        router.push("/dashboard/messages");
+      }, 2000);
     },
     onError: (error: CustomError) => {
       errorToastWithCustomError(error);
