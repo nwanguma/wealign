@@ -1,7 +1,5 @@
 # **WeAlign: Connecting Developers, Building Businesses**
 
-[WeAlign Logo]
-
 ## **Overview**
 
 WeAlign is a platform designed to help developers transform their side projects into real businesses. By enabling developers to find collaborators, discover tech events, read insightful articles, and more, WeAlign empowers the developer community to align their passions with real-world opportunities.
