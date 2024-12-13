@@ -1,38 +1,44 @@
-# WeAlign
+# **WeAlign: Connecting Developers, Building Businesses**
 
-This is the client-side application of WeAlign, a platform designed to help developers turn side projects into actual businesses by enabling collaboration, event discovery, and sharing resources.
+[WeAlign Logo]
 
-## 🌟 Project Overview
+## **Overview**
 
-WeAlign connects developers with like-minded collaborators, helping them find events, articles, and other resources that are essential for turning side projects into successful ventures.
+WeAlign is a platform designed to help developers transform their side projects into real businesses. By enabling developers to find collaborators, discover tech events, read insightful articles, and more, WeAlign empowers the developer community to align their passions with real-world opportunities.
 
-## 🛠️ Tech Stack
+**Mission**: To help developers bridge the gap between side projects and business ventures by providing the tools and connections they need to succeed.
 
-- **Frontend Framework:** [Next.js](https://nextjs.org/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/) for rapid, responsive design
-- **State Management:** [Redux](https://redux.js.org/) for global state management
-- **Authentication:** JWT (JSON Web Token)
-- **Routing:** Next.js dynamic routing
+## **Features**
 
-## 🚀 Features
+- **Find Collaborators**: Easily connect with developers and co-founders to bring your ideas to life.
+- **Discover Tech Events**: Stay up-to-date with the latest tech conferences, meetups, and events happening around the world.
+- **Read Articles**: Curated content and resources to help developers grow, innovate, and stay ahead of industry trends.
+- **Turn Ideas into Businesses**: Tools and a network that supports your journey from idea to viable business.
 
-- **User Authentication:** Sign up, log in, and manage user profiles.
-- **Collaborator Discovery:** Users can browse and join projects, view collaborator profiles.
-- **Event Listings:** Discover and attend tech events that align with your side projects.
-- **Article & Resource Sharing:** Read and share helpful articles and resources.
-- **Real-time Notifications:** Get updates on project status, new events, and collaborators.
+## **Tech Stack**
 
-## 🔧 Getting Started
+- **Frontend**: React.js, Next.js, TypeScript
+- **Backend**: NestJS, Node.js, PostgreSQL
+- **Deployment**: Docker, Fly.io
+- **Authentication**: JWT, OAuth
+- **Database**: PostgreSQL
 
-### Prerequisites
+## **How It Works**
 
-Before you begin, ensure you have the following installed:
+1. **Sign Up**: Create an account with your details.
+2. **Create a Project**: Post your project idea, specifying the skills and collaborators you're looking for.
+3. **Connect with Collaborators**: Browse through profiles and match with developers who share your vision.
+4. **Join Events**: Stay informed about events that match your interests and goals.
+5. **Read & Learn**: Access a library of articles, tutorials, and insights tailored for developers.
 
-- [Node.js](https://nodejs.org/en/) (version 16.x or higher)
-- [npm](https://www.npmjs.com/) (Node Package Manager)
-- A running backend API, please contact me via [email](mailto:nwangumat@gmail.com) for access to API.
+## **Installation**
 
-### Installation
+### **Prerequisites**
+
+- Node.js (v16 or higher)
+- Docker (optional, for containerized deployment)
+
+### **Steps to Run Locally**
 
 1. Clone the repository:
 
@@ -47,33 +53,37 @@ Before you begin, ensure you have the following installed:
    npm install
    ```
 
-3. Set up environment variables:
+3. Set up your `.env.local` file (refer to `env.example` for required variables):
 
-   Create a `.env.local` file in the root of the project and add the necessary environment variables:
-
-   ```env
-   NEXT_PUBLIC_API_URL=http://localhost:8000  # Your backend URL
-   NEXT_PUBLIC_AUTH_URL=http://localhost:8000/auth  # Auth endpoint
+   ```bash
+   cp env.example .env.local
    ```
 
-4. Start the development server:
+4. Start the application:
 
    ```bash
    npm run dev
    ```
 
-5. Open the app in your browser:
+5. The app should now be running at [http://localhost:3000](http://localhost:3000).
 
-   Visit `http://localhost:3000` to see the app running locally.
+## **Contributing**
 
-## 📚 Resources
+The backend of WeAlign is currently private, and access to it is required to fully run the frontend or understand the API structure. If you're interested in contributing to the frontend or backend, please reach out to request access to the backend.
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Axios Documentation](https://axios-http.com/docs/intro)
+### **How to Contribute**
 
-## 🚨 License
+1. **Request Backend Access**: To work on the frontend or contribute to the backend, please contact us to request access to the backend. We will evaluate your request and provide the necessary access for collaboration.
+2. Fork the repository.
+3. Create a new branch for your feature or bug fix.
+4. Make your changes.
+5. Run tests (if applicable) to ensure everything works as expected.
+6. Create a pull request detailing your changes.
 
-This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+We appreciate all contributions and are excited to collaborate with you!
 
----
+## **Contact**
+
+For any questions, feedback, or suggestions, feel free to reach out:
+
+- Email: nwangumat @ gmail dot com
